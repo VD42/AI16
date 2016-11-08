@@ -31,6 +31,8 @@ void MyStrategy::Init(const model::Game & g)
 
 	LaneType type = (LaneType)(rand() % 3);
 
+	type = LANE_MIDDLE; // middle rush
+
 	if (type == LANE_TOP)
 	{
 		m_tWaypoints = {
@@ -54,10 +56,27 @@ void MyStrategy::Init(const model::Game & g)
 			second = { 600.0, fMapSize - 200.0 };
 		else
 			second = { 200.0, fMapSize - 600.0 };
-		m_tWaypoints = {
+		/*m_tWaypoints = {
 			{ 100.0, fMapSize - 100.0 },
 			second,
 			{ 800.0, fMapSize - 800.0 },
+			{ fMapSize - 600.0, 600.0 }
+		};*/
+		m_tWaypoints = {
+			{ 100.0, fMapSize - 100.0 },
+			second,
+			{ 800.0, fMapSize - 600.0 },
+			{ 1000.0, fMapSize - 800.0 },
+			{ 1200.0, fMapSize - 1000.0 },
+			{ 1400.0, fMapSize - 1200.0 },
+			{ 1600.0, fMapSize - 1400.0 },
+			{ 1800.0, fMapSize - 1600.0 },
+			{ 2000.0, fMapSize - 1800.0 },
+			{ 2200.0, fMapSize - 2000.0 },
+			{ 2400.0, fMapSize - 2600.0 },
+			{ 2600.0, fMapSize - 2800.0 },
+			{ 2800.0, fMapSize - 3000.0 },
+			{ 3000.0, fMapSize - 3200.0 },
 			{ fMapSize - 600.0, 600.0 }
 		};
 	}
@@ -86,8 +105,24 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	Tick();
 }
 
+void MyStrategy::CheckBlock()
+{
+	static int nBlockCounter = 0;
+	static std::pair<double, double> lastWaypoint;
+	if (lastWaypoint == GetNextWaypoint())
+		nBlockCounter++;
+	else
+		nBlockCounter = 0;
+	lastWaypoint = GetNextWaypoint();
+	if (nBlockCounter > 300)
+		GoTo(GetPreviousWaypoint());
+}
+
 void MyStrategy::Tick()
 {
+	if (m_state.world.getTickIndex() < 333)
+		return;
+
 	m_state.move.setStrafeSpeed((rand() % 2) ? m_state.game.getWizardStrafeSpeed() : -m_state.game.getWizardStrafeSpeed());
 
 	if (m_state.self.getLife() < m_state.self.getMaxLife() * 0.25)
@@ -115,6 +150,8 @@ void MyStrategy::Tick()
 	}
 
 	GoTo(GetNextWaypoint());
+
+	//CheckBlock();
 }
 
 const LivingUnit * MyStrategy::GetNearestTarget()

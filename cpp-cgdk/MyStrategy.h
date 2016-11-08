@@ -49,6 +49,8 @@ public:
 	void GoTo(std::pair<double, double> point);
 	std::pair<double, double> GetNextWaypoint();
 	std::pair<double, double> GetPreviousWaypoint();
+
+	void CheckBlock();
 };
 
 #endif

@@ -3,3 +3,4 @@
 /cpp-cgdk/.vs
 /key.ppk
 /local-runner/game.log
+*.opendb
