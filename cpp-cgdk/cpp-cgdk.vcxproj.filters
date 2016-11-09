@@ -25,6 +25,9 @@
     <Filter Include="Source Files\model">
       <UniqueIdentifier>{eeedc3fb-d4a0-4c60-8a78-4879474b7f75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{2870ffdb-689b-4939-8a5a-f4e943d0f962}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyStrategy.cpp">
@@ -98,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="csimplesocket\SimpleSocket.cpp">
       <Filter>Source Files\csimplesocket</Filter>
+    </ClCompile>
+    <ClCompile Include="MyStrategy_PathFinding.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="model\World.h">
       <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="MyStrategy_PathFinding.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

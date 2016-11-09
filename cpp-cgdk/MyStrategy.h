@@ -4,6 +4,7 @@
 #define _MY_STRATEGY_H_
 
 #include "Strategy.h"
+#include "MyStrategy_PathFinding.h"
 
 class MyStrategy : public Strategy
 {
@@ -37,6 +38,8 @@ public:
 
 	const model::Game * game;
 	std::vector<std::pair<double, double>> m_tWaypoints;
+
+	CPathFinder m_pathFinder;
 
 	MyStrategy();
     void move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move) override;

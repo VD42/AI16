@@ -15,7 +15,7 @@ const model::World MyStrategy::CState::tmp::w;
 const model::Game MyStrategy::CState::tmp::g;
 model::Move MyStrategy::CState::tmp::m;
 
-MyStrategy::MyStrategy() : m_state(CState::tmp::s, CState::tmp::w, CState::tmp::g, CState::tmp::m)
+MyStrategy::MyStrategy() : m_state(CState::tmp::s, CState::tmp::w, CState::tmp::g, CState::tmp::m), m_pathFinder(*this)
 {
 	srand((unsigned int)time(nullptr));
 	game = nullptr;
@@ -26,6 +26,7 @@ void MyStrategy::Init(const model::Game & g)
 	if (game)
 		return;
 	game = &g;
+	m_pathFinder.Init();
 
 	double fMapSize = game->getMapSize();
 
@@ -64,7 +65,7 @@ void MyStrategy::Init(const model::Game & g)
 		};*/
 		m_tWaypoints = {
 			{ 100.0, fMapSize - 100.0 },
-			second,
+			//second,
 			{ 800.0, fMapSize - 600.0 },
 			{ 1000.0, fMapSize - 800.0 },
 			{ 1200.0, fMapSize - 1000.0 },
@@ -100,8 +101,8 @@ void MyStrategy::Init(const model::Game & g)
 
 void MyStrategy::move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move)
 {
-	Init(game);
 	m_state = CState(self, world, game, move);
+	Init(game);
 	Tick();
 }
 
@@ -120,10 +121,10 @@ void MyStrategy::CheckBlock()
 
 void MyStrategy::Tick()
 {
-	if (m_state.world.getTickIndex() < 333)
+	if (m_state.world.getTickIndex() < 600)
 		return;
 
-	m_state.move.setStrafeSpeed((rand() % 2) ? m_state.game.getWizardStrafeSpeed() : -m_state.game.getWizardStrafeSpeed());
+	//m_state.move.setStrafeSpeed((rand() % 2) ? m_state.game.getWizardStrafeSpeed() : -m_state.game.getWizardStrafeSpeed());
 
 	if (m_state.self.getLife() < m_state.self.getMaxLife() * 0.25)
 	{
@@ -200,10 +201,24 @@ const LivingUnit * MyStrategy::GetNearestTarget()
 
 void MyStrategy::GoTo(std::pair<double, double> point)
 {
+	static std::vector<std::pair<double, double>> last_path;
+	std::vector<std::pair<double, double>> path = m_pathFinder.SearchPath(point.first, point.second, last_path);
+	if ((int)path.size() < 2)
+	{
+		// nothing
+		printf("%d\tNW: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
+	}
+	else
+	{
+		point.first = path[1].first;
+		point.second = path[1].second;
+		printf("%d\tFY: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
+	}
 	double fAngle = m_state.self.getAngleTo(point.first, point.second);
 	m_state.move.setTurn(fAngle);
 	if (std::abs(fAngle) < m_state.game.getStaffSector() / 4.0)
 		m_state.move.setSpeed(m_state.game.getWizardForwardSpeed());
+	last_path = path;
 }
 
 double GetDistanceTo(std::pair<double, double> p1, std::pair<double, double> p2)
