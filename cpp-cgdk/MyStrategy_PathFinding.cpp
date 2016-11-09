@@ -69,25 +69,28 @@ std::vector<std::pair<double, double>> CPathFinder::SearchPath(double X, double 
 {
 	std::vector<std::vector<bool>> coverageMap = GenerateCoverageMap();
 
-	bool bValid = true;
-	int firstStep = -1;
-	for (int step = 0; step < (int)lastPath.size(); step++)
+	if ((int)lastPath.size() > 0 && (int)(lastPath.back().first / m_nTileSize) == (int)(X / m_nTileSize) && (int)(lastPath.back().second / m_nTileSize) == (int)(Y / m_nTileSize))
 	{
-		if (
-			(int)(lastPath[step].first / m_nTileSize) == (int)(m_strategy.m_state.self.getX() / m_nTileSize)
-			&& (int)(lastPath[step].second / m_nTileSize) == (int)(m_strategy.m_state.self.getY() / m_nTileSize)
-		)
-			firstStep = step;
-		if (firstStep == -1)
-			continue;
-		if (!coverageMap[(int)(lastPath[step].first / m_nTileSize)][(int)(lastPath[step].second / m_nTileSize)])
+		bool bValid = true;
+		int firstStep = -1;
+		for (int step = 0; step < (int)lastPath.size(); step++)
 		{
-			bValid = false;
-			break;
+			if (
+				(int)(lastPath[step].first / m_nTileSize) == (int)(m_strategy.m_state.self.getX() / m_nTileSize)
+				&& (int)(lastPath[step].second / m_nTileSize) == (int)(m_strategy.m_state.self.getY() / m_nTileSize)
+				)
+				firstStep = step;
+			if (firstStep == -1)
+				continue;
+			if (!coverageMap[(int)(lastPath[step].first / m_nTileSize)][(int)(lastPath[step].second / m_nTileSize)])
+			{
+				bValid = false;
+				break;
+			}
 		}
+		if (bValid && firstStep > -1)
+			return std::vector<std::pair<double, double>>(lastPath.begin() + firstStep, lastPath.end());
 	}
-	if (bValid && firstStep > -1)
-		return std::vector<std::pair<double, double>>(lastPath.begin() + firstStep, lastPath.end());
 
 	std::vector<std::vector<int>> wayMap(m_nMapSize, std::vector<int>(m_nMapSize, 0));
 
@@ -97,6 +100,7 @@ std::vector<std::pair<double, double>> CPathFinder::SearchPath(double X, double 
 				wayMap[x][y] = std::numeric_limits<int>::max();
 
 	wayMap[(int)(m_strategy.m_state.self.getX() / m_nTileSize)][(int)(m_strategy.m_state.self.getY() / m_nTileSize)] = 1;
+	wayMap[(int)(X / m_nTileSize)][(int)(Y / m_nTileSize)] = 0;
 
 	for (int step = 1; step < 1000; step++)
 	{
@@ -117,12 +121,38 @@ std::vector<std::pair<double, double>> CPathFinder::SearchPath(double X, double 
 					if (x > 0 && y < m_nMapSize - 1 && wayMap[x - 1][y + 1] == 0) wayMap[x - 1][y + 1] = step + 1;
 				}
 	}
-	std::vector<std::pair<double, double>> result;
-	if (wayMap[(int)(X / m_nTileSize)][(int)(Y / m_nTileSize)] == std::numeric_limits<int>::max())
-		return result;
 
 	int lastX = (int)(X / m_nTileSize);
 	int lastY = (int)(Y / m_nTileSize);
+
+	std::vector<std::pair<double, double>> result;
+	if (wayMap[lastX][lastY] == 0)
+	{
+		int metrics = std::numeric_limits<int>::max();
+		int newLastX = lastX;
+		int newlastY = lastY;
+		int startX = (int)(m_strategy.m_state.self.getX() / m_nTileSize);
+		int startY = (int)(m_strategy.m_state.self.getY() / m_nTileSize);
+		for (int x = 0; x < m_nMapSize; x++)
+			for (int y = 0; y < m_nMapSize; y++)
+				if (wayMap[x][y] > 1 && wayMap[x][y] < std::numeric_limits<int>::max())
+					if (std::abs(startX - x) + std::abs(startY - y) < metrics)
+					{
+						newLastX = lastX;
+						newlastY = lastY;
+						metrics = std::abs(startX - x) + std::abs(startY - y);
+					}
+		if (metrics != std::numeric_limits<int>::max())
+		{
+			lastX = newLastX;
+			lastY = newlastY;
+		}
+		else
+		{
+			return result;
+		}
+	}
+	
 	result.insert(result.begin(), std::make_pair(((double)lastX + 0.5) * (double)m_nTileSize, ((double)lastY + 0.5) * (double)m_nTileSize));
 
 	for (int step = wayMap[lastX][lastY] - 1; step > 0; step--)

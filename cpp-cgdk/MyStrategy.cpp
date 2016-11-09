@@ -199,7 +199,7 @@ const LivingUnit * MyStrategy::GetNearestTarget()
 	return pNearestTarget;
 }
 
-void MyStrategy::GoTo(std::pair<double, double> point)
+void MyStrategy::GoTo(std::pair<double, double> point, bool bSecondChance/* = false*/)
 {
 	static std::vector<std::pair<double, double>> last_path;
 	std::vector<std::pair<double, double>> path = m_pathFinder.SearchPath(point.first, point.second, last_path);
@@ -207,12 +207,16 @@ void MyStrategy::GoTo(std::pair<double, double> point)
 	{
 		// nothing
 		printf("%d\tNW: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
+		if (bSecondChance)
+			return; // stay this
+		GoTo(GetPreviousWaypoint(), true);
+		return;
 	}
 	else
 	{
 		point.first = path[1].first;
 		point.second = path[1].second;
-		printf("%d\tFY: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
+		printf("%d\tFW: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
 	}
 	double fAngle = m_state.self.getAngleTo(point.first, point.second);
 	m_state.move.setTurn(fAngle);

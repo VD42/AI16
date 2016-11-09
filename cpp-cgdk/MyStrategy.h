@@ -49,7 +49,7 @@ public:
 	void Init(const model::Game & g);
 
 	const model::LivingUnit * GetNearestTarget();
-	void GoTo(std::pair<double, double> point);
+	void GoTo(std::pair<double, double> point, bool bSecondChance = false);
 	std::pair<double, double> GetNextWaypoint();
 	std::pair<double, double> GetPreviousWaypoint();
 
