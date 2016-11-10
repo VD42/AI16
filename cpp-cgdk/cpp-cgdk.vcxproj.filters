@@ -102,7 +102,7 @@
     <ClCompile Include="csimplesocket\SimpleSocket.cpp">
       <Filter>Source Files\csimplesocket</Filter>
     </ClCompile>
-    <ClCompile Include="MyStrategy_PathFinding.cpp">
+    <ClCompile Include="MyStrategy_Settings.cpp">
       <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -212,7 +212,7 @@
     <ClInclude Include="model\World.h">
       <Filter>Header Files\model</Filter>
     </ClInclude>
-    <ClInclude Include="MyStrategy_PathFinding.h">
+    <ClInclude Include="MyStrategy_Settings.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>

@@ -136,7 +136,7 @@
     <ClCompile Include="model\Wizard.cpp" />
     <ClCompile Include="model\World.cpp" />
     <ClCompile Include="MyStrategy.cpp" />
-    <ClCompile Include="MyStrategy_PathFinding.cpp" />
+    <ClCompile Include="MyStrategy_Settings.cpp" />
     <ClCompile Include="RemoteProcessClient.cpp" />
     <ClCompile Include="Runner.cpp" />
     <ClCompile Include="Strategy.cpp" />
@@ -174,7 +174,7 @@
     <ClInclude Include="model\Wizard.h" />
     <ClInclude Include="model\World.h" />
     <ClInclude Include="MyStrategy.h" />
-    <ClInclude Include="MyStrategy_PathFinding.h" />
+    <ClInclude Include="MyStrategy_Settings.h" />
     <ClInclude Include="RemoteProcessClient.h" />
     <ClInclude Include="Runner.h" />
     <ClInclude Include="Strategy.h" />

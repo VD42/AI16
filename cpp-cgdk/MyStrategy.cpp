@@ -8,255 +8,123 @@
 #include <time.h>
 #include <limits>
 
-using namespace model;
+#include "MyStrategy_Settings.h"
 
-const model::Wizard MyStrategy::CState::tmp::s;
-const model::World MyStrategy::CState::tmp::w;
-const model::Game MyStrategy::CState::tmp::g;
-model::Move MyStrategy::CState::tmp::m;
 
-MyStrategy::MyStrategy() : m_state(CState::tmp::s, CState::tmp::w, CState::tmp::g, CState::tmp::m), m_pathFinder(*this)
+MyStrategy::MyStrategy()
 {
 	srand((unsigned int)time(nullptr));
-	game = nullptr;
-}
-
-void MyStrategy::Init(const model::Game & g)
-{
-	if (game)
-		return;
-	game = &g;
-	m_pathFinder.Init();
-
-	double fMapSize = game->getMapSize();
-
-	LaneType type = (LaneType)(rand() % 3);
-
-	type = LANE_MIDDLE; // middle rush
-
-	if (type == LANE_TOP)
-	{
-		m_tWaypoints = {
-			{ 100.0, fMapSize - 100.0 },
-			{ 100.0, fMapSize - 400.0 },
-			{ 200.0, fMapSize - 800.0 },
-			{ 200.0, fMapSize * 0.75 },
-			{ 200.0, fMapSize * 0.5 },
-			{ 200.0, fMapSize * 0.25},
-			{ 200.0, 200.0 },
-			{ fMapSize * 0.25, 200.0 },
-			{ fMapSize * 0.5, 200.0 },
-			{ fMapSize * 0.75, 200.0 },
-			{ fMapSize - 200.0, 200.0 }
-		};
-	}
-	else if (type == LANE_MIDDLE)
-	{
-		std::pair<double, double> second;
-		if (rand() % 2)
-			second = { 600.0, fMapSize - 200.0 };
-		else
-			second = { 200.0, fMapSize - 600.0 };
-		/*m_tWaypoints = {
-			{ 100.0, fMapSize - 100.0 },
-			second,
-			{ 800.0, fMapSize - 800.0 },
-			{ fMapSize - 600.0, 600.0 }
-		};*/
-		m_tWaypoints = {
-			{ 100.0, fMapSize - 100.0 },
-			//second,
-			{ 800.0, fMapSize - 600.0 },
-			{ 1000.0, fMapSize - 800.0 },
-			{ 1200.0, fMapSize - 1000.0 },
-			{ 1400.0, fMapSize - 1200.0 },
-			{ 1600.0, fMapSize - 1400.0 },
-			{ 1800.0, fMapSize - 1600.0 },
-			{ 2000.0, fMapSize - 1800.0 },
-			{ 2200.0, fMapSize - 2000.0 },
-			{ 2400.0, fMapSize - 2600.0 },
-			{ 2600.0, fMapSize - 2800.0 },
-			{ 2800.0, fMapSize - 3000.0 },
-			{ 3000.0, fMapSize - 3200.0 },
-			{ fMapSize - 600.0, 600.0 }
-		};
-	}
-	else if (type == LANE_BOTTOM)
-	{
-		m_tWaypoints = {
-			{ 100.0, fMapSize - 100.0 },
-			{ 400.0, fMapSize - 100.0 },
-			{ 800.0, fMapSize - 200.0 },
-			{ fMapSize * 0.25, fMapSize - 200.0 },
-			{ fMapSize * 0.5, fMapSize - 200.0 },
-			{ fMapSize * 0.75, fMapSize - 200.0 },
-			{ fMapSize - 200.0, fMapSize - 200.0 },
-			{ fMapSize - 200.0, fMapSize * 0.75 },
-			{ fMapSize - 200.0, fMapSize * 0.5 },
-			{ fMapSize - 200.0, fMapSize * 0.25 },
-			{ fMapSize - 200.0, 200.0 }
-		};
-	}
 }
 
 void MyStrategy::move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move)
 {
-	m_state = CState(self, world, game, move);
-	Init(game);
-	Tick();
-}
+	m_self = &self;
+	m_world = &world;
+	m_game = &game;
+	m_move = &move;
 
-void MyStrategy::CheckBlock()
-{
-	static int nBlockCounter = 0;
-	static std::pair<double, double> lastWaypoint;
-	if (lastWaypoint == GetNextWaypoint())
-		nBlockCounter++;
-	else
-		nBlockCounter = 0;
-	lastWaypoint = GetNextWaypoint();
-	if (nBlockCounter > 300)
-		GoTo(GetPreviousWaypoint());
-}
+	std::pair<double, double> result = { 0.0, 0.0 };
 
-void MyStrategy::Tick()
-{
-	if (m_state.world.getTickIndex() < 600)
-		return;
+	AddPower(result, CalcPower(m_game->getMapSize() - 800.0, 800.0, 1.0)); // enemy base
 
-	//m_state.move.setStrafeSpeed((rand() % 2) ? m_state.game.getWizardStrafeSpeed() : -m_state.game.getWizardStrafeSpeed());
-
-	if (m_state.self.getLife() < m_state.self.getMaxLife() * 0.25)
+	for (auto & unit : m_world->getBuildings())
 	{
-		GoTo(GetPreviousWaypoint());
-		return;
-	}
-
-	const LivingUnit * pNearestTarget = GetNearestTarget();
-	if (pNearestTarget)
-	{
-		double fDistance = m_state.self.getDistanceTo(*pNearestTarget);
-		if (fDistance <= m_state.self.getCastRange())
+		if (unit.getFaction() == m_self->getFaction())
 		{
-			double fAngle = m_state.self.getAngleTo(*pNearestTarget);
-			m_state.move.setTurn(fAngle);
-			if (std::abs(fAngle) < m_state.game.getStaffSector() / 2.0)
-			{
-				m_state.move.setAction(ACTION_MAGIC_MISSILE);
-				m_state.move.setCastAngle(fAngle);
-				m_state.move.setMinCastDistance(fDistance - pNearestTarget->getRadius() + m_state.game.getMagicMissileRadius());
-			}
-			return;
+			if (unit.getType() == model::BUILDING_FACTION_BASE)
+				AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_BASE(*this, unit)));
+			else if (unit.getType() == model::BUILDING_GUARDIAN_TOWER)
+				AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_TOWER(*this, unit)));
+		}
+		else
+		{
+			if (unit.getType() == model::BUILDING_FACTION_BASE)
+				AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_BASE(*this, unit)));
+			else if (unit.getType() == model::BUILDING_GUARDIAN_TOWER)
+				AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_TOWER(*this, unit)));
 		}
 	}
 
-	GoTo(GetNextWaypoint());
-
-	//CheckBlock();
-}
-
-const LivingUnit * MyStrategy::GetNearestTarget()
-{
-	const LivingUnit * pNearestTarget = nullptr;
-	double fNearestTargetDistance = std::numeric_limits<double>::max();
-
-	for (auto & target : m_state.world.getBuildings())
+	for (auto & unit : m_world->getWizards())
 	{
-		if (target.getFaction() == FACTION_NEUTRAL || target.getFaction() == m_state.self.getFaction())
+		if (unit.isMe())
 			continue;
-		double fDistance = m_state.self.getDistanceTo(target);
-		if (fDistance < fNearestTargetDistance)
-		{
-			pNearestTarget = &target;
-			fNearestTargetDistance = fDistance;
-		}
+		if (unit.getFaction() == m_self->getFaction())
+			AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_WIZARD(*this, unit)));
+		else
+			AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
 	}
 
-	for (auto & target : m_state.world.getWizards())
+	for (auto & unit : m_world->getMinions())
 	{
-		if (target.getFaction() == FACTION_NEUTRAL || target.getFaction() == m_state.self.getFaction())
-			continue;
-		double fDistance = m_state.self.getDistanceTo(target);
-		if (fDistance < fNearestTargetDistance)
-		{
-			pNearestTarget = &target;
-			fNearestTargetDistance = fDistance;
-		}
+		if (unit.getFaction() == m_self->getFaction())
+			AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_CREEP(*this, unit)));
+		else if (unit.getFaction() == model::FACTION_NEUTRAL)
+			AddPower(result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP(*this, unit)));
+		else
+			AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_CREEP(*this, unit)));
 	}
 
-	for (auto & target : m_state.world.getMinions())
-	{
-		if (target.getFaction() == FACTION_NEUTRAL || target.getFaction() == m_state.self.getFaction())
-			continue;
-		double fDistance = m_state.self.getDistanceTo(target);
-		if (fDistance < fNearestTargetDistance)
-		{
-			pNearestTarget = &target;
-			fNearestTargetDistance = fDistance;
-		}
-	}
+	for (auto & unit : m_world->getTrees())
+		AddPower(result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 
-	return pNearestTarget;
+	Step(result);
 }
 
-void MyStrategy::GoTo(std::pair<double, double> point, bool bSecondChance/* = false*/)
+std::pair<double, double> MyStrategy::CalcPower(double X, double Y, double PW)
 {
-	static std::vector<std::pair<double, double>> last_path;
-	std::vector<std::pair<double, double>> path = m_pathFinder.SearchPath(point.first, point.second, last_path);
-	if ((int)path.size() < 2)
-	{
-		// nothing
-		printf("%d\tNW: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
-		if (bSecondChance)
-			return; // stay this
-		GoTo(GetPreviousWaypoint(), true);
-		return;
-	}
-	else
-	{
-		point.first = path[1].first;
-		point.second = path[1].second;
-		printf("%d\tFW: %dx%d\r\n", m_state.world.getTickIndex(), (int)point.first, (int)point.second);
-	}
-	double fAngle = m_state.self.getAngleTo(point.first, point.second);
-	m_state.move.setTurn(fAngle);
-	if (std::abs(fAngle) < m_state.game.getStaffSector() / 4.0)
-		m_state.move.setSpeed(m_state.game.getWizardForwardSpeed());
-	last_path = path;
+	return{ (X - m_self->getX()) / std::hypot(X - m_self->getX(), Y - m_self->getY()) * PW, (Y - m_self->getY()) / std::hypot(X - m_self->getX(), Y - m_self->getY()) * PW };
 }
 
-double GetDistanceTo(std::pair<double, double> p1, std::pair<double, double> p2)
+std::pair<double, double> MyStrategy::CalcPower(const model::CircularUnit & unit, double PW)
 {
-	double xRange = p1.first - p2.first;
-	double yRange = p1.second - p2.second;
-	return sqrt(xRange * xRange + yRange * yRange);
+	return CalcPower(unit.getX(), unit.getY(), PW);
 }
 
-std::pair<double, double> MyStrategy::GetNextWaypoint()
+void MyStrategy::AddPower(std::pair<double, double> & result, std::pair<double, double> & add)
 {
-	int nLastWaypointIndex = (int)m_tWaypoints.size() - 1;
-	auto lastWaypoint = m_tWaypoints[nLastWaypointIndex];
-	for (int i = 0; i < nLastWaypointIndex; i++)
-	{
-		auto waypoint = m_tWaypoints[i];
-		if (m_state.self.getDistanceTo(waypoint.first, waypoint.second) <= 100.0)
-			return m_tWaypoints[i + 1];
-		if (GetDistanceTo(lastWaypoint, waypoint) < m_state.self.getDistanceTo(lastWaypoint.first, lastWaypoint.second))
-			return waypoint;
-	}
-	return lastWaypoint;
+	result.first += add.first;
+	result.second += add.second;
 }
 
-std::pair<double, double> MyStrategy::GetPreviousWaypoint()
+void MyStrategy::Step(std::pair<double, double> direction)
 {
-	auto firstWaypoint = m_tWaypoints[0];
-	for (int i = (int)m_tWaypoints.size() - 1; i > 0; i--)
+	double angleFrom = m_self->getAngle();
+	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
+	
+	m_move->setSpeed(0.0);
+	m_move->setStrafeSpeed(0.0);
+
+	if (0 <= angle && angle <= PI / 2.0)
 	{
-		auto waypoint = m_tWaypoints[i];
-		if (m_state.self.getDistanceTo(waypoint.first, waypoint.second) <= 100.0)
-			return m_tWaypoints[i - 1];
-		if (GetDistanceTo(firstWaypoint, waypoint) < m_state.self.getDistanceTo(firstWaypoint.first, firstWaypoint.second))
-			return waypoint;
+		m_move->setTurn(angle);
+		m_move->setSpeed(m_game->getWizardForwardSpeed());
 	}
-	return firstWaypoint;
+	else if (PI / 2.0 < angle && angle <= PI)
+	{
+		m_move->setTurn(angle - PI / 2.0);
+		m_move->setStrafeSpeed(m_game->getWizardForwardSpeed());
+	}
+	else if (angle > PI)
+	{
+		// TODO
+		m_move->setTurn(angle);
+		m_move->setSpeed(m_game->getWizardForwardSpeed());
+	}
+	else if (-PI / 2.0 <= angle && angle < 0.0)
+	{
+		m_move->setTurn(angle);
+		m_move->setSpeed(m_game->getWizardForwardSpeed());
+	}
+	else if (-PI <= angle && angle < -PI / 2.0)
+	{
+		m_move->setTurn(angle + PI / 2.0);
+		m_move->setStrafeSpeed(-m_game->getWizardForwardSpeed());
+	}
+	else if (angle < PI)
+	{
+		// TODO
+		m_move->setTurn(angle);
+		m_move->setSpeed(m_game->getWizardForwardSpeed());
+	}
 }
