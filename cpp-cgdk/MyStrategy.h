@@ -7,8 +7,9 @@ class MyStrategy : public Strategy
 private:
 	std::pair<double, double> CalcPower(double X, double Y, double PW);
 	std::pair<double, double> CalcPower(const model::CircularUnit & unit, double PW);
-	void MyStrategy::AddPower(std::pair<double, double> & result, std::pair<double, double> & add);
+	void AddPower(std::pair<double, double> & result, std::pair<double, double> add);
 
+	bool Shoot();
 	void Step(std::pair<double, double> direction);
 
 public:
