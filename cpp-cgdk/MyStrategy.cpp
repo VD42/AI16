@@ -14,6 +14,7 @@
 MyStrategy::MyStrategy()
 {
 	srand((unsigned int)time(nullptr));
+	m_file.open("dump.txt", std::ofstream::out | std::ofstream::binary);
 }
 
 void MyStrategy::move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move)
@@ -23,28 +24,66 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_game = &game;
 	m_move = &move;
 
+	m_tPowers.clear();
+
 	std::pair<double, double> result = { 0.0, 0.0 };
 
-	AddPower(result, CalcPower(m_game->getMapSize() - 800.0, 800.0, 10.0)); // enemy base
+	std::vector<std::pair<double, double>> m_tWaypoints = {
+		{ 100.0, m_game->getMapSize() - 100.0 },
+		{ 800.0, m_game->getMapSize() - 800.0 },
+		{ 1000.0, m_game->getMapSize() - 1000.0 },
+		{ 1200.0, m_game->getMapSize() - 1200.0 },
+		{ 1400.0, m_game->getMapSize() - 1400.0 },
+		{ 1600.0, m_game->getMapSize() - 1600.0 },
+		{ 1800.0, m_game->getMapSize() - 1800.0 },
+		{ 2000.0, m_game->getMapSize() - 2000.0 },
+		{ 2200.0, m_game->getMapSize() - 2200.0 },
+		{ 2400.0, m_game->getMapSize() - 2400.0 },
+		{ 2600.0, m_game->getMapSize() - 2600.0 },
+		{ 2800.0, m_game->getMapSize() - 2800.0 },
+		{ 3000.0, m_game->getMapSize() - 3000.0 },
+		{ m_game->getMapSize() - 600.0, 600.0 }
+	};
+
+	int nearestwaypoint = 0;
+	for (int i = 1; i < (int)m_tWaypoints.size(); i++)
+	{
+		if (std::hypot(m_tWaypoints[i].first - m_self->getX(), m_tWaypoints[i].second - m_self->getY()) < std::hypot(m_tWaypoints[nearestwaypoint].first - m_self->getX(), m_tWaypoints[nearestwaypoint].second - m_self->getY()))
+			nearestwaypoint = i;
+	}
+	m_tWaypoints.assign(m_tWaypoints.begin() + nearestwaypoint, m_tWaypoints.end());
 
 	if (m_self->getLife() < m_self->getMaxLife() * 0.5)
-		AddPower(result, CalcPower(800.0, m_game->getMapSize() - 800.0, 1000.0)); // friendly base
+		AddPower("heal", result, CalcPower(600.0, m_game->getMapSize() - 600.0, 1000.0)); // friendly base
+
+	double step = 0.0;
+	int nIndex = 0;
+	for (auto & waypoint : m_tWaypoints)
+	{
+		step += 10.0;
+		char buf[128];
+		sprintf(buf, "%d", nIndex);
+		AddPower("waypoint " + std::string(buf), result, CalcPower(waypoint.first, waypoint.second, step));
+		nIndex++;
+	}
 
 	for (auto & unit : m_world->getBuildings())
 	{
+		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+
 		if (unit.getFaction() == m_self->getFaction())
 		{
 			if (unit.getType() == model::BUILDING_FACTION_BASE)
-				AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_BASE(*this, unit)));
+				AddPower("friendly base", result, CalcPower(unit, CSettings::PW_FRIENDLY_BASE(*this, unit)));
 			else if (unit.getType() == model::BUILDING_GUARDIAN_TOWER)
-				AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_TOWER(*this, unit)));
+				AddPower("friendly tower", result, CalcPower(unit, CSettings::PW_FRIENDLY_TOWER(*this, unit)));
 		}
 		else
 		{
 			if (unit.getType() == model::BUILDING_FACTION_BASE)
-				AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_BASE(*this, unit)));
+				AddPower("enemy base", result, CalcPower(unit, CSettings::PW_ENEMY_BASE(*this, unit)));
 			else if (unit.getType() == model::BUILDING_GUARDIAN_TOWER)
-				AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_TOWER(*this, unit)));
+				AddPower("enemy tower", result, CalcPower(unit, CSettings::PW_ENEMY_TOWER(*this, unit)));
 		}
 	}
 
@@ -52,13 +91,17 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	{
 		if (unit.isMe())
 			continue;
+
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getVisionRange())
 			continue;
+
+		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+
 		if (unit.getFaction() == m_self->getFaction())
-			AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_WIZARD(*this, unit)));
+			AddPower("friendly wizard", result, CalcPower(unit, CSettings::PW_FRIENDLY_WIZARD(*this, unit)));
 		else
-			AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
+			AddPower("enemy wizard", result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
 	}
 
 	for (auto & unit : m_world->getMinions())
@@ -66,12 +109,15 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getVisionRange())
 			continue;
+
+		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+
 		if (unit.getFaction() == m_self->getFaction())
-			AddPower(result, CalcPower(unit, CSettings::PW_FRIENDLY_CREEP(*this, unit)));
+			AddPower("friendly creep", result, CalcPower(unit, CSettings::PW_FRIENDLY_CREEP(*this, unit)));
 		else if (unit.getFaction() == model::FACTION_NEUTRAL)
-			AddPower(result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP(*this, unit)));
+			AddPower("neutral creep", result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP(*this, unit)));
 		else
-			AddPower(result, CalcPower(unit, CSettings::PW_ENEMY_CREEP(*this, unit)));
+			AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP(*this, unit)));
 	}
 
 	for (auto & unit : m_world->getTrees())
@@ -79,11 +125,25 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getVisionRange())
 			continue;
-		AddPower(result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
+
+		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+
+		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 	}
 
-	if (std::abs(result.first) + std::abs(result.second) >= 200.0 || !Shoot())
-		Step(result);
+	Step(result);
+	Shoot(result);
+
+	m_file << m_world->getTickIndex() << "\r\n";
+	m_file << m_tPowers.size() << "\r\n";
+	for (auto & item : m_tPowers)
+	{
+		m_file << item.first << "\r\n";
+		m_file << item.second.first << "\r\n";
+		m_file << item.second.second << "\r\n";
+	}
+
+	m_file.flush();
 }
 
 std::pair<double, double> MyStrategy::CalcPower(double X, double Y, double PW)
@@ -96,14 +156,21 @@ std::pair<double, double> MyStrategy::CalcPower(const model::CircularUnit & unit
 	return CalcPower(unit.getX(), unit.getY(), PW);
 }
 
-void MyStrategy::AddPower(std::pair<double, double> & result, std::pair<double, double> add)
+void MyStrategy::AddPower(std::string comment, std::pair<double, double> & result, std::pair<double, double> add)
 {
+	m_tPowers.push_back(std::make_pair(comment, add));
 	result.first += add.first;
 	result.second += add.second;
 }
 
-bool MyStrategy::Shoot()
+void MyStrategy::Shoot(std::pair<double, double> direction)
 {
+	if (std::abs(direction.first) + std::abs(direction.second) > 1000.0)
+		return;
+
+	const model::CircularUnit * target = nullptr;
+	double MAX_PRIORITY = 0.0;
+
 	for (auto & unit : m_world->getMinions())
 	{
 		if (unit.getFaction() == m_self->getFaction() || unit.getFaction() == model::FACTION_NEUTRAL)
@@ -111,15 +178,12 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double angle = m_self->getAngleTo(unit);
-		m_move->setTurn(angle);
-		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+		double P = 100.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (P > MAX_PRIORITY)
 		{
-			m_move->setAction(model::ACTION_MAGIC_MISSILE);
-			m_move->setCastAngle(angle);
-			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getMagicMissileRadius());
+			target = &unit;
+			MAX_PRIORITY = P;
 		}
-		return true;
 	}
 
 	for (auto & unit : m_world->getWizards())
@@ -129,15 +193,12 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double angle = m_self->getAngleTo(unit);
-		m_move->setTurn(angle);
-		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+		double P = 75.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (P > MAX_PRIORITY)
 		{
-			m_move->setAction(model::ACTION_MAGIC_MISSILE);
-			m_move->setCastAngle(angle);
-			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getMagicMissileRadius());
+			target = &unit;
+			MAX_PRIORITY = P;
 		}
-		return true;
 	}
 
 	for (auto & unit : m_world->getBuildings())
@@ -147,22 +208,50 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double angle = m_self->getAngleTo(unit);
+		double P = 50.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (P > MAX_PRIORITY)
+		{
+			target = &unit;
+			MAX_PRIORITY = P;
+		}
+	}
+
+	for (auto & unit : m_world->getTrees())
+	{
+		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+		if (D > m_self->getCastRange())
+			continue;
+		//double angle = m_self->getAngleTo(unit);
+		//if (std::abs(angle) < -PI / 4.0 || std::abs(angle) > PI / 4.0)
+		//	continue;
+		if (std::abs(direction.first) + std::abs(direction.second) > 10.0)
+			continue;
+		double P = 10.0 * (1.0 / (D + 1.0));
+		if (P > MAX_PRIORITY)
+		{
+			target = &unit;
+			MAX_PRIORITY = P;
+		}
+	}
+
+	if (target)
+	{
+		double D = std::hypot(m_self->getX() - target->getX(), m_self->getY() - target->getY());
+		double angle = m_self->getAngleTo(*target);
 		m_move->setTurn(angle);
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
 		{
 			m_move->setAction(model::ACTION_MAGIC_MISSILE);
 			m_move->setCastAngle(angle);
-			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getMagicMissileRadius());
+			m_move->setMinCastDistance(D - target->getRadius() + m_game->getMagicMissileRadius());
 		}
-		return true;
 	}
-
-	return false;
 }
 
 void MyStrategy::Step(std::pair<double, double> direction)
 {
+	printf("%f / %f - ", direction.first, direction.second);
+
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 	
 	m_move->setTurn(0.0);
@@ -171,31 +260,32 @@ void MyStrategy::Step(std::pair<double, double> direction)
 
 	if (-PI / 2.0 <= angle && angle <= PI / 2.0)
 	{
+		printf("F: %f\r\n", angle);
 		m_move->setTurn(angle);
 		m_move->setSpeed(m_game->getWizardForwardSpeed());
 	}
 	else if (PI / 2.0 < angle && angle <= 3.0 * PI / 2.0)
 	{
+		printf("R: %f\r\n", angle - PI / 2.0);
 		m_move->setTurn(angle - PI / 2.0);
 		m_move->setStrafeSpeed(m_game->getWizardStrafeSpeed());
 	}
 	else if (angle > 3.0 * PI / 2.0)
 	{
+		printf("B: %f\r\n", angle - PI);
 		m_move->setTurn(angle - PI);
 		m_move->setSpeed(-m_game->getWizardBackwardSpeed());
 	}
 	else if (-PI / 2.0 >= angle && angle > -3.0 * PI / 2.0)
 	{
+		printf("L: %f\r\n", angle + PI / 2.0);
 		m_move->setTurn(angle + PI / 2.0);
 		m_move->setStrafeSpeed(-m_game->getWizardStrafeSpeed());
 	}
 	else if (angle < -3.0 * PI / 2.0)
 	{
+		printf("B: %f\r\n", angle + PI);
 		m_move->setTurn(angle + PI);
 		m_move->setSpeed(-m_game->getWizardBackwardSpeed());
 	}
-
-	m_move->setAction(model::ACTION_MAGIC_MISSILE);
-	m_move->setCastAngle(angle);
-	m_move->setMinCastDistance(m_self->getCastRange());
 }

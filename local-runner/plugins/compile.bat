@@ -30,4 +30,4 @@ if not "%JAVA_HOME%"=="" (
     )
 )
 
-javac -encoding UTF-8 *.java
+"C:\Program Files\Java\jdk1.8.0_111\bin\javac" -encoding UTF-8 *.java
