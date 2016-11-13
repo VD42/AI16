@@ -12,7 +12,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() + strategy.m_game->getWizardForwardSpeed();
+	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() * 5.0 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
 	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
 
 	double PW = 0.0;
@@ -50,7 +50,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() + strategy.m_game->getWizardForwardSpeed();
+	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() * 1.5 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
 	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
 
 	double PW = 0.0;
@@ -126,17 +126,27 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_game->getWizardForwardSpeed();
+	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_game->getWizardForwardSpeed() * 2.0;
 	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
 
 	double PW = 0.0;
 
-	if (DISTANCE >= MY_RANGE)
-		PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-	else if (DISTANCE < MY_RANGE / 2.0)
-		PW = -500.0;
+	if (strategy.m_self->getLife() > unit.getLife())
+	{
+		if (DISTANCE >= MY_RANGE)
+			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+		else if (DISTANCE < MY_RANGE / 2.0)
+			PW = -500.0;
+		else
+			PW = 0.0;
+	}
 	else
-		PW = 0.0;
+	{
+		if (DISTANCE <= ENEMY_RANGE)
+			PW = -10000.0;
+		else
+			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+	}
 
 	return PW;
 };
