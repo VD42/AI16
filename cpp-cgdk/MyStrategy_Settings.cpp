@@ -31,14 +31,14 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -100.0;
+			PW = -500.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -1000.0;
+			PW = -10000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -69,14 +69,14 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -100.0;
+			PW = -500.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -1000.0;
+			PW = -10000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -107,14 +107,14 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -100.0;
+			PW = -500.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -1000.0;
+			PW = -10000.0;
 		else
 			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -134,7 +134,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	if (DISTANCE >= MY_RANGE)
 		PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	else if (DISTANCE < MY_RANGE / 2.0)
-		PW = -100.0;
+		PW = -500.0;
 	else
 		PW = 0.0;
 
@@ -164,14 +164,14 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 120.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -100.0;
+			PW = -500.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -1000.0;
+			PW = -10000.0;
 		else
 			PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
