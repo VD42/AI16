@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Strategy.h"
+#include "MyStrategy_Global.h"
 
 class MyStrategy : public Strategy
 {
@@ -13,6 +14,8 @@ private:
 	void Step(std::pair<double, double> direction, bool shoot);
 
 public:
+	CGlobal m_global;
+
 	const model::Wizard * m_self;
 	const model::World * m_world;
 	const model::Game * m_game;

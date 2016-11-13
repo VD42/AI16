@@ -4,7 +4,7 @@
 
 const std::function<double(MyStrategy&, const model::Tree&)> CSettings::PW_TREE = [](MyStrategy & strategy, const model::Tree & unit)
 {
-	return -5.0;
+	return -1.0;
 };
 
 
