@@ -1,1 +1,2 @@
-start java -cp ".;*;%~dp0/*" -jar repeater.jar %1
+java -cp ".;*;%~dp0/*" -jar repeater.jar %1
+pause

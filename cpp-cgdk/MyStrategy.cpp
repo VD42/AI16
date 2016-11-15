@@ -172,7 +172,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		waypoint = { pEnMinUnit->getX(), pEnMinUnit->getY() };
 	}
 
-	AddPower("base", result, CalcPower(waypoint.first, waypoint.second, 100.0));
+	AddPower("base", result, CalcPower(waypoint.first, waypoint.second, 150.0));
 
 	Step(result, Shoot());
 }
@@ -206,9 +206,9 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		if (unit.getFaction() == model::FACTION_NEUTRAL && D - m_self->getRadius() - unit.getRadius() > 25.0)
+		if (unit.getFaction() == model::FACTION_NEUTRAL && (D - m_self->getRadius() - unit.getRadius() > 25.0 || std::abs(m_self->getAngleTo(unit)) > PI / 5.0))
 			continue;
-		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 40.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -251,7 +251,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		if (D - m_self->getRadius() - unit.getRadius() > 25.0)
+		if (D - m_self->getRadius() - unit.getRadius() > 25.0 || std::abs(m_self->getAngleTo(unit)) > PI / 5.0)
 			continue;
 		double P = 10.0 * (1.0 / (D + 1.0));
 		if (P > MAX_PRIORITY)
