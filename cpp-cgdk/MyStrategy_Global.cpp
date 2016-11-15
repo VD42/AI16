@@ -2,7 +2,7 @@
 #include "MyStrategy.h"
 
 
-CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLaneChoosed(false), m_strategy(strategy), m_top(LaneState::TOWER_1), m_mid(LaneState::TOWER_1), m_bot(LaneState::TOWER_1), m_bVaidCords(false)
+CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLaneChoosed(false), m_strategy(strategy), m_top(LaneState::TOWER_1), m_mid(LaneState::TOWER_1), m_bot(LaneState::TOWER_1), m_bVaidCords(false), m_bBonusT(false), m_bBonusB(false)
 {
 	m_T1 = { 0.0, 0.0 };
 	m_T2 = { 0.0, 0.0 };
@@ -108,8 +108,8 @@ std::pair<double, double> CGlobal::GetWaypoint()
 {
 	if (m_lane == model::LANE_TOP)
 	{
-		if (m_top == LaneState::TOWER_1) return { (m_strategy.m_self->getY() < 400.0 ? m_T1.first : 200.0), m_T1.second };
-		if (m_top == LaneState::TOWER_2) return { (m_strategy.m_self->getY() < 400.0 ? m_T2.first : 200.0), m_T2.second };
+		if (m_top == LaneState::TOWER_1) return { (m_strategy.m_self->getY() < 400.0 ? m_T1.first : 250.0), m_T1.second };
+		if (m_top == LaneState::TOWER_2) return { (m_strategy.m_self->getY() < 400.0 ? m_T2.first : 250.0), m_T2.second };
 		if (m_top == LaneState::BASE) return { m_BS.first, m_BS.second };
 	}
 	else if (m_lane == model::LANE_MIDDLE)
@@ -120,8 +120,8 @@ std::pair<double, double> CGlobal::GetWaypoint()
 	}
 	else if (m_lane == model::LANE_BOTTOM)
 	{
-		if (m_bot == LaneState::TOWER_1) return { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 400.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 200.0) };
-		if (m_bot == LaneState::TOWER_2) return { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 400.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 200.0) };
+		if (m_bot == LaneState::TOWER_1) return { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 400.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) };
+		if (m_bot == LaneState::TOWER_2) return { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 400.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) };
 		if (m_bot == LaneState::BASE) return { m_BS.first, m_BS.second };
 	}
 	return { m_BS.first, m_BS.second };
@@ -244,6 +244,56 @@ void CGlobal::Update()
 			}
 			if (!bFound)
 				m_bot = LaneState::BASE;
+		}
+	}
+	if (m_strategy.m_world->getTickIndex() % 2500 >= 2400)
+	{
+		m_bBonusT = true;
+		m_bBonusB = true;
+	}
+	else if (m_strategy.m_world->getTickIndex() % 2500 > 2000)
+	{
+		m_bBonusT = false;
+		m_bBonusB = false;
+	}
+	if (m_bBonusT)
+	{
+		if (m_strategy.m_world->getTickIndex() % 2500 < 2400)
+		{
+			if (m_strategy.m_self->getDistanceTo(1200.0, 1200.0) <= m_strategy.m_game->getWizardVisionRange())
+			{
+				bool bFound = false;
+				for (auto & unit : m_strategy.m_world->getBonuses())
+				{
+					if (1200.0 - 0.1 < unit.getX() && unit.getX() < 1200.0 + 0.1 && 1200.0 - 0.1 < unit.getY() && unit.getY() < 1200.0 + 0.1)
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (!bFound)
+					m_bBonusT = false;
+			}
+		}
+	}
+	if (m_bBonusB)
+	{
+		if (m_strategy.m_world->getTickIndex() % 2500 < 2400)
+		{
+			if (m_strategy.m_self->getDistanceTo(2800.0, 2800.0) <= m_strategy.m_game->getWizardVisionRange())
+			{
+				bool bFound = false;
+				for (auto & unit : m_strategy.m_world->getBonuses())
+				{
+					if (2800.0 - 0.1 < unit.getX() && unit.getX() < 2800.0 + 0.1 && 2800.0 - 0.1 < unit.getY() && unit.getY() < 2800.0 + 0.1)
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (!bFound)
+					m_bBonusB = false;
+			}
 		}
 	}
 }

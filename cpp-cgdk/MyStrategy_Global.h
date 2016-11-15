@@ -34,6 +34,9 @@ public:
 	std::pair<double, double> m_B2;
 	std::pair<double, double> m_BS;
 
+	bool m_bBonusT;
+	bool m_bBonusB;
+
 	CGlobal(MyStrategy & strategy);
     model::LaneType GetLane(const model::LivingUnit & unit);
 	void ChooseLane();

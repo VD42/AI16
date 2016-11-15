@@ -26,4 +26,7 @@ public:
 	static const std::function<double(MyStrategy&, const model::Minion&)> PW_NEUTRAL_CREEP_FETISH;
 
 	static const std::function<double(MyStrategy&, const model::CircularUnit&)> PW_CIRCULAR_UNIT;
+
+	static bool HAVE_EMPOWER(MyStrategy & strategy, const model::Wizard & wizard);
+	static bool HAVE_SHIELD(MyStrategy & strategy, const model::Wizard & wizard);
 };

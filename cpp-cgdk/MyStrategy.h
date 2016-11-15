@@ -21,6 +21,8 @@ public:
 	const model::Game * m_game;
 	model::Move * m_move;
 
+	bool m_bSeedReady;
+
 	MyStrategy();
     void move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move) override;
 

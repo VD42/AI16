@@ -4,7 +4,7 @@
 
 const std::function<double(MyStrategy&, const model::Tree&)> CSettings::PW_TREE = [](MyStrategy & strategy, const model::Tree & unit)
 {
-	return -1.0;
+	return -0.5;
 };
 
 
@@ -26,7 +26,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -64,7 +64,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -102,7 +102,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -131,7 +131,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 
 	double PW = 0.0;
 
-	if (strategy.m_self->getLife() > unit.getLife())
+	if ((strategy.m_self->getLife() > unit.getLife()) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -169,7 +169,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 120.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -218,12 +218,78 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_F
 
 const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEUTRAL_CREEP_ORC = [](MyStrategy & strategy, const model::Minion & unit)
 {
-	return 0.0;
+	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
+
+	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() * 5.0 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
+	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+
+	double PW = 0.0;
+
+	for (auto & minion : strategy.m_world->getMinions())
+	{
+		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
+			continue;
+		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
+		if (MINION_DISTANCE < DISTANCE)
+			PW += 1.0;
+	}
+
+	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
+	{
+		if (DISTANCE >= MY_RANGE)
+			PW = 0.0;
+		else if (DISTANCE < MY_RANGE / 2.0)
+			PW = -0.5;
+		else
+			PW = 0.0;
+	}
+	else
+	{
+		if (DISTANCE <= ENEMY_RANGE)
+			PW = -1.0;
+		else
+			PW = 0.0;
+	}
+
+	return PW;
 };
 
 const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEUTRAL_CREEP_FETISH = [](MyStrategy & strategy, const model::Minion & unit)
 {
-	return 0.0;
+	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
+
+	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() * 1.5 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
+	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+
+	double PW = 0.0;
+
+	for (auto & minion : strategy.m_world->getMinions())
+	{
+		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
+			continue;
+		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
+		if (MINION_DISTANCE < DISTANCE)
+			PW += 1.0;
+	}
+
+	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
+	{
+		if (DISTANCE >= MY_RANGE)
+			PW = 0.0;
+		else if (DISTANCE < MY_RANGE / 2.0)
+			PW = -0.5;
+		else
+			PW = 0.0;
+	}
+	else
+	{
+		if (DISTANCE <= ENEMY_RANGE)
+			PW = -1.0;
+		else
+			PW = 0.0;
+	}
+
+	return PW;
 };
 
 
@@ -236,3 +302,23 @@ const std::function<double(MyStrategy&, const model::CircularUnit&)> CSettings::
 		return -10000.0;
 	return -((10000.0 / ((D - 4.0) * (D - 4.0))) - 38.0);
 };
+
+bool CSettings::HAVE_SHIELD(MyStrategy & strategy, const model::Wizard & wizard)
+{
+	for (auto status : wizard.getStatuses())
+	{
+		if (status.getType() == model::STATUS_SHIELDED)
+			return true;
+	}
+	return false;
+}
+
+bool CSettings::HAVE_EMPOWER(MyStrategy & strategy, const model::Wizard & wizard)
+{
+	for (auto status : wizard.getStatuses())
+	{
+		if (status.getType() == model::STATUS_EMPOWERED)
+			return true;
+	}
+	return false;
+}

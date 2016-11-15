@@ -11,9 +11,9 @@
 #include "MyStrategy_Settings.h"
 
 
-MyStrategy::MyStrategy() : m_global(*this)
+MyStrategy::MyStrategy() : m_global(*this), m_bSeedReady(false)
 {
-	srand((unsigned int)time(nullptr));
+	
 }
 
 void MyStrategy::move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move)
@@ -22,6 +22,12 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_world = &world;
 	m_game = &game;
 	m_move = &move;
+
+	if (!m_bSeedReady)
+	{
+		srand((unsigned int)time(nullptr) + m_game->getRandomSeed() + m_self->getId());
+		m_bSeedReady = true;
+	}
 
 	m_global.SetTowerCords();
 	m_global.ChooseLane();
@@ -41,6 +47,9 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, 10000.0));
 	if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 5.0)
 		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
+
+	double enMinBase = 40000.0;
+	const model::CircularUnit * pEnMinUnit = nullptr;
 
 	for (auto & unit : m_world->getBuildings())
 	{
@@ -81,6 +90,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		{
 			if (m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first, waypoint.second))
 				waypoint = { unit.getX(), unit.getY() };
+			if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
+			{
+				enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
+				pEnMinUnit = &unit;
+			}
 			AddPower("enemy wizard", result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
 		}
 	}
@@ -103,6 +117,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			{
 				if (m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first, waypoint.second))
 					waypoint = { unit.getX(), unit.getY() };
+				if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
+				{
+					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
+					pEnMinUnit = &unit;
+				}
 				AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_ORC(*this, unit)));
 			}
 		}
@@ -116,6 +135,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			{
 				if (m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first, waypoint.second))
 					waypoint = { unit.getX(), unit.getY() };
+				if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
+				{
+					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
+					pEnMinUnit = &unit;
+				}
 				AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_FETISH(*this, unit)));
 			}
 		}
@@ -130,6 +154,22 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
+	}
+
+	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) - 100.0))
+	{
+		if (m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
+			waypoint = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 1200.0 };
+	}
+	else if (m_global.m_bBonusB)
+	{
+		if (m_self->getDistanceTo(2800.0, 2800.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(2800.0, 2800.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
+			waypoint = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 2800.0 };
+	}
+
+	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.first) > 1000.0)
+	{
+		waypoint = { pEnMinUnit->getX(), pEnMinUnit->getY() };
 	}
 
 	AddPower("base", result, CalcPower(waypoint.first, waypoint.second, 100.0));
@@ -161,12 +201,14 @@ bool MyStrategy::Shoot()
 
 	for (auto & unit : m_world->getMinions())
 	{
-		if (unit.getFaction() == m_self->getFaction() || unit.getFaction() == model::FACTION_NEUTRAL)
+		if (unit.getFaction() == m_self->getFaction())
 			continue;
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = 100.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (unit.getFaction() == model::FACTION_NEUTRAL && D - m_self->getRadius() - unit.getRadius() > 25.0)
+			continue;
+		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 40.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -238,53 +280,39 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 
-	printf("%d - ", m_global.m_lane);
+	/*printf("%d - ", m_global.m_lane);
 	if (m_global.m_lane == model::LANE_TOP)
 		printf("%d - ", m_global.m_top);
 	if (m_global.m_lane == model::LANE_MIDDLE)
 		printf("%d - ", m_global.m_mid);
 	if (m_global.m_lane == model::LANE_BOTTOM)
 		printf("%d - ", m_global.m_bot);
-	printf("%f / %f / %f - ", direction.first, direction.second, angle);
+	printf("%f / %f / %f - ", direction.first, direction.second, angle);*/
 
 	if (!shoot)
-	{
-		if (std::abs(angle) > PI / 30.0)
-		{
-			m_move->setTurn(angle > 0.0 ? PI / 30.0 : -PI / 30.0);
-		}
-		else
-		{
-			m_move->setTurn(angle);
-		}
-	}
+		m_move->setTurn(angle);
 	
 	m_move->setSpeed(0.0);
 	m_move->setStrafeSpeed(0.0);
 
 	if (-PI / 4.0 <= angle && angle <= PI / 4.0)
 	{
-		printf("F: %f\r\n", angle);
-		m_move->setSpeed(m_game->getWizardForwardSpeed());
+		m_move->setSpeed(m_game->getWizardForwardSpeed() * 10.0);
 	}
 	else if (PI / 4.0 < angle && angle <= 3.0 * PI / 4.0)
 	{
-		printf("R: %f\r\n", angle - PI / 2.0);
-		m_move->setStrafeSpeed(m_game->getWizardStrafeSpeed());
+		m_move->setStrafeSpeed(m_game->getWizardStrafeSpeed() * 10.0);
 	}
 	else if (angle > 3.0 * PI / 4.0)
 	{
-		printf("B: %f\r\n", angle - PI);
-		m_move->setSpeed(-m_game->getWizardBackwardSpeed());
+		m_move->setSpeed(-m_game->getWizardBackwardSpeed() * 10.0);
 	}
 	else if (-PI / 4.0 >= angle && angle > -3.0 * PI / 4.0)
 	{
-		printf("L: %f\r\n", angle + PI / 2.0);
-		m_move->setStrafeSpeed(-m_game->getWizardStrafeSpeed());
+		m_move->setStrafeSpeed(-m_game->getWizardStrafeSpeed() * 10.0);
 	}
 	else if (angle < -3.0 * PI / 4.0)
 	{
-		printf("B: %f\r\n", angle + PI);
-		m_move->setSpeed(-m_game->getWizardBackwardSpeed());
+		m_move->setSpeed(-m_game->getWizardBackwardSpeed() * 10.0);
 	}
 }

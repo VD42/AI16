@@ -4,8 +4,6 @@ import model.*;
 
 import static java.lang.StrictMath.*;
 
-import java.io.*;
-
 public final class LocalTestRendererListener {
     private Graphics graphics;
     private World world;
@@ -23,57 +21,22 @@ public final class LocalTestRendererListener {
                                 double left, double top, double width, double height) {
         updateFields(graphics, world, game, canvasWidth, canvasHeight, left, top, width, height);
 
-        /*graphics.setColor(Color.BLACK);
+        graphics.setColor(Color.BLACK);
         drawRect(100.0D, 100.0D, 5100.0D, 5100.0D);
 
         for (Wizard wizard : world.getWizards()) {
             double radius = wizard.getRadius();
             double diameter = radius * 2.0D;
             drawRect(wizard.getX() - radius, wizard.getY() - radius, diameter, diameter);
-        }*/
+        }
     }
 
     public void afterDrawScene(Graphics graphics, World world, Game game, int canvasWidth, int canvasHeight,
                                double left, double top, double width, double height) {
         updateFields(graphics, world, game, canvasWidth, canvasHeight, left, top, width, height);
 
-        //graphics.setColor(Color.BLACK);
-        //drawCircle(2600.0D, 2600.0D, 2400.0D);
-        
-        Wizard self = world.getWizards()[0];
-        
-        try
-        {
-            graphics.setColor(Color.BLACK);
-            
-            DataInputStream dataIn = new DataInputStream(new FileInputStream("C:\\Users\\vladi\\Documents\\AI16\\cpp-cgdk\\dump.txt"));
-            
-            //drawLine(self.getX(), self.getY(), self.getX() + 100.0 * (world.getTickIndex() / 20000.0), self.getY() + 100.0 * (world.getTickIndex() / 20000.0));
-            
-            for (int i = 0; i <= world.getTickIndex(); i++)
-            {
-                int tick = dataIn.readInt();
-                int count = dataIn.readInt();
-                
-                for (int j = 0; j < count; j++)
-                {
-                    String s = dataIn.readLine();
-                    Double x = dataIn.readDouble();
-                    Double y = dataIn.readDouble();
-                    
-                    if (tick != world.getTickIndex())
-                        continue;
-                    
-                    //drawLine(self.getX(), self.getY(), self.getX() + x, self.getY() + y);
-                }
-            }
-            dataIn.close();
-        }
-        catch (IOException ex)
-        {
-            //graphics.setColor(Color.RED);
-            // drawLine(self.getX(), self.getY(), self.getX() + 100.0 * (world.getTickIndex() / 20000.0), self.getY() + 100.0 * (world.getTickIndex() / 20000.0));
-        }
+        graphics.setColor(Color.BLACK);
+        drawCircle(2600.0D, 2600.0D, 2400.0D);
     }
 
     private void updateFields(Graphics graphics, World world, Game game, int canvasWidth, int canvasHeight,
