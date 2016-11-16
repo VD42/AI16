@@ -2,6 +2,7 @@
 
 #include "Strategy.h"
 #include "MyStrategy_Global.h"
+#include <deque>
 
 class MyStrategy : public Strategy
 {
@@ -27,4 +28,9 @@ public:
     void move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move) override;
 
 	std::vector<std::pair<std::string, std::pair<double, double >> > m_tPowers;
+
+	std::deque<std::pair<double, double>> m_LastPositions;
+	int m_LastShootTick = 0;
+	bool m_FreeMode = false;
+	int m_FreeModeTick = -1;
 };

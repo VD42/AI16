@@ -29,6 +29,36 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_bSeedReady = true;
 	}
 
+	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
+	if (m_LastPositions.size() > 150)
+		m_LastPositions.pop_back();
+	if (!m_FreeMode && m_world->getTickIndex() >= 150 && m_LastShootTick < m_world->getTickIndex() - 150)
+	{
+		bool good = false;
+		for (auto & val : m_LastPositions)
+		{
+			if (std::hypot(val.first - m_LastPositions.front().first, val.second - m_LastPositions.front().second) > 50.0)
+			{
+				good = true;
+				break;
+			}
+		}
+		if (!good)
+		{
+			printf("FATAL! Run free mode! Tick: %d\r\n", m_world->getTickIndex());
+			m_FreeModeTick = m_world->getTickIndex();
+			m_FreeMode = true;
+		}
+	}
+	if (m_FreeMode)
+	{
+		if (m_world->getTickIndex() > m_FreeModeTick + 150)
+		{
+			printf("Disabling free mode. Tick: %d\r\n", m_world->getTickIndex());
+			m_FreeMode = false;
+		}
+	}
+
 	m_global.SetTowerCords();
 	m_global.ChooseLane();
 	m_global.Update();
@@ -36,7 +66,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	std::pair<double, double> result = { 0.0, 0.0 };
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+	if (m_FreeMode || m_self->getLife() < m_self->getMaxLife() * 0.4)
 		AddPower("heal", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
 
 	if (m_self->getX() - m_self->getRadius() < 5.0)
@@ -206,7 +236,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		if (unit.getFaction() == model::FACTION_NEUTRAL && (D - m_self->getRadius() - unit.getRadius() > 25.0 || std::abs(m_self->getAngleTo(unit)) > PI / 2.0))
+		if (unit.getFaction() == model::FACTION_NEUTRAL && (D - m_self->getRadius() - unit.getRadius() > 25.0 || (!m_FreeMode && std::abs(m_self->getAngleTo(unit)) > PI / 5.0)))
 			continue;
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
@@ -251,7 +281,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		if (D - m_self->getRadius() - unit.getRadius() > 25.0 || std::abs(m_self->getAngleTo(unit)) > PI / 2.0)
+		if (D - m_self->getRadius() - unit.getRadius() > 25.0 || (!m_FreeMode && std::abs(m_self->getAngleTo(unit)) > PI / 5.0))
 			continue;
 		double P = 10.0 * (1.0 / (D + 1.0));
 		if (P > MAX_PRIORITY)
@@ -263,6 +293,8 @@ bool MyStrategy::Shoot()
 
 	if (!target)
 		return false;
+
+	m_LastShootTick = m_world->getTickIndex();
 
 	double D = std::hypot(m_self->getX() - target->getX(), m_self->getY() - target->getY());
 	double angle = m_self->getAngleTo(*target);
