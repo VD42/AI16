@@ -43,4 +43,7 @@ public:
 	std::pair<double, double> GetWaypoint();
 	void Update();
 	void SetTowerCords();
+
+	bool TowerNotExists(std::pair<double, double> position);
+	bool BonusNotExists(std::pair<double, double> position);
 };

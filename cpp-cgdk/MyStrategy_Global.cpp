@@ -108,8 +108,8 @@ std::pair<double, double> CGlobal::GetWaypoint()
 {
 	if (m_lane == model::LANE_TOP)
 	{
-		if (m_top == LaneState::TOWER_1) return { (m_strategy.m_self->getY() < 400.0 ? m_T1.first : 250.0), m_T1.second };
-		if (m_top == LaneState::TOWER_2) return { (m_strategy.m_self->getY() < 400.0 ? m_T2.first : 250.0), m_T2.second };
+		if (m_top == LaneState::TOWER_1) return { (m_strategy.m_self->getY() < 700.0 ? m_T1.first : 250.0), m_T1.second };
+		if (m_top == LaneState::TOWER_2) return { (m_strategy.m_self->getY() < 700.0 ? m_T2.first : 250.0), m_T2.second };
 		if (m_top == LaneState::BASE) return { m_BS.first, m_BS.second };
 	}
 	else if (m_lane == model::LANE_MIDDLE)
@@ -120,132 +120,120 @@ std::pair<double, double> CGlobal::GetWaypoint()
 	}
 	else if (m_lane == model::LANE_BOTTOM)
 	{
-		if (m_bot == LaneState::TOWER_1) return { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 400.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) };
-		if (m_bot == LaneState::TOWER_2) return { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 400.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) };
+		if (m_bot == LaneState::TOWER_1) return { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) };
+		if (m_bot == LaneState::TOWER_2) return { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) };
 		if (m_bot == LaneState::BASE) return { m_BS.first, m_BS.second };
 	}
 	return { m_BS.first, m_BS.second };
 }
 
+bool CGlobal::TowerNotExists(std::pair<double, double> position)
+{
+	for (auto & unit : m_strategy.m_world->getWizards())
+	{
+		if (unit.getFaction() != m_strategy.m_self->getFaction())
+			continue;
+		if (unit.getDistanceTo(position.first, position.second) >= m_strategy.m_game->getWizardVisionRange())
+			continue;
+		bool bFound = false;
+		for (auto & building : m_strategy.m_world->getBuildings())
+		{
+			if (building.getFaction() == m_strategy.m_self->getFaction())
+				continue;
+			if (building.getType() == model::BUILDING_FACTION_BASE)
+				continue;
+			if (position.first - 0.1 < building.getX() && building.getX() < position.first + 0.1 && position.second - 0.1 < building.getY() && building.getY() < position.second + 0.1)
+			{
+				bFound = true;
+				break;
+			}
+		}
+		if (!bFound)
+			return true;
+	}
+	for (auto & unit : m_strategy.m_world->getMinions())
+	{
+		if (unit.getFaction() != m_strategy.m_self->getFaction())
+			continue;
+		if (unit.getDistanceTo(position.first, position.second) >= m_strategy.m_game->getMinionVisionRange())
+			continue;
+		bool bFound = false;
+		for (auto & building : m_strategy.m_world->getBuildings())
+		{
+			if (building.getFaction() == m_strategy.m_self->getFaction())
+				continue;
+			if (building.getType() == model::BUILDING_FACTION_BASE)
+				continue;
+			if (position.first - 0.1 < building.getX() && building.getX() < position.first + 0.1 && position.second - 0.1 < building.getY() && building.getY() < position.second + 0.1)
+			{
+				bFound = true;
+				break;
+			}
+		}
+		if (!bFound)
+			return true;
+	}
+	return false;
+}
+
+bool CGlobal::BonusNotExists(std::pair<double, double> position)
+{
+	for (auto & unit : m_strategy.m_world->getWizards())
+	{
+		if (unit.getFaction() != m_strategy.m_self->getFaction())
+			continue;
+		if (unit.getDistanceTo(position.first, position.second) >= m_strategy.m_game->getWizardVisionRange())
+			continue;
+		bool bFound = false;
+		for (auto & bonus : m_strategy.m_world->getBonuses())
+		{
+			if (position.first - 0.1 < bonus.getX() && bonus.getX() < position.first + 0.1 && position.second - 0.1 < bonus.getY() && bonus.getY() < position.second + 0.1)
+			{
+				bFound = true;
+				break;
+			}
+		}
+		if (!bFound)
+			return true;
+	}
+	for (auto & unit : m_strategy.m_world->getMinions())
+	{
+		if (unit.getFaction() != m_strategy.m_self->getFaction())
+			continue;
+		if (unit.getDistanceTo(position.first, position.second) >= m_strategy.m_game->getMinionVisionRange())
+			continue;
+		bool bFound = false;
+		for (auto & bonus : m_strategy.m_world->getBonuses())
+		{
+			if (position.first - 0.1 < bonus.getX() && bonus.getX() < position.first + 0.1 && position.second - 0.1 < bonus.getY() && bonus.getY() < position.second + 0.1)
+			{
+				bFound = true;
+				break;
+			}
+		}
+		if (!bFound)
+			return true;
+	}
+	return false;
+}
+
 void CGlobal::Update()
 {
-	if (m_lane == model::LANE_TOP)
-	{
-		if (m_top == LaneState::TOWER_1 && m_strategy.m_self->getDistanceTo(m_T1.first, m_T1.second) <= m_strategy.m_game->getWizardVisionRange())
-		{
-			bool bFound = false;
-			for (auto & unit : m_strategy.m_world->getBuildings())
-			{
-				if (unit.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (unit.getType() == model::BUILDING_FACTION_BASE)
-					continue;
-				if (m_T1.first - 0.1 < unit.getX() && unit.getX() < m_T1.first + 0.1 && m_T1.second - 0.1 < unit.getY() && unit.getY() < m_T1.second + 0.1)
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (!bFound)
-				m_top = LaneState::TOWER_2;
-		}
-		if (m_top == LaneState::TOWER_2 && m_strategy.m_self->getDistanceTo(m_T2.first, m_T2.second) <= m_strategy.m_game->getWizardVisionRange())
-		{
-			bool bFound = false;
-			for (auto & unit : m_strategy.m_world->getBuildings())
-			{
-				if (unit.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (unit.getType() == model::BUILDING_FACTION_BASE)
-					continue;
-				if (m_T2.first - 0.1 < unit.getX() && unit.getX() < m_T2.first + 0.1 && m_T2.second - 0.1 < unit.getY() && unit.getY() < m_T2.second + 0.1)
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (!bFound)
-				m_top = LaneState::BASE;
-		}
-	}
-	if (m_lane == model::LANE_MIDDLE)
-	{
-		if (m_mid == LaneState::TOWER_1 && m_strategy.m_self->getDistanceTo(m_M1.first, m_M1.second) <= m_strategy.m_game->getWizardVisionRange())
-		{
-			bool bFound = false;
-			for (auto & unit : m_strategy.m_world->getBuildings())
-			{
-				if (unit.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (unit.getType() == model::BUILDING_FACTION_BASE)
-					continue;
-				if (m_M1.first - 0.1 < unit.getX() && unit.getX() < m_M1.first + 0.1 && m_M1.second - 0.1 < unit.getY() && unit.getY() < m_M1.second + 0.1)
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (!bFound)
-				m_mid = LaneState::TOWER_2;
-		}
-		if (m_mid == LaneState::TOWER_2 && m_strategy.m_self->getDistanceTo(m_M2.first, m_M2.second) <= m_strategy.m_game->getWizardVisionRange())
-		{
-			bool bFound = false;
-			for (auto & unit : m_strategy.m_world->getBuildings())
-			{
-				if (unit.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (unit.getType() == model::BUILDING_FACTION_BASE)
-					continue;
-				if (m_M2.first - 0.1 < unit.getX() && unit.getX() < m_M2.first + 0.1 && m_M2.second - 0.1 < unit.getY() && unit.getY() < m_M2.second + 0.1)
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (!bFound)
-				m_mid = LaneState::BASE;
-		}
-	}
-	if (m_lane == model::LANE_BOTTOM)
-	{
-		if (m_bot == LaneState::TOWER_1 && m_strategy.m_self->getDistanceTo(m_B1.first, m_B1.second) <= m_strategy.m_game->getWizardVisionRange())
-		{
-			bool bFound = false;
-			for (auto & unit : m_strategy.m_world->getBuildings())
-			{
-				if (unit.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (unit.getType() == model::BUILDING_FACTION_BASE)
-					continue;
-				if (m_B1.first - 0.1 < unit.getX() && unit.getX() < m_B1.first + 0.1 && m_B1.second - 0.1 < unit.getY() && unit.getY() < m_B1.second + 0.1)
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (!bFound)
-				m_bot = LaneState::TOWER_2;
-		}
-		if (m_bot == LaneState::TOWER_2 && m_strategy.m_self->getDistanceTo(m_B2.first, m_B2.second) <= m_strategy.m_game->getWizardVisionRange())
-		{
-			bool bFound = false;
-			for (auto & unit : m_strategy.m_world->getBuildings())
-			{
-				if (unit.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (unit.getType() == model::BUILDING_FACTION_BASE)
-					continue;
-				if (m_B2.first - 0.1 < unit.getX() && unit.getX() < m_B2.first + 0.1 && m_B2.second - 0.1 < unit.getY() && unit.getY() < m_B2.second + 0.1)
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (!bFound)
-				m_bot = LaneState::BASE;
-		}
-	}
+	if (m_top == LaneState::TOWER_1 && TowerNotExists(m_T1))
+		m_top = LaneState::TOWER_2;
+	if (m_top == LaneState::TOWER_2 && TowerNotExists(m_T2))
+		m_top = LaneState::BASE;
+
+	if (m_mid == LaneState::TOWER_1 && TowerNotExists(m_M1))
+		m_mid = LaneState::TOWER_2;
+	if (m_mid == LaneState::TOWER_2 && TowerNotExists(m_M2))
+		m_mid = LaneState::BASE;
+
+	if (m_bot == LaneState::TOWER_1 && TowerNotExists(m_B1))
+		m_bot = LaneState::TOWER_2;
+	if (m_bot == LaneState::TOWER_2 && TowerNotExists(m_B2))
+		m_bot = LaneState::BASE;
+
 	if (m_strategy.m_world->getTickIndex() % 2500 >= 2400)
 	{
 		m_bBonusT = true;
@@ -260,40 +248,16 @@ void CGlobal::Update()
 	{
 		if (m_strategy.m_world->getTickIndex() % 2500 < 2400)
 		{
-			if (m_strategy.m_self->getDistanceTo(1200.0, 1200.0) <= m_strategy.m_game->getWizardVisionRange())
-			{
-				bool bFound = false;
-				for (auto & unit : m_strategy.m_world->getBonuses())
-				{
-					if (1200.0 - 0.1 < unit.getX() && unit.getX() < 1200.0 + 0.1 && 1200.0 - 0.1 < unit.getY() && unit.getY() < 1200.0 + 0.1)
-					{
-						bFound = true;
-						break;
-					}
-				}
-				if (!bFound)
-					m_bBonusT = false;
-			}
+			if (BonusNotExists(std::make_pair(1200.0, 1200.0)))
+				m_bBonusT = false;
 		}
 	}
 	if (m_bBonusB)
 	{
 		if (m_strategy.m_world->getTickIndex() % 2500 < 2400)
 		{
-			if (m_strategy.m_self->getDistanceTo(2800.0, 2800.0) <= m_strategy.m_game->getWizardVisionRange())
-			{
-				bool bFound = false;
-				for (auto & unit : m_strategy.m_world->getBonuses())
-				{
-					if (2800.0 - 0.1 < unit.getX() && unit.getX() < 2800.0 + 0.1 && 2800.0 - 0.1 < unit.getY() && unit.getY() < 2800.0 + 0.1)
-					{
-						bFound = true;
-						break;
-					}
-				}
-				if (!bFound)
-					m_bBonusB = false;
-			}
+			if (BonusNotExists(std::make_pair(2800.0, 2800.0)))
+				m_bBonusB = false;
 		}
 	}
 }
