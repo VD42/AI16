@@ -234,19 +234,19 @@ void CGlobal::Update()
 	if (m_bot == LaneState::TOWER_2 && TowerNotExists(m_B2))
 		m_bot = LaneState::BASE;
 
-	if (m_strategy.m_world->getTickIndex() % 2500 >= 2400)
+	if ((m_strategy.m_world->getTickIndex() - 1) % 2500 >= 2400)
 	{
 		m_bBonusT = true;
 		m_bBonusB = true;
 	}
-	else if (m_strategy.m_world->getTickIndex() % 2500 > 2000)
+	else if ((m_strategy.m_world->getTickIndex() - 1) % 2500 > 2000)
 	{
 		m_bBonusT = false;
 		m_bBonusB = false;
 	}
 	if (m_bBonusT)
 	{
-		if (m_strategy.m_world->getTickIndex() % 2500 < 2400)
+		if ((m_strategy.m_world->getTickIndex() - 1) % 2500 < 2400)
 		{
 			if (BonusNotExists(std::make_pair(1200.0, 1200.0)))
 				m_bBonusT = false;
@@ -254,7 +254,7 @@ void CGlobal::Update()
 	}
 	if (m_bBonusB)
 	{
-		if (m_strategy.m_world->getTickIndex() % 2500 < 2400)
+		if ((m_strategy.m_world->getTickIndex() - 1) % 2500 < 2400)
 		{
 			if (BonusNotExists(std::make_pair(2800.0, 2800.0)))
 				m_bBonusB = false;
