@@ -69,14 +69,50 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	if (m_FreeMode || m_self->getLife() < m_self->getMaxLife() * 0.4)
 		AddPower("heal", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
 
-	if (m_self->getX() - m_self->getRadius() < 5.0)
+	if (m_self->getX() - m_self->getRadius() < 3.0)
+	{
 		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
-	if (m_self->getX() + m_self->getRadius() > m_game->getMapSize() - 5.0)
+	}
+	else if (m_self->getX() - m_self->getRadius() <= 20.0)
+	{
+		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, (10000.0 / ((m_self->getX() - m_self->getRadius() - 2.0) * (m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
+	}
+
+	if (m_self->getX() + m_self->getRadius() > m_game->getMapSize() - 3.0)
+	{
 		AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, 10000.0));
-	if (m_self->getY() - m_self->getRadius() < 5.0)
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, 10000.0));
-	if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 5.0)
+	}
+	else if (m_self->getX() + m_self->getRadius() >= m_game->getMapSize() - 20.0)
+	{
+		AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, (10000.0 / ((m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
+	}
+
+	if (m_self->getY() - m_self->getRadius() < 3.0)
+	{
+		AddPower("brake", result, CalcPower(m_self->getX(), m_self->getY() + 1.0, 10000.0));
+	}
+	else if (m_self->getY() - m_self->getRadius() <= 20.0)
+	{
+		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, (10000.0 / ((m_self->getY() - m_self->getRadius() - 2.0) * (m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
+	}
+
+	if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 3.0)
+	{
 		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
+	}
+	else if (m_self->getY() + m_self->getRadius() >= m_game->getMapSize() - 20.0)
+	{
+		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, (10000.0 / ((m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
+	}
+
+	//if (m_self->getX() - m_self->getRadius() < 5.0)
+	//	AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
+	//if (m_self->getX() + m_self->getRadius() > m_game->getMapSize() - 5.0)
+	//	AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, 10000.0));
+	//if (m_self->getY() - m_self->getRadius() < 5.0)
+	//	AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, 10000.0));
+	//if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 5.0)
+	//	AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
 
 	double enMinBase = 40000.0;
 	const model::CircularUnit * pEnMinUnit = nullptr;
@@ -236,6 +272,8 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
+		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode)
+			continue;
 		if (unit.getFaction() == model::FACTION_NEUTRAL && (D - m_self->getRadius() - unit.getRadius() > 25.0 || (!m_FreeMode && std::abs(m_self->getAngleTo(unit)) > PI / 5.0)))
 			continue;
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
@@ -253,7 +291,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = 105.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = 150.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;

@@ -47,6 +47,20 @@ void CGlobal::ChooseLane()
 {
 	if (m_lane == model::_LANE_UNKNOWN_)
 	{
+		if (m_strategy.m_self->isMaster())
+		{
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			std::vector<model::Message> m_tMessages = {
+				model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+				model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+				model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+				model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+			};
+			m_strategy.m_move->setMessages(m_tMessages);
+			return;
+		}
+
 		int l = rand() % 3;
 		switch (l)
 		{
@@ -54,6 +68,16 @@ void CGlobal::ChooseLane()
 		case 1: m_lane = model::LANE_MIDDLE; break;
 		case 2: m_lane = model::LANE_BOTTOM; break;
 		}
+
+		m_bLaneChoosed = true; // no rechoose lane!
+	}
+
+	for (auto & message : m_strategy.m_self->getMessages())
+	{
+		if (message.getLane() == model::_LANE_UNKNOWN_)
+			continue;
+		m_lane = message.getLane();
+		m_bLaneChoosed = true;
 	}
 
 	if (m_bLaneChoosed)

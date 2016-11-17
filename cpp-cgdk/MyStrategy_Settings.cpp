@@ -26,19 +26,27 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -500.0;
+		else if (DISTANCE < MY_RANGE / 1.5)
+			PW = -175.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -10000.0;
+			PW = -300.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -64,19 +72,27 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -500.0;
+		else if (DISTANCE < MY_RANGE / 1.5)
+			PW = -175.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -10000.0;
+			PW = -300.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -102,19 +118,27 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -500.0;
+		else if (DISTANCE < MY_RANGE / 1.5)
+			PW = -175.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -10000.0;
+			PW = -300.0;
 		else
 			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -131,19 +155,27 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 
 	double PW = 0.0;
 
-	if ((strategy.m_self->getLife() > unit.getLife()) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
+	if (PW > 0.0 || (strategy.m_self->getLife() / 2.0) > unit.getLife() || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -500.0;
+		else if (DISTANCE < MY_RANGE / 1.5)
+			PW = -175.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -10000.0;
+			PW = -300.0;
 		else
 			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -169,19 +201,27 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 120.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		else if (DISTANCE < MY_RANGE / 2.0)
-			PW = -500.0;
+		else if (DISTANCE < MY_RANGE / 1.5)
+			PW = -175.0;
 		else
 			PW = 0.0;
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -10000.0;
+			PW = -300.0;
 		else
 			PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -234,11 +274,19 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = 0.0;
-		else if (DISTANCE < MY_RANGE / 2.0)
+		else if (DISTANCE < MY_RANGE / 1.5)
 			PW = -0.5;
 		else
 			PW = 0.0;
@@ -272,11 +320,19 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = 0.0;
-		else if (DISTANCE < MY_RANGE / 2.0)
+		else if (DISTANCE < MY_RANGE / 1.5)
 			PW = -0.5;
 		else
 			PW = 0.0;
@@ -298,9 +354,9 @@ const std::function<double(MyStrategy&, const model::CircularUnit&)> CSettings::
 	double D = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY()) - strategy.m_self->getRadius() - unit.getRadius();
 	if (D > 20.0)
 		return 0.0;
-	if (D < 5.0)
+	if (D < 3.0)
 		return -10000.0;
-	return -((10000.0 / ((D - 4.0) * (D - 4.0))) - 38.0);
+	return -((10000.0 / ((D - 2.0) * (D - 2.0))) - 30.8);
 };
 
 bool CSettings::HAVE_SHIELD(MyStrategy & strategy, const model::Wizard & wizard)
