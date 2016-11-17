@@ -32,7 +32,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
 	if (m_LastPositions.size() > 150)
 		m_LastPositions.pop_back();
-	if (!m_FreeMode && m_world->getTickIndex() >= 150 && m_LastShootTick < m_world->getTickIndex() - 150)
+	if (!m_FreeMode && m_world->getTickIndex() >= 150 && m_self->getLife() >= m_self->getMaxLife() * 0.4 && m_LastShootTick < m_world->getTickIndex() - 150)
 	{
 		bool good = false;
 		for (auto & val : m_LastPositions)
