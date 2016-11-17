@@ -69,7 +69,7 @@ void CGlobal::ChooseLane()
 		case 2: m_lane = model::LANE_BOTTOM; break;
 		}
 
-		m_bLaneChoosed = true; // no rechoose lane!
+		m_bLaneChoosed = true; // no rechoose lane! but master wizard can do it!
 	}
 
 	for (auto & message : m_strategy.m_self->getMessages())

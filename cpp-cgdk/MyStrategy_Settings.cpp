@@ -163,7 +163,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
-	if (PW > 0.0 || (strategy.m_self->getLife() / 2.0) > unit.getLife() || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
+	if (PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
