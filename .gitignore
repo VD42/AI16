@@ -4,3 +4,4 @@
 /key.ppk
 /local-runner/game.log
 *.opendb
+*.class
