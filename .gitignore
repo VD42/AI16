@@ -1,3 +1,5 @@
 /cpp-cgdk/x64
 *.db
 /cpp-cgdk/.vs
+/key.ppk
+/local-runner/game.log
