@@ -25,7 +25,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	if (!m_bSeedReady)
 	{
-		srand((unsigned int)time(nullptr) + m_game->getRandomSeed() + m_self->getId());
+		volatile unsigned int seed = (unsigned int)time(nullptr) + (unsigned int)m_game->getRandomSeed() + (unsigned int)m_self->getId() + (unsigned int)(m_self->getX() * 100.0) + (unsigned int)(m_self->getY() * 100.0);
+		srand(seed);
 		m_bSeedReady = true;
 	}
 

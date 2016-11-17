@@ -47,7 +47,7 @@ void CGlobal::ChooseLane()
 {
 	if (m_lane == model::_LANE_UNKNOWN_)
 	{
-		if (m_strategy.m_self->isMaster())
+		if (false && m_strategy.m_self->isMaster())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -61,7 +61,8 @@ void CGlobal::ChooseLane()
 			return;
 		}
 
-		int l = rand() % 3;
+		volatile int rand_number = rand();
+		int l = rand_number % 3;
 		switch (l)
 		{
 		case 0: m_lane = model::LANE_TOP; break;
