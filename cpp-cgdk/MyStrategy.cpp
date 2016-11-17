@@ -66,8 +66,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	std::pair<double, double> result = { 0.0, 0.0 };
 
-	if (m_FreeMode || m_self->getLife() < m_self->getMaxLife() * 0.4)
-		AddPower("heal", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
+	if (m_FreeMode/* || m_self->getLife() < m_self->getMaxLife() * 0.4*/)
+		AddPower("back", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
 
 	if (m_self->getX() - m_self->getRadius() < 3.0)
 	{
@@ -160,10 +160,17 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 		else
 		{
-			if (unit.getType() == model::BUILDING_FACTION_BASE)
-				AddPower("enemy base", result, CalcPower(unit, CSettings::PW_ENEMY_BASE(*this, unit)));
-			else if (unit.getType() == model::BUILDING_GUARDIAN_TOWER)
-				AddPower("enemy tower", result, CalcPower(unit, CSettings::PW_ENEMY_TOWER(*this, unit)));
+			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+			{
+				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 900.0 ? -2000.0 : 0.0));
+			}
+			else
+			{
+				if (unit.getType() == model::BUILDING_FACTION_BASE)
+					AddPower("enemy base", result, CalcPower(unit, CSettings::PW_ENEMY_BASE(*this, unit)));
+				else if (unit.getType() == model::BUILDING_GUARDIAN_TOWER)
+					AddPower("enemy tower", result, CalcPower(unit, CSettings::PW_ENEMY_TOWER(*this, unit)));
+			}
 		}
 	}
 
@@ -191,7 +198,14 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 				pEnMinUnit = &unit;
 			}
-			AddPower("enemy wizard", result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
+			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+			{
+				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 600.0 ? -2000.0 : 0.0));
+			}
+			else
+			{
+				AddPower("enemy wizard", result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
+			}
 		}
 	}
 
@@ -218,7 +232,14 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_ORC(*this, unit)));
+				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+				{
+					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
+				}
+				else
+				{
+					AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_ORC(*this, unit)));
+				}
 			}
 		}
 		else if (unit.getType() == model::MINION_FETISH_BLOWDART)
@@ -236,7 +257,14 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_FETISH(*this, unit)));
+				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+				{
+					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
+				}
+				else
+				{
+					AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_FETISH(*this, unit)));
+				}
 			}
 		}
 	}
