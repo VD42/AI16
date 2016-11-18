@@ -143,12 +143,6 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseX = m_BS.first - 200.0;
 			double baseY = m_BS.second - 150.0;
 
-			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
-			{
-				baseX = m_BS.first - 800.0;
-				priority = true;
-			}
-
 			return { { (m_strategy.m_self->getY() < 700.0 ? baseX : 250.0), baseY }, priority };
 		}
 	}
@@ -161,13 +155,6 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseX = m_BS.first - 200.0;
 			double baseY = m_BS.second + 200.0;
 
-			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
-			{
-				baseX = m_BS.first - 800.0;
-				baseY = m_BS.second + 800.0;
-				priority = true;
-			}
-
 			return { { baseX, baseY }, priority };
 		}
 	}
@@ -179,12 +166,6 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 		{
 			double baseX = m_BS.first + 150.0;
 			double baseY = m_BS.second + 200.0;
-
-			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
-			{
-				baseX = m_BS.second + 800.0;
-				priority = true;
-			}
 
 			return { { baseX, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? baseY : m_strategy.m_game->getMapSize() - 250.0) }, priority };
 		}
@@ -309,20 +290,17 @@ void CGlobal::Update()
 	if (m_top == LaneState::TOWER_2 && EnemyTowerNotExists(m_T2))
 	{
 		m_top = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		if (OwnLaneControl())
 		{
-			m_lane = model::LANE_TOP;
-			m_bLaneChoosed = true;
-			m_bLaneRush = true;
-			if (m_strategy.m_self->isMaster())
+			if (m_mid == LaneState::TOWER_1 || m_mid == LaneState::TOWER_2)
 			{
-				std::vector<model::Message> m_tMessages = {
-					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>())
-				};
-				m_strategy.m_move->setMessages(m_tMessages);
+				m_lane = model::LANE_MIDDLE;
+				m_bLaneChoosed = true;
+			}
+			else if (m_bot == LaneState::TOWER_1 || m_bot == LaneState::TOWER_2)
+			{
+				m_lane = model::LANE_BOTTOM;
+				m_bLaneChoosed = true;
 			}
 		}
 	}
@@ -334,20 +312,17 @@ void CGlobal::Update()
 	if (m_mid == LaneState::TOWER_2 && EnemyTowerNotExists(m_M2))
 	{
 		m_mid = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		if (OwnLaneControl())
 		{
-			m_lane = model::LANE_MIDDLE;
-			m_bLaneChoosed = true;
-			m_bLaneRush = true;
-			if (m_strategy.m_self->isMaster())
+			if (m_top == LaneState::TOWER_1 || m_top == LaneState::TOWER_2)
 			{
-				std::vector<model::Message> m_tMessages = {
-					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>())
-				};
-				m_strategy.m_move->setMessages(m_tMessages);
+				m_lane = model::LANE_TOP;
+				m_bLaneChoosed = true;
+			}
+			else if (m_bot == LaneState::TOWER_1 || m_bot == LaneState::TOWER_2)
+			{
+				m_lane = model::LANE_BOTTOM;
+				m_bLaneChoosed = true;
 			}
 		}
 	}
@@ -359,20 +334,17 @@ void CGlobal::Update()
 	if (m_bot == LaneState::TOWER_2 && EnemyTowerNotExists(m_B2))
 	{
 		m_bot = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		if (OwnLaneControl())
 		{
-			m_lane = model::LANE_BOTTOM;
-			m_bLaneChoosed = true;
-			m_bLaneRush = true;
-			if (m_strategy.m_self->isMaster())
+			if (m_mid == LaneState::TOWER_1 || m_mid == LaneState::TOWER_2)
 			{
-				std::vector<model::Message> m_tMessages = {
-					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>())
-				};
-				m_strategy.m_move->setMessages(m_tMessages);
+				m_lane = model::LANE_MIDDLE;
+				m_bLaneChoosed = true;
+			}
+			else if (m_bot == LaneState::TOWER_1 || m_bot == LaneState::TOWER_2)
+			{
+				m_lane = model::LANE_TOP;
+				m_bLaneChoosed = true;
 			}
 		}
 	}

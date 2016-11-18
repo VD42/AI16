@@ -368,7 +368,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = (unit.getType() == model::BUILDING_FACTION_BASE  ? 200.0 : 50.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = (unit.getType() == model::BUILDING_FACTION_BASE  ? 200.0 : 125.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
