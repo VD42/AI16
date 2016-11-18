@@ -130,27 +130,66 @@ void CGlobal::ChooseLane()
 	m_bLaneChoosed = true;
 }
 
-std::pair<double, double> CGlobal::GetWaypoint()
+std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 {
+	bool priority = false;
+
 	if (m_lane == model::LANE_TOP)
 	{
-		if (m_top == LaneState::TOWER_1) return { (m_strategy.m_self->getY() < 700.0 ? m_T1.first : 250.0), m_T1.second };
-		if (m_top == LaneState::TOWER_2) return { (m_strategy.m_self->getY() < 700.0 ? m_T2.first : 250.0), m_T2.second };
-		if (m_top == LaneState::BASE) return { (m_strategy.m_self->getY() < 700.0 ? m_BS.first : 250.0), m_BS.second };
+		if (m_top == LaneState::TOWER_1) return { { (m_strategy.m_self->getY() < 700.0 ? m_T1.first : 250.0), m_T1.second }, priority };
+		if (m_top == LaneState::TOWER_2) return { { (m_strategy.m_self->getY() < 700.0 ? m_T2.first : 250.0), m_T2.second }, priority };
+		if (m_top == LaneState::BASE)
+		{
+			double baseX = m_BS.first - 200.0;
+			double baseY = m_BS.second - 150.0;
+
+			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			{
+				baseX = m_BS.first - 800.0;
+				priority = true;
+			}
+
+			return { { (m_strategy.m_self->getY() < 700.0 ? baseX : 250.0), baseY }, priority };
+		}
 	}
 	else if (m_lane == model::LANE_MIDDLE)
 	{
-		if (m_mid == LaneState::TOWER_1) return { m_M1.first, m_M1.second };
-		if (m_mid == LaneState::TOWER_2) return { m_M2.first, m_M2.second };
-		if (m_mid == LaneState::BASE) return { m_BS.first, m_BS.second };
+		if (m_mid == LaneState::TOWER_1) return { { m_M1.first, m_M1.second }, priority };
+		if (m_mid == LaneState::TOWER_2) return { { m_M2.first, m_M2.second }, priority };
+		if (m_mid == LaneState::BASE)
+		{
+			double baseX = m_BS.first - 200.0;
+			double baseY = m_BS.second + 200.0;
+
+			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			{
+				baseX = m_BS.first - 800.0;
+				baseY = m_BS.second + 800.0;
+				priority = true;
+			}
+
+			return { { baseX, baseY }, priority };
+		}
 	}
 	else if (m_lane == model::LANE_BOTTOM)
 	{
-		if (m_bot == LaneState::TOWER_1) return { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) };
-		if (m_bot == LaneState::TOWER_2) return { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) };
-		if (m_bot == LaneState::BASE) return { m_BS.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_BS.second : m_strategy.m_game->getMapSize() - 250.0) };
+		if (m_bot == LaneState::TOWER_1) return { { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) }, priority };
+		if (m_bot == LaneState::TOWER_2) return { { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) }, priority };
+		if (m_bot == LaneState::BASE)
+		{
+			double baseX = m_BS.first + 150.0;
+			double baseY = m_BS.second + 200.0;
+
+			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			{
+				baseX = m_BS.second + 800.0;
+				priority = true;
+			}
+
+			return { { baseX, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? baseY : m_strategy.m_game->getMapSize() - 250.0) }, priority };
+		}
 	}
-	return { m_BS.first, m_BS.second };
+	return { { m_BS.first, m_BS.second }, priority };
 }
 
 bool CGlobal::EnemyTowerNotExists(std::pair<double, double> position)

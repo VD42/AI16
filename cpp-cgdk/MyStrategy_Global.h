@@ -41,7 +41,7 @@ public:
 	CGlobal(MyStrategy & strategy);
     model::LaneType GetLane(const model::LivingUnit & unit);
 	void ChooseLane();
-	std::pair<double, double> GetWaypoint();
+	std::pair<std::pair<double, double>, bool> GetWaypoint();
 	void Update();
 	void SetTowerCords();
 

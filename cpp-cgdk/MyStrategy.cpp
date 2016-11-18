@@ -186,8 +186,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 		else
 		{
-			if (m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first, waypoint.second))
-				waypoint = { unit.getX(), unit.getY() };
+			if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
+				waypoint.first = { unit.getX(), unit.getY() };
 			if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
 			{
 				enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
@@ -220,8 +220,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				AddPower("neutral creep", result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP_ORC(*this, unit)));
 			else
 			{
-				if (m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first, waypoint.second))
-					waypoint = { unit.getX(), unit.getY() };
+				if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
+					waypoint.first = { unit.getX(), unit.getY() };
 				if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
 				{
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
@@ -245,8 +245,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				AddPower("neutral creep", result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP_FETISH(*this, unit)));
 			else
 			{
-				if (m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first, waypoint.second))
-					waypoint = { unit.getX(), unit.getY() };
+				if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
+					waypoint.first = { unit.getX(), unit.getY() };
 				if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
 				{
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
@@ -275,23 +275,32 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 	}
 
-	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) - 100.0))
+	for (auto & unit : m_world->getProjectiles()) // test
+	{
+		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+		if (D > m_self->getVisionRange())
+			continue;
+
+		AddPower("projectile", result, CalcPower(unit, CSettings::PW_PROJECTILE(*this, unit)));
+	}
+
+	if (!waypoint.second && m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) - 100.0))
 	{
 		if (m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
-			waypoint = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 1200.0 };
+			waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 1200.0 };
 	}
-	else if (m_global.m_bBonusB)
+	else if (!waypoint.second && m_global.m_bBonusB)
 	{
 		if (m_self->getDistanceTo(2800.0, 2800.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(2800.0, 2800.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
-			waypoint = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 2800.0 };
+			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 2800.0 };
 	}
 
-	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.first) > 1000.0)
+	if (!waypoint.second && pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.first) > 1000.0)
 	{
-		waypoint = { pEnMinUnit->getX(), pEnMinUnit->getY() };
+		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
 	}
 
-	AddPower("base", result, CalcPower(waypoint.first, waypoint.second, 150.0));
+	AddPower("base", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
 
 	Step(result, Shoot());
 }

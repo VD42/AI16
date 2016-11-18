@@ -27,6 +27,8 @@ public:
 
 	static const std::function<double(MyStrategy&, const model::CircularUnit&)> PW_CIRCULAR_UNIT;
 
+	static const std::function<double(MyStrategy&, const model::Projectile&)> PW_PROJECTILE;
+
 	static bool HAVE_EMPOWER(MyStrategy & strategy, const model::Wizard & wizard);
 	static bool HAVE_SHIELD(MyStrategy & strategy, const model::Wizard & wizard);
 };
