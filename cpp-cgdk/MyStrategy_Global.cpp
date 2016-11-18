@@ -2,7 +2,7 @@
 #include "MyStrategy.h"
 
 
-CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLaneChoosed(false), m_strategy(strategy), m_top(LaneState::TOWER_1), m_mid(LaneState::TOWER_1), m_bot(LaneState::TOWER_1), m_bVaidCords(false), m_bBonusT(false), m_bBonusB(false)
+CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLaneChoosed(false), m_strategy(strategy), m_top(LaneState::TOWER_1), m_mid(LaneState::TOWER_1), m_bot(LaneState::TOWER_1), m_bVaidCords(false), m_bBonusT(false), m_bBonusB(false), m_bLaneRush(false), m_bMasterNotSilent(false)
 {
 	m_T1 = { 0.0, 0.0 };
 	m_T2 = { 0.0, 0.0 };
@@ -47,7 +47,7 @@ void CGlobal::ChooseLane()
 {
 	if (m_lane == model::_LANE_UNKNOWN_)
 	{
-		if (false && m_strategy.m_self->isMaster())
+		if (m_strategy.m_self->isMaster())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -77,6 +77,7 @@ void CGlobal::ChooseLane()
 	{
 		if (message.getLane() == model::_LANE_UNKNOWN_)
 			continue;
+		m_bMasterNotSilent = true;
 		m_lane = message.getLane();
 		m_bLaneChoosed = true;
 	}
@@ -245,19 +246,79 @@ bool CGlobal::BonusNotExists(std::pair<double, double> position)
 void CGlobal::Update()
 {
 	if (m_top == LaneState::TOWER_1 && TowerNotExists(m_T1))
+	{
 		m_top = LaneState::TOWER_2;
+	}
 	if (m_top == LaneState::TOWER_2 && TowerNotExists(m_T2))
+	{
 		m_top = LaneState::BASE;
+		if (OwnLaneControl() && !m_bLaneRush)
+		{
+			m_lane = model::LANE_TOP;
+			m_bLaneChoosed = true;
+			m_bLaneRush = true;
+			if (m_strategy.m_self->isMaster())
+			{
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
+			}
+		}
+	}
 
 	if (m_mid == LaneState::TOWER_1 && TowerNotExists(m_M1))
+	{
 		m_mid = LaneState::TOWER_2;
+	}
 	if (m_mid == LaneState::TOWER_2 && TowerNotExists(m_M2))
+	{
 		m_mid = LaneState::BASE;
+		if (OwnLaneControl() && !m_bLaneRush)
+		{
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			m_bLaneRush = true;
+			if (m_strategy.m_self->isMaster())
+			{
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
+			}
+		}
+	}
 
 	if (m_bot == LaneState::TOWER_1 && TowerNotExists(m_B1))
+	{
 		m_bot = LaneState::TOWER_2;
+	}
 	if (m_bot == LaneState::TOWER_2 && TowerNotExists(m_B2))
+	{
 		m_bot = LaneState::BASE;
+		if (OwnLaneControl() && !m_bLaneRush)
+		{
+			m_lane = model::LANE_BOTTOM;
+			m_bLaneChoosed = true;
+			m_bLaneRush = true;
+			if (m_strategy.m_self->isMaster())
+			{
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
+			}
+		}
+	}
 
 	if ((m_strategy.m_world->getTickIndex() - 1) % 2500 >= 2400)
 	{
@@ -342,4 +403,13 @@ void CGlobal::SetTowerCords()
 	}
 
 	m_bVaidCords = true;
+}
+
+bool CGlobal::OwnLaneControl()
+{
+	if (m_strategy.m_self->isMaster())
+		return true;
+	if (m_bMasterNotSilent)
+		return false;
+	return true;
 }

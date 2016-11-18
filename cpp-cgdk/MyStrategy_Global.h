@@ -20,6 +20,7 @@ public:
 
 	model::LaneType m_lane;
 	bool m_bLaneChoosed;
+	bool m_bLaneRush;
 
 	LaneState m_top;
 	LaneState m_mid;
@@ -46,4 +47,7 @@ public:
 
 	bool TowerNotExists(std::pair<double, double> position);
 	bool BonusNotExists(std::pair<double, double> position);
+
+	bool m_bMasterNotSilent;
+	bool OwnLaneControl();
 };
