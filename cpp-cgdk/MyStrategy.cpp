@@ -33,7 +33,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
 	if (m_LastPositions.size() > 150)
 		m_LastPositions.pop_back();
-	if (!m_FreeMode && m_world->getTickIndex() >= 150 && m_self->getLife() >= m_self->getMaxLife() * 0.4 && m_LastShootTick < m_world->getTickIndex() - 150)
+	if (!m_FreeMode && m_world->getTickIndex() >= 150 && m_nLastHealTick < m_world->getTickIndex() - 150 && m_LastShootTick < m_world->getTickIndex() - 150)
 	{
 		bool good = false;
 		for (auto & val : m_LastPositions)
@@ -59,6 +59,9 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			m_FreeMode = false;
 		}
 	}
+
+	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+		m_nLastHealTick = m_world->getTickIndex();
 
 	m_global.SetTowerCords();
 	m_global.ChooseLane();
@@ -396,11 +399,19 @@ bool MyStrategy::Shoot()
 	double D = std::hypot(m_self->getX() - target->getX(), m_self->getY() - target->getY());
 	double angle = m_self->getAngleTo(*target);
 	m_move->setTurn(angle);
-	if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+	if (D - target->getRadius() < m_game->getStaffRange())
 	{
-		m_move->setAction(model::ACTION_MAGIC_MISSILE);
-		m_move->setCastAngle(angle);
-		m_move->setMinCastDistance(D - target->getRadius() + m_game->getMagicMissileRadius());
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+			m_move->setAction(model::ACTION_STAFF);
+	}
+	else
+	{
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+		{
+			m_move->setAction(model::ACTION_MAGIC_MISSILE);
+			m_move->setCastAngle(angle);
+			m_move->setMinCastDistance(D - target->getRadius() + m_game->getMagicMissileRadius());
+		}
 	}
 	return true;
 }

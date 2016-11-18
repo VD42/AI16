@@ -33,4 +33,5 @@ public:
 	int m_LastShootTick = 0;
 	bool m_FreeMode = false;
 	int m_FreeModeTick = -1;
+	int m_nLastHealTick = -1;
 };
