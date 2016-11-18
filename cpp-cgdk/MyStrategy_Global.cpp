@@ -153,7 +153,7 @@ std::pair<double, double> CGlobal::GetWaypoint()
 	return { m_BS.first, m_BS.second };
 }
 
-bool CGlobal::TowerNotExists(std::pair<double, double> position)
+bool CGlobal::EnemyTowerNotExists(std::pair<double, double> position)
 {
 	for (auto & unit : m_strategy.m_world->getWizards())
 	{
@@ -200,6 +200,24 @@ bool CGlobal::TowerNotExists(std::pair<double, double> position)
 			return true;
 	}
 	return false;
+}
+
+bool CGlobal::FriendlyTowerNotExists(std::pair<double, double> position)
+{
+	bool bFound = false;
+	for (auto & building : m_strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != m_strategy.m_self->getFaction())
+			continue;
+		if (building.getType() == model::BUILDING_FACTION_BASE)
+			continue;
+		if (position.first - 0.1 < building.getX() && building.getX() < position.first + 0.1 && position.second - 0.1 < building.getY() && building.getY() < position.second + 0.1)
+		{
+			bFound = true;
+			break;
+		}
+	}
+	return !bFound;
 }
 
 bool CGlobal::BonusNotExists(std::pair<double, double> position)
@@ -245,14 +263,14 @@ bool CGlobal::BonusNotExists(std::pair<double, double> position)
 
 void CGlobal::Update()
 {
-	if (m_top == LaneState::TOWER_1 && TowerNotExists(m_T1))
+	if (m_top == LaneState::TOWER_1 && EnemyTowerNotExists(m_T1))
 	{
 		m_top = LaneState::TOWER_2;
 	}
-	if (m_top == LaneState::TOWER_2 && TowerNotExists(m_T2))
+	if (m_top == LaneState::TOWER_2 && EnemyTowerNotExists(m_T2))
 	{
 		m_top = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush)
+		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_TOP;
 			m_bLaneChoosed = true;
@@ -270,14 +288,14 @@ void CGlobal::Update()
 		}
 	}
 
-	if (m_mid == LaneState::TOWER_1 && TowerNotExists(m_M1))
+	if (m_mid == LaneState::TOWER_1 && EnemyTowerNotExists(m_M1))
 	{
 		m_mid = LaneState::TOWER_2;
 	}
-	if (m_mid == LaneState::TOWER_2 && TowerNotExists(m_M2))
+	if (m_mid == LaneState::TOWER_2 && EnemyTowerNotExists(m_M2))
 	{
 		m_mid = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush)
+		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -295,14 +313,14 @@ void CGlobal::Update()
 		}
 	}
 
-	if (m_bot == LaneState::TOWER_1 && TowerNotExists(m_B1))
+	if (m_bot == LaneState::TOWER_1 && EnemyTowerNotExists(m_B1))
 	{
 		m_bot = LaneState::TOWER_2;
 	}
-	if (m_bot == LaneState::TOWER_2 && TowerNotExists(m_B2))
+	if (m_bot == LaneState::TOWER_2 && EnemyTowerNotExists(m_B2))
 	{
 		m_bot = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush)
+		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_BOTTOM;
 			m_bLaneChoosed = true;
@@ -410,6 +428,17 @@ bool CGlobal::OwnLaneControl()
 	if (m_strategy.m_self->isMaster())
 		return true;
 	if (m_bMasterNotSilent)
+		return false;
+	return true;
+}
+
+bool CGlobal::Tower2Exists()
+{
+	if (FriendlyTowerNotExists({ m_strategy.m_game->getMapSize() - m_T2.first, m_strategy.m_game->getMapSize() - m_T2.second }))
+		return false;
+	if (FriendlyTowerNotExists({ m_strategy.m_game->getMapSize() - m_M2.first, m_strategy.m_game->getMapSize() - m_M2.second }))
+		return false;
+	if (FriendlyTowerNotExists({ m_strategy.m_game->getMapSize() - m_B2.first, m_strategy.m_game->getMapSize() - m_B2.second }))
 		return false;
 	return true;
 }

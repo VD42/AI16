@@ -45,8 +45,10 @@ public:
 	void Update();
 	void SetTowerCords();
 
-	bool TowerNotExists(std::pair<double, double> position);
+	bool EnemyTowerNotExists(std::pair<double, double> position);
+	bool FriendlyTowerNotExists(std::pair<double, double> position);
 	bool BonusNotExists(std::pair<double, double> position);
+	bool Tower2Exists();
 
 	bool m_bMasterNotSilent;
 	bool OwnLaneControl();
