@@ -135,7 +135,7 @@ std::pair<double, double> CGlobal::GetWaypoint()
 	{
 		if (m_top == LaneState::TOWER_1) return { (m_strategy.m_self->getY() < 700.0 ? m_T1.first : 250.0), m_T1.second };
 		if (m_top == LaneState::TOWER_2) return { (m_strategy.m_self->getY() < 700.0 ? m_T2.first : 250.0), m_T2.second };
-		if (m_top == LaneState::BASE) return { m_BS.first, m_BS.second };
+		if (m_top == LaneState::BASE) return { (m_strategy.m_self->getY() < 700.0 ? m_BS.first : 250.0), m_BS.second };
 	}
 	else if (m_lane == model::LANE_MIDDLE)
 	{
@@ -147,7 +147,7 @@ std::pair<double, double> CGlobal::GetWaypoint()
 	{
 		if (m_bot == LaneState::TOWER_1) return { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) };
 		if (m_bot == LaneState::TOWER_2) return { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) };
-		if (m_bot == LaneState::BASE) return { m_BS.first, m_BS.second };
+		if (m_bot == LaneState::BASE) return { m_BS.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_BS.second : m_strategy.m_game->getMapSize() - 250.0) };
 	}
 	return { m_BS.first, m_BS.second };
 }

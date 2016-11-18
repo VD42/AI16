@@ -109,15 +109,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, (10000.0 / ((m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
 	}
 
-	//if (m_self->getX() - m_self->getRadius() < 5.0)
-	//	AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
-	//if (m_self->getX() + m_self->getRadius() > m_game->getMapSize() - 5.0)
-	//	AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, 10000.0));
-	//if (m_self->getY() - m_self->getRadius() < 5.0)
-	//	AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, 10000.0));
-	//if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 5.0)
-	//	AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
-
 	double enMinBase = 40000.0;
 	const model::CircularUnit * pEnMinUnit = nullptr;
 
