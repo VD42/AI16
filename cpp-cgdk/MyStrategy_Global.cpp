@@ -538,6 +538,28 @@ void CGlobal::ReCheckLane()
 		return;
 	}
 
+	if (nTopWizards == 0)
+	{
+		m_lane = model::LANE_TOP;
+		m_bLaneChoosed = true;
+		return;
+	}
+
+	if (nMidWizards == 0)
+	{
+		m_lane = model::LANE_MIDDLE;
+		m_bLaneChoosed = true;
+		return;
+	}
+
+
+	if (nBotWizards == 0)
+	{
+		m_lane = model::LANE_BOTTOM;
+		m_bLaneChoosed = true;
+		return;
+	}
+
 	if (nTopWizards >= 3)
 	{
 		if (nMidWizards < nBotWizards)
