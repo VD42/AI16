@@ -35,9 +35,6 @@ public:
 	int m_FreeModeTick = -1;
 	int m_nLastHealTick = -1;
 
-	int m_nLastTickStaff = -1;
-	int m_nLastTickMissile = -1;
-
 	void BestShoot(const model::CircularUnit & unit, bool turn);
 
 	int m_nLastReceivedTickIndex = -1;

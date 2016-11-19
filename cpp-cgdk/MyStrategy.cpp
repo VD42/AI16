@@ -74,7 +74,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 	}
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+	if (m_self->getLife() < m_self->getMaxLife() * 0.5)
 		m_nLastHealTick = m_world->getTickIndex();
 
 	m_global.SetTowerCords();
@@ -84,7 +84,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	std::pair<double, double> result = { 0.0, 0.0 };
 
-	if (m_FreeMode/* || m_self->getLife() < m_self->getMaxLife() * 0.4*/)
+	if (m_FreeMode)
 		AddPower("back", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
 
 	if (m_self->getX() - m_self->getRadius() < 3.0)
@@ -127,33 +127,33 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	const model::CircularUnit * pEnMinUnit = nullptr;
 
 	std::vector<model::Building> m_tBuildings = m_world->getBuildings();
-	m_tBuildings.push_back(model::Building(0, m_global.m_BS.first, m_global.m_BS.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getFactionBaseRadius(), m_game->getFactionBaseLife(), m_game->getFactionBaseLife(), std::vector<model::Status>(), model::BUILDING_FACTION_BASE, m_game->getFactionBaseVisionRange(), m_game->getFactionBaseAttackRange(), 0, 0, 0));
+	m_tBuildings.push_back(model::Building(0, m_global.m_BS.first, m_global.m_BS.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getFactionBaseRadius(), m_game->getFactionBaseLife(), m_game->getFactionBaseLife(), std::vector<model::Status>(), model::BUILDING_FACTION_BASE, m_game->getFactionBaseVisionRange(), m_game->getFactionBaseAttackRange(), 0, 0, m_game->getFactionBaseCooldownTicks()));
 	if (m_global.m_top == CGlobal::LaneState::TOWER_1)
 	{
-		m_tBuildings.push_back(model::Building(0, m_global.m_T1.first, m_global.m_T1.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
-		m_tBuildings.push_back(model::Building(0, m_global.m_T2.first, m_global.m_T2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
+		m_tBuildings.push_back(model::Building(0, m_global.m_T1.first, m_global.m_T1.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
+		m_tBuildings.push_back(model::Building(0, m_global.m_T2.first, m_global.m_T2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
 	}
 	else if (m_global.m_top == CGlobal::LaneState::TOWER_2)
 	{
-		m_tBuildings.push_back(model::Building(0, m_global.m_T2.first, m_global.m_T2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
+		m_tBuildings.push_back(model::Building(0, m_global.m_T2.first, m_global.m_T2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
 	}
 	if (m_global.m_mid == CGlobal::LaneState::TOWER_1)
 	{
-		m_tBuildings.push_back(model::Building(0, m_global.m_M1.first, m_global.m_M1.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
-		m_tBuildings.push_back(model::Building(0, m_global.m_M2.first, m_global.m_M2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
+		m_tBuildings.push_back(model::Building(0, m_global.m_M1.first, m_global.m_M1.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
+		m_tBuildings.push_back(model::Building(0, m_global.m_M2.first, m_global.m_M2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
 	}
 	else if (m_global.m_mid == CGlobal::LaneState::TOWER_2)
 	{
-		m_tBuildings.push_back(model::Building(0, m_global.m_M2.first, m_global.m_M2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
+		m_tBuildings.push_back(model::Building(0, m_global.m_M2.first, m_global.m_M2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
 	}
 	if (m_global.m_bot == CGlobal::LaneState::TOWER_1)
 	{
-		m_tBuildings.push_back(model::Building(0, m_global.m_B1.first, m_global.m_B1.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
-		m_tBuildings.push_back(model::Building(0, m_global.m_B2.first, m_global.m_B2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
+		m_tBuildings.push_back(model::Building(0, m_global.m_B1.first, m_global.m_B1.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
+		m_tBuildings.push_back(model::Building(0, m_global.m_B2.first, m_global.m_B2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
 	}
 	else if (m_global.m_bot == CGlobal::LaneState::TOWER_2)
 	{
-		m_tBuildings.push_back(model::Building(0, m_global.m_B2.first, m_global.m_B2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, 0));
+		m_tBuildings.push_back(model::Building(0, m_global.m_B2.first, m_global.m_B2.second, 0.0, 0.0, 0.0, m_self->getFaction() == model::FACTION_ACADEMY ? model::FACTION_RENEGADES : model::FACTION_ACADEMY, m_game->getGuardianTowerRadius(), m_game->getGuardianTowerLife(), m_game->getGuardianTowerLife(), std::vector<model::Status>(), model::BUILDING_GUARDIAN_TOWER, m_game->getGuardianTowerVisionRange(), m_game->getGuardianTowerAttackRange(), 0, 0, m_game->getGuardianTowerCooldownTicks()));
 	}
 
 	for (auto & unit : m_tBuildings)
@@ -169,7 +169,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 		else
 		{
-			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+			if (m_self->getLife() < m_self->getMaxLife() * 0.5)
 			{
 				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 900.0 ? -2000.0 : 0.0));
 			}
@@ -207,7 +207,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 				pEnMinUnit = &unit;
 			}
-			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+			if (m_self->getLife() < m_self->getMaxLife() * 0.5)
 			{
 				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 600.0 ? -2000.0 : 0.0));
 			}
@@ -241,7 +241,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+				if (m_self->getLife() < m_self->getMaxLife() * 0.5)
 				{
 					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
 				}
@@ -266,7 +266,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+				if (m_self->getLife() < m_self->getMaxLife() * 0.5)
 				{
 					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
 				}
@@ -408,7 +408,7 @@ bool MyStrategy::Shoot()
 	if (!target)
 		return false;
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.15)
+	if (m_self->getLife() < m_self->getMaxLife() * 0.25)
 	{
 		BestShoot(*target, false);
 		return false;
@@ -481,22 +481,18 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	double angle = m_self->getAngleTo(unit);
 	if (turn)
 		m_move->setTurn(angle);
-	if (D - unit.getRadius() < m_game->getStaffRange() && m_nLastTickStaff + m_game->getStaffCooldownTicks() <= m_world->getTickIndex())
+	if (D - unit.getRadius() < m_game->getStaffRange() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[1] == 0)
 	{
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
-		{
 			m_move->setAction(model::ACTION_STAFF);
-			m_nLastTickStaff = m_world->getTickIndex();
-		}
 	}
-	else if (m_nLastTickMissile + m_game->getMagicMissileCooldownTicks() <= m_world->getTickIndex())
+	else if (m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[2] == 0)
 	{
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
 		{
 			m_move->setAction(model::ACTION_MAGIC_MISSILE);
 			m_move->setCastAngle(angle);
 			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getMagicMissileRadius());
-			m_nLastTickMissile = m_world->getTickIndex();
 		}
 	}
 }
