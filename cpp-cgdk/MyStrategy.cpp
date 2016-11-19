@@ -30,7 +30,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_bSeedReady = true;
 	}
 
-	if ((m_world->getTickIndex() + 1501) % 2500 == 0)
+	if (m_world->getTickIndex() == 500 || (m_world->getTickIndex() + 1000) % 2500 == 0)
 	{
 		m_global.ReCheckLane();
 	}
