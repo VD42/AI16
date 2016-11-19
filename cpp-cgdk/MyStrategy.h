@@ -30,13 +30,15 @@ public:
 	std::vector<std::pair<std::string, std::pair<double, double >> > m_tPowers;
 
 	std::deque<std::pair<double, double>> m_LastPositions;
-	int m_LastShootTick = 0;
+	int m_LastShootTick = -1;
 	bool m_FreeMode = false;
 	int m_FreeModeTick = -1;
 	int m_nLastHealTick = -1;
 
-	int m_nLastTickStaff = 0;
-	int m_nLastTickMissile = 0;
+	int m_nLastTickStaff = -1;
+	int m_nLastTickMissile = -1;
 
 	void BestShoot(const model::CircularUnit & unit, bool turn);
+
+	int m_nLastReceivedTickIndex = -1;
 };
