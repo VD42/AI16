@@ -52,4 +52,6 @@ public:
 
 	bool m_bMasterNotSilent;
 	bool OwnLaneControl();
+
+	void ReCheckLane();
 };

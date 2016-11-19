@@ -15,32 +15,39 @@ CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLane
 
 model::LaneType CGlobal::GetLane(const model::LivingUnit & unit)
 {
-	double toTop = unit.getDistanceTo(200.0, 200.0);
-	double toMid = unit.getDistanceTo(2000.0, 2000.0);
-	double toBot = unit.getDistanceTo(m_strategy.m_game->getMapSize() - 200.0, m_strategy.m_game->getMapSize() - 200.0);
+	std::pair<double, double> T1 = { 0.0, 2000.0 };
+	std::pair<double, double> T2 = { 2000.0, 0.0 };
+	std::pair<double, double> M1 = { 1600.0, 2400.0 };
+	std::pair<double, double> M2 = { 2400.0, 1600.0 };
+	std::pair<double, double> B1 = { 2000.0, 4000.0 };
+	std::pair<double, double> B2 = { 4000.0, 2000.0 };
 
-	if (toTop < toMid)
-	{
-		if (toTop < toBot)
-		{
-			return model::LANE_TOP;
-		}
-		else
-		{
-			return model::LANE_BOTTOM;
-		}
-	}
-	else
-	{
-		if (toMid < toBot)
-		{
-			return model::LANE_MIDDLE;
-		}
-		else
-		{
-			return model::LANE_BOTTOM;
-		}
-	}
+	double toT1 = unit.getDistanceTo(T1.first, T1.second);
+	double toT2 = unit.getDistanceTo(T2.first, T2.second);
+	double toM1 = unit.getDistanceTo(M1.first, M1.second);
+	double toM2 = unit.getDistanceTo(M2.first, M2.second);
+	double toB1 = unit.getDistanceTo(B1.first, B1.second);
+	double toB2 = unit.getDistanceTo(B2.first, B2.second);
+
+	if (toT1 < toM1 && toT1 < toM2 && toT1 < toB1 && toT1 < toB2)
+		return model::LANE_TOP;
+
+	if (toT2 < toM1 && toT2 < toM2 && toT2 < toB1 && toT2 < toB2)
+		return model::LANE_TOP;
+
+	if (toM1 < toT1 && toM1 < toT2 && toM1 < toB1 && toM1 < toB2)
+		return model::LANE_MIDDLE;
+
+	if (toM2 < toT1 && toM2 < toT2 && toM2 < toB1 && toM2 < toB2)
+		return model::LANE_MIDDLE;
+
+	if (toB1 < toT1 && toB1 < toT2 && toB1 < toM1 && toB1 < toM2)
+		return model::LANE_BOTTOM;
+
+	if (toB2 < toT1 && toB2 < toT2 && toB2 < toM1 && toB2 < toM2)
+		return model::LANE_BOTTOM;
+
+	return model::_LANE_UNKNOWN_;
 }
 
 void CGlobal::ChooseLane()
@@ -143,6 +150,12 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseX = m_BS.first - 200.0;
 			double baseY = m_BS.second - 150.0;
 
+			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			{
+				baseX = m_BS.first - 800.0;
+				priority = true;
+			}
+
 			return { { (m_strategy.m_self->getY() < 700.0 ? baseX : 250.0), baseY }, priority };
 		}
 	}
@@ -155,6 +168,13 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseX = m_BS.first - 200.0;
 			double baseY = m_BS.second + 200.0;
 
+			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			{
+				baseX = m_BS.first - 800.0;
+				baseY = m_BS.second + 800.0;
+				priority = true;
+			}
+
 			return { { baseX, baseY }, priority };
 		}
 	}
@@ -166,6 +186,12 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 		{
 			double baseX = m_BS.first + 150.0;
 			double baseY = m_BS.second + 200.0;
+
+			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			{
+				baseX = m_BS.second + 800.0;
+				priority = true;
+			}
 
 			return { { baseX, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? baseY : m_strategy.m_game->getMapSize() - 250.0) }, priority };
 		}
@@ -290,17 +316,20 @@ void CGlobal::Update()
 	if (m_top == LaneState::TOWER_2 && EnemyTowerNotExists(m_T2))
 	{
 		m_top = LaneState::BASE;
-		if (OwnLaneControl())
+		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
-			if (m_mid == LaneState::TOWER_1 || m_mid == LaneState::TOWER_2)
+			m_lane = model::LANE_TOP;
+			m_bLaneChoosed = true;
+			m_bLaneRush = true;
+			if (m_strategy.m_self->isMaster())
 			{
-				m_lane = model::LANE_MIDDLE;
-				m_bLaneChoosed = true;
-			}
-			else if (m_bot == LaneState::TOWER_1 || m_bot == LaneState::TOWER_2)
-			{
-				m_lane = model::LANE_BOTTOM;
-				m_bLaneChoosed = true;
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
 			}
 		}
 	}
@@ -312,17 +341,20 @@ void CGlobal::Update()
 	if (m_mid == LaneState::TOWER_2 && EnemyTowerNotExists(m_M2))
 	{
 		m_mid = LaneState::BASE;
-		if (OwnLaneControl())
+		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
-			if (m_top == LaneState::TOWER_1 || m_top == LaneState::TOWER_2)
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			m_bLaneRush = true;
+			if (m_strategy.m_self->isMaster())
 			{
-				m_lane = model::LANE_TOP;
-				m_bLaneChoosed = true;
-			}
-			else if (m_bot == LaneState::TOWER_1 || m_bot == LaneState::TOWER_2)
-			{
-				m_lane = model::LANE_BOTTOM;
-				m_bLaneChoosed = true;
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
 			}
 		}
 	}
@@ -334,17 +366,20 @@ void CGlobal::Update()
 	if (m_bot == LaneState::TOWER_2 && EnemyTowerNotExists(m_B2))
 	{
 		m_bot = LaneState::BASE;
-		if (OwnLaneControl())
+		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
-			if (m_mid == LaneState::TOWER_1 || m_mid == LaneState::TOWER_2)
+			m_lane = model::LANE_BOTTOM;
+			m_bLaneChoosed = true;
+			m_bLaneRush = true;
+			if (m_strategy.m_self->isMaster())
 			{
-				m_lane = model::LANE_MIDDLE;
-				m_bLaneChoosed = true;
-			}
-			else if (m_bot == LaneState::TOWER_1 || m_bot == LaneState::TOWER_2)
-			{
-				m_lane = model::LANE_TOP;
-				m_bLaneChoosed = true;
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
 			}
 		}
 	}
@@ -452,4 +487,78 @@ bool CGlobal::Tower2Exists()
 	if (FriendlyTowerNotExists({ m_strategy.m_game->getMapSize() - m_B2.first, m_strategy.m_game->getMapSize() - m_B2.second }))
 		return false;
 	return true;
+}
+
+void CGlobal::ReCheckLane()
+{
+	if (!OwnLaneControl() && !m_bLaneRush)
+		return;
+
+	int nTopWizards = 0;
+	int nMidWizards = 0;
+	int nBotWizards = 0;
+	int nTopWizardsEnemy = 0;
+	int nMidWizardsEnemy = 0;
+	int nBotWizardsEnemy = 0;
+	for (auto & unit : m_strategy.m_world->getWizards())
+	{
+		if (unit.getFaction() == m_strategy.m_self->getFaction())
+		{
+			if (GetLane(unit) == model::LANE_TOP)
+				nTopWizards++;
+			else if (GetLane(unit) == model::LANE_MIDDLE)
+				nMidWizards++;
+			else if (GetLane(unit) == model::LANE_BOTTOM)
+				nBotWizards++;
+		}
+		else
+		{
+			if (GetLane(unit) == model::LANE_TOP)
+				nTopWizardsEnemy++;
+			else if (GetLane(unit) == model::LANE_MIDDLE)
+				nMidWizardsEnemy++;
+			else if (GetLane(unit) == model::LANE_BOTTOM)
+				nBotWizardsEnemy++;
+		}
+	}
+
+	printf("FW: T - %d / M - %d / B - %d\r\n", nTopWizards, nMidWizards, nBotWizards);
+	printf("EW: T - %d / M - %d / B - %d\r\n", nTopWizardsEnemy, nMidWizardsEnemy, nBotWizardsEnemy);
+
+	if (nTopWizardsEnemy + nMidWizardsEnemy + nBotWizardsEnemy == 5)
+	{
+		if (nTopWizards < nTopWizardsEnemy)
+			m_lane = model::LANE_TOP;
+		else if (nBotWizards < nBotWizardsEnemy)
+			m_lane = model::LANE_BOTTOM;
+		else if (nMidWizards < nMidWizardsEnemy)
+			m_lane = model::LANE_MIDDLE;
+
+		m_bLaneChoosed = true;
+		return;
+	}
+
+	if (nTopWizards >= 3)
+	{
+		if (nMidWizards < nBotWizards)
+			m_lane = model::LANE_MIDDLE;
+		else
+			m_lane = model::LANE_BOTTOM;
+	}
+	if (nMidWizards >= 3)
+	{
+		if (nBotWizards < nTopWizards)
+			m_lane = model::LANE_BOTTOM;
+		else
+			m_lane = model::LANE_TOP;
+	}
+	if (nBotWizards >= 3)
+	{
+		if (nMidWizards < nTopWizards)
+			m_lane = model::LANE_MIDDLE;
+		else
+			m_lane = model::LANE_TOP;
+	}
+
+	m_bLaneChoosed = true;
 }
