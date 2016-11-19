@@ -399,25 +399,8 @@ bool MyStrategy::Shoot()
 	if (!target)
 		return false;
 
-	m_LastShootTick = m_world->getTickIndex();
+	BestShoot(*target, true);
 
-	double D = std::hypot(m_self->getX() - target->getX(), m_self->getY() - target->getY());
-	double angle = m_self->getAngleTo(*target);
-	m_move->setTurn(angle);
-	if (D - target->getRadius() < m_game->getStaffRange())
-	{
-		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
-			m_move->setAction(model::ACTION_STAFF);
-	}
-	else
-	{
-		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
-		{
-			m_move->setAction(model::ACTION_MAGIC_MISSILE);
-			m_move->setCastAngle(angle);
-			m_move->setMinCastDistance(D - target->getRadius() + m_game->getMagicMissileRadius());
-		}
-	}
 	return true;
 }
 
@@ -448,9 +431,7 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 
 		if (tree)
 		{
-			m_move->setAction(model::ACTION_MAGIC_MISSILE);
-			m_move->setCastAngle(angle);
-			m_move->setMinCastDistance(minD - tree->getRadius() + m_game->getMagicMissileRadius());
+			BestShoot(*tree, false);
 		}
 	}
 	
@@ -476,5 +457,32 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 	else if (angle < -3.0 * PI / 4.0)
 	{
 		m_move->setSpeed(-m_game->getWizardBackwardSpeed() * 10.0);
+	}
+}
+
+void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
+{
+	m_LastShootTick = m_world->getTickIndex();
+	double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+	double angle = m_self->getAngleTo(unit);
+	if (turn)
+		m_move->setTurn(angle);
+	if (D - unit.getRadius() < m_game->getStaffRange() && m_nLastTickStaff + m_game->getStaffCooldownTicks() <= m_world->getTickIndex())
+	{
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+		{
+			m_move->setAction(model::ACTION_STAFF);
+			m_nLastTickStaff = m_world->getTickIndex();
+		}
+	}
+	else if (m_nLastTickMissile + m_game->getMagicMissileCooldownTicks() <= m_world->getTickIndex())
+	{
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+		{
+			m_move->setAction(model::ACTION_MAGIC_MISSILE);
+			m_move->setCastAngle(angle);
+			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getMagicMissileRadius());
+			m_nLastTickMissile = m_world->getTickIndex();
+		}
 	}
 }

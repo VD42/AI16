@@ -34,4 +34,9 @@ public:
 	bool m_FreeMode = false;
 	int m_FreeModeTick = -1;
 	int m_nLastHealTick = -1;
+
+	int m_nLastTickStaff = 0;
+	int m_nLastTickMissile = 0;
+
+	void BestShoot(const model::CircularUnit & unit, bool turn);
 };
