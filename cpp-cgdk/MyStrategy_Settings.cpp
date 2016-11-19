@@ -42,21 +42,28 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		}
 		else if (DISTANCE < MY_RANGE / 1.5)
 		{
-			bool bFound = false;
-			for (auto & wizard : strategy.m_world->getWizards())
+			if (PW < 0.5)
 			{
-				if (wizard.getFaction() == strategy.m_self->getFaction())
-					continue;
-				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (bFound)
 				PW = -175.0;
+			}
 			else
-				PW = 0.0;
+			{
+				bool bFound = false;
+				for (auto & wizard : strategy.m_world->getWizards())
+				{
+					if (wizard.getFaction() == strategy.m_self->getFaction())
+						continue;
+					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (bFound)
+					PW = -175.0;
+				else
+					PW = 10.0;
+			}
 		}
 		else
 		{
@@ -100,7 +107,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
-	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
+	if (PW > 0.0)
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -108,21 +115,28 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		}
 		else if (DISTANCE < MY_RANGE / 1.5)
 		{
-			bool bFound = false;
-			for (auto & wizard : strategy.m_world->getWizards())
+			if (PW < 0.5)
 			{
-				if (wizard.getFaction() == strategy.m_self->getFaction())
-					continue;
-				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (bFound)
 				PW = -175.0;
+			}
 			else
-				PW = 0.0;
+			{
+				bool bFound = false;
+				for (auto & wizard : strategy.m_world->getWizards())
+				{
+					if (wizard.getFaction() == strategy.m_self->getFaction())
+						continue;
+					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (bFound)
+					PW = -175.0;
+				else
+					PW = 10.0;
+			}
 		}
 		else
 		{
@@ -174,21 +188,28 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		}
 		else if (DISTANCE < MY_RANGE / 1.5)
 		{
-			bool bFound = false;
-			for (auto & wizard : strategy.m_world->getWizards())
+			if (PW < 1.5)
 			{
-				if (wizard.getFaction() == strategy.m_self->getFaction())
-					continue;
-				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (bFound)
 				PW = -175.0;
+			}
 			else
-				PW = 0.0;
+			{
+				bool bFound = false;
+				for (auto & wizard : strategy.m_world->getWizards())
+				{
+					if (wizard.getFaction() == strategy.m_self->getFaction())
+						continue;
+					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (bFound)
+					PW = -175.0;
+				else
+					PW = 10.0;
+			}
 		}
 		else
 		{
@@ -233,11 +254,54 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	if (PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
+		{
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+		}
 		else if (DISTANCE < MY_RANGE / 1.5)
-			PW = -175.0;
+		{
+			bool bFound = false;
+			for (auto & wizard : strategy.m_world->getWizards())
+			{
+				if (wizard.getFaction() == strategy.m_self->getFaction())
+					continue;
+				if (wizard.getId() == unit.getId())
+					continue;
+				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+				{
+					bFound = true;
+					break;
+				}
+			}
+			for (auto & building : strategy.m_world->getBuildings())
+			{
+				if (building.getFaction() == strategy.m_self->getFaction())
+					continue;
+				if (strategy.m_self->getDistanceTo(building) < strategy.m_game->getWizardVisionRange())
+				{
+					int nUnits = 0;
+					for (auto & minion : strategy.m_world->getMinions())
+					{
+						if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
+							continue;
+						if (building.getDistanceTo(minion) <= building.getAttackRange())
+							nUnits++;
+					}
+					if (nUnits < 2)
+					{
+						bFound = true;
+						break;
+					}
+				}
+			}
+			if (bFound)
+				PW = -175.0;
+			else
+				PW = 10.0;
+		}
 		else
+		{
 			PW = 0.0;
+		}
 	}
 	else
 	{
@@ -284,21 +348,28 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		}
 		else if (DISTANCE < MY_RANGE / 1.5)
 		{
-			bool bFound = false;
-			for (auto & wizard : strategy.m_world->getWizards())
+			if (PW < 1.5)
 			{
-				if (wizard.getFaction() == strategy.m_self->getFaction())
-					continue;
-				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (bFound)
 				PW = -175.0;
+			}
 			else
-				PW = 0.0;
+			{
+				bool bFound = false;
+				for (auto & wizard : strategy.m_world->getWizards())
+				{
+					if (wizard.getFaction() == strategy.m_self->getFaction())
+						continue;
+					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (bFound)
+					PW = -175.0;
+				else
+					PW = 10.0;
+			}
 		}
 		else
 		{
@@ -376,7 +447,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 			PW += 1.0;
 	}
 
-	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
+	if (PW > 0.0)
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = 0.0;
@@ -422,7 +493,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 			PW += 1.0;
 	}
 
-	if (PW > 0.0 || HAVE_SHIELD(strategy, *strategy.m_self))
+	if (PW > 0.0)
 	{
 		if (DISTANCE >= MY_RANGE)
 			PW = 0.0;

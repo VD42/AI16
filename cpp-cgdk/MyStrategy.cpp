@@ -74,7 +74,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 	}
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.5)
+	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
 		m_nLastHealTick = m_world->getTickIndex();
 
 	m_global.SetTowerCords();
@@ -169,7 +169,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 		else
 		{
-			if (m_self->getLife() < m_self->getMaxLife() * 0.5)
+			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
 			{
 				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 900.0 ? -2000.0 : 0.0));
 			}
@@ -207,7 +207,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 				pEnMinUnit = &unit;
 			}
-			if (m_self->getLife() < m_self->getMaxLife() * 0.5)
+			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
 			{
 				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 600.0 ? -2000.0 : 0.0));
 			}
@@ -241,7 +241,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				if (m_self->getLife() < m_self->getMaxLife() * 0.5)
+				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
 				{
 					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
 				}
@@ -266,7 +266,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				if (m_self->getLife() < m_self->getMaxLife() * 0.5)
+				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
 				{
 					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
 				}
@@ -408,7 +408,7 @@ bool MyStrategy::Shoot()
 	if (!target)
 		return false;
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.25)
+	if (m_self->getLife() < m_self->getMaxLife() * 0.15)
 	{
 		BestShoot(*target, false);
 		return false;
