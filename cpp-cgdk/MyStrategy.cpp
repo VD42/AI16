@@ -425,17 +425,34 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 
-	/*printf("%d - ", m_global.m_lane);
-	if (m_global.m_lane == model::LANE_TOP)
-		printf("%d - ", m_global.m_top);
-	if (m_global.m_lane == model::LANE_MIDDLE)
-		printf("%d - ", m_global.m_mid);
-	if (m_global.m_lane == model::LANE_BOTTOM)
-		printf("%d - ", m_global.m_bot);
-	printf("%f / %f / %f - ", direction.first, direction.second, angle);*/
-
 	if (!shoot)
+	{
 		m_move->setTurn(angle);
+
+		const model::Tree * tree = nullptr;
+		double minD = 40000.0;
+
+		for (auto & unit : m_world->getTrees())
+		{
+			double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+			if (D > m_self->getCastRange())
+				continue;
+			if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
+				continue;
+			if (D < minD)
+			{
+				minD = D;
+				tree = &unit;
+			}
+		}
+
+		if (tree)
+		{
+			m_move->setAction(model::ACTION_MAGIC_MISSILE);
+			m_move->setCastAngle(angle);
+			m_move->setMinCastDistance(minD - tree->getRadius() + m_game->getMagicMissileRadius());
+		}
+	}
 	
 	m_move->setSpeed(0.0);
 	m_move->setStrafeSpeed(0.0);
