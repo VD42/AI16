@@ -399,8 +399,13 @@ bool MyStrategy::Shoot()
 	if (!target)
 		return false;
 
-	BestShoot(*target, true);
+	if (m_self->getLife() < m_self->getMaxLife() * 0.15)
+	{
+		BestShoot(*target, false);
+		return false;
+	}
 
+	BestShoot(*target, true);
 	return true;
 }
 
