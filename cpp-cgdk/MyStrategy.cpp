@@ -298,6 +298,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("projectile", result, CalcPower(unit, CSettings::PW_PROJECTILE(*this, unit)));
 	}
 
+	for (auto & unit : m_world->getBonuses())
+	{
+		AddPower("bonus", result, CalcPower(unit, 200.0));
+	}
+
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) - 100.0))
 	{
 		if (m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
