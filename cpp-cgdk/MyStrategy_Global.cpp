@@ -54,7 +54,7 @@ void CGlobal::ChooseLane()
 {
 	if (m_lane == model::_LANE_UNKNOWN_)
 	{
-		if (m_strategy.m_self->isMaster())
+		/*if (m_strategy.m_self->isMaster())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -66,7 +66,7 @@ void CGlobal::ChooseLane()
 			};
 			m_strategy.m_move->setMessages(m_tMessages);
 			return;
-		}
+		}*/
 
 		volatile int rand_number = rand();
 		int l = rand_number % 3;
@@ -316,7 +316,7 @@ void CGlobal::Update()
 	if (m_top == LaneState::TOWER_2 && EnemyTowerNotExists(m_T2))
 	{
 		m_top = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		/*if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_TOP;
 			m_bLaneChoosed = true;
@@ -331,7 +331,7 @@ void CGlobal::Update()
 				};
 				m_strategy.m_move->setMessages(m_tMessages);
 			}
-		}
+		}*/
 	}
 
 	if (m_mid == LaneState::TOWER_1 && EnemyTowerNotExists(m_M1))
@@ -341,7 +341,7 @@ void CGlobal::Update()
 	if (m_mid == LaneState::TOWER_2 && EnemyTowerNotExists(m_M2))
 	{
 		m_mid = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		/*if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -356,7 +356,7 @@ void CGlobal::Update()
 				};
 				m_strategy.m_move->setMessages(m_tMessages);
 			}
-		}
+		}*/
 	}
 
 	if (m_bot == LaneState::TOWER_1 && EnemyTowerNotExists(m_B1))
@@ -366,7 +366,7 @@ void CGlobal::Update()
 	if (m_bot == LaneState::TOWER_2 && EnemyTowerNotExists(m_B2))
 	{
 		m_bot = LaneState::BASE;
-		if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		/*if (OwnLaneControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_BOTTOM;
 			m_bLaneChoosed = true;
@@ -381,7 +381,7 @@ void CGlobal::Update()
 				};
 				m_strategy.m_move->setMessages(m_tMessages);
 			}
-		}
+		}*/
 	}
 
 	if ((m_strategy.m_world->getTickIndex() - 1) % 2500 >= 2400)
