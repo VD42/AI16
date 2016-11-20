@@ -220,7 +220,18 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	{
 		if (DISTANCE <= ENEMY_RANGE)
 		{
-			if (strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.4 || DISTANCE < MY_RANGE / 1.5)
+			bool bFound = false;
+			for (auto & wizard : strategy.m_world->getWizards())
+			{
+				if (wizard.getFaction() == strategy.m_self->getFaction())
+					continue;
+				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+				{
+					bFound = true;
+					break;
+				}
+			}
+			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.4 || DISTANCE < MY_RANGE / 1.5)
 				PW = -300.0;
 			else
 				PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -380,7 +391,18 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	{
 		if (DISTANCE <= ENEMY_RANGE)
 		{
-			if (strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.4 || DISTANCE < MY_RANGE / 1.5)
+			bool bFound = false;
+			for (auto & wizard : strategy.m_world->getWizards())
+			{
+				if (wizard.getFaction() == strategy.m_self->getFaction())
+					continue;
+				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+				{
+					bFound = true;
+					break;
+				}
+			}
+			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.4 || DISTANCE < MY_RANGE / 1.5)
 				PW = -300.0;
 			else
 				PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
