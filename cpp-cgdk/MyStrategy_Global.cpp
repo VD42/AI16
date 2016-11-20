@@ -530,54 +530,130 @@ void CGlobal::ReCheckLane()
 
 	if (nTopWizardsEnemy + nMidWizardsEnemy + nBotWizardsEnemy == 5)
 	{
-		if (nTopWizards < nTopWizardsEnemy)
-			m_lane = model::LANE_TOP;
-		else if (nBotWizards < nBotWizardsEnemy)
-			m_lane = model::LANE_BOTTOM;
-		else if (nMidWizards < nMidWizardsEnemy)
-			m_lane = model::LANE_MIDDLE;
+		if (m_lane == model::LANE_TOP)
+		{
+			if (nTopWizards > nTopWizardsEnemy)
+			{
+				if (nMidWizards < nMidWizardsEnemy)
+					m_lane = model::LANE_MIDDLE;
+				else if (nBotWizards < nBotWizardsEnemy)
+					m_lane = model::LANE_BOTTOM;
+			}
+			m_bLaneChoosed = true;
+			return;
+		}
 
-		m_bLaneChoosed = true;
-		return;
+		if (m_lane == model::LANE_MIDDLE)
+		{
+			if (nMidWizards > nMidWizardsEnemy)
+			{
+				if (nTopWizards < nTopWizardsEnemy)
+					m_lane = model::LANE_TOP;
+				else if (nBotWizards < nBotWizardsEnemy)
+					m_lane = model::LANE_BOTTOM;
+			}
+			m_bLaneChoosed = true;
+			return;
+		}
+
+		if (m_lane == model::LANE_BOTTOM)
+		{
+			if (nBotWizards > nBotWizardsEnemy)
+			{
+				if (nMidWizards < nMidWizardsEnemy)
+					m_lane = model::LANE_MIDDLE;
+				else if (nTopWizards < nTopWizardsEnemy)
+					m_lane = model::LANE_TOP;
+			}
+			m_bLaneChoosed = true;
+			return;
+		}
 	}
 
 	if (nTopWizards == 0)
 	{
-		m_lane = model::LANE_TOP;
-		m_bLaneChoosed = true;
-		return;
+		if (m_lane == model::LANE_TOP)
+		{
+			m_bLaneChoosed = true;
+			return;
+		}
+
+		if (m_lane == model::LANE_MIDDLE && nMidWizards > 1 && nMidWizards >= nMidWizardsEnemy)
+		{
+			m_lane = model::LANE_TOP;
+			m_bLaneChoosed = true;
+			return;
+		}
+
+		if (m_lane == model::LANE_BOTTOM && nBotWizards > 1 && nBotWizards >= nBotWizardsEnemy)
+		{
+			m_lane = model::LANE_TOP;
+			m_bLaneChoosed = true;
+			return;
+		}
 	}
 
 	if (nMidWizards == 0)
 	{
-		m_lane = model::LANE_MIDDLE;
-		m_bLaneChoosed = true;
-		return;
-	}
+		if (m_lane == model::LANE_MIDDLE)
+		{
+			m_bLaneChoosed = true;
+			return;
+		}
 
+		if (m_lane == model::LANE_TOP && nTopWizards > 1 && nTopWizards >= nTopWizardsEnemy)
+		{
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			return;
+		}
+
+		if (m_lane == model::LANE_BOTTOM && nBotWizards > 1 && nBotWizards >= nBotWizardsEnemy)
+		{
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			return;
+		}
+	}
 
 	if (nBotWizards == 0)
 	{
-		m_lane = model::LANE_BOTTOM;
-		m_bLaneChoosed = true;
-		return;
+		if (m_lane == model::LANE_BOTTOM)
+		{
+			m_bLaneChoosed = true;
+			return;
+		}
+
+		if (m_lane == model::LANE_TOP && nTopWizards > 1 && nTopWizards >= nTopWizardsEnemy)
+		{
+			m_lane = model::LANE_BOTTOM;
+			m_bLaneChoosed = true;
+			return;
+		}
+
+		if (m_lane == model::LANE_MIDDLE && nMidWizards > 1 && nMidWizards >= nMidWizardsEnemy)
+		{
+			m_lane = model::LANE_BOTTOM;
+			m_bLaneChoosed = true;
+			return;
+		}
 	}
 
-	if (nTopWizards >= 3)
+	if (nTopWizards >= 3 && m_lane == model::LANE_TOP)
 	{
 		if (nMidWizards < nBotWizards)
 			m_lane = model::LANE_MIDDLE;
 		else
 			m_lane = model::LANE_BOTTOM;
 	}
-	if (nMidWizards >= 3)
+	if (nMidWizards >= 3 && m_lane == model::LANE_MIDDLE)
 	{
 		if (nBotWizards < nTopWizards)
 			m_lane = model::LANE_BOTTOM;
 		else
 			m_lane = model::LANE_TOP;
 	}
-	if (nBotWizards >= 3)
+	if (nBotWizards >= 3 && m_lane == model::LANE_BOTTOM)
 	{
 		if (nMidWizards < nTopWizards)
 			m_lane = model::LANE_MIDDLE;
