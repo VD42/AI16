@@ -23,6 +23,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_game = &game;
 	m_move = &move;
 
+	m_tPowers.clear();
+
 	if (!m_bSeedReady)
 	{
 		volatile unsigned int seed = (unsigned int)time(nullptr) + (unsigned int)m_game->getRandomSeed() + (unsigned int)m_self->getId() + (unsigned int)(m_self->getX() * 100.0) + (unsigned int)(m_self->getY() * 100.0);

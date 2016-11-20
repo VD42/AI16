@@ -494,6 +494,9 @@ void CGlobal::ReCheckLane()
 	if (!OwnLaneControl() && !m_bLaneRush)
 		return;
 
+	if (m_strategy.m_self->getDistanceTo(m_BS.first, m_BS.second) < 1000.0)
+		return;
+
 	int nTopWizards = 0;
 	int nMidWizards = 0;
 	int nBotWizards = 0;

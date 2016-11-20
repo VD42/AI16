@@ -1,2 +1,1 @@
-java -cp ".;*;%~dp0/*" -jar repeater.jar %1
-pause
+start java -Xms128M -Xmx1G -cp ".;*;%~dp0/*" -jar repeater.jar %1
