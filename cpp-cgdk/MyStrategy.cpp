@@ -41,6 +41,15 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	m_nLastReceivedTickIndex = m_world->getTickIndex();
 
+	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+		m_bHealMode = true;
+	if (m_self->getLife() < m_self->getMaxLife() * 0.15)
+		m_bVeryHealMode = true;
+	if (m_self->getLife() >= m_self->getMaxLife() * 0.3)
+		m_bVeryHealMode = false;
+	if (m_self->getLife() >= m_self->getMaxLife() * 0.8)
+		m_bHealMode = false;
+
 	if (m_world->getTickIndex() == 500 || (m_world->getTickIndex() + 1000) % 2500 == 0)
 	{
 		m_global.ReCheckLane();
@@ -76,7 +85,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 	}
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+	if (m_bHealMode)
 		m_nLastHealTick = m_world->getTickIndex();
 
 	m_global.SetTowerCords();
@@ -171,7 +180,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 		else
 		{
-			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+			if (m_bHealMode)
 			{
 				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 900.0 ? -2000.0 : 0.0));
 			}
@@ -209,7 +218,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 				pEnMinUnit = &unit;
 			}
-			if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+			if (m_bHealMode)
 			{
 				AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 600.0 ? -2000.0 : 0.0));
 			}
@@ -243,7 +252,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+				if (m_bHealMode)
 				{
 					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
 				}
@@ -268,7 +277,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					enMinBase = unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second);
 					pEnMinUnit = &unit;
 				}
-				if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+				if (m_bHealMode)
 				{
 					AddPower("heal", result, CalcPower(unit.getX(), unit.getY(), m_self->getDistanceTo(unit) < 500.0 ? -2000.0 : 0.0));
 				}
@@ -415,7 +424,7 @@ bool MyStrategy::Shoot()
 	if (!target)
 		return false;
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.15)
+	if (m_bVeryHealMode)
 	{
 		BestShoot(*target, false);
 		return false;

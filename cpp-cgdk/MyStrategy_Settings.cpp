@@ -220,10 +220,10 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	{
 		if (DISTANCE <= ENEMY_RANGE)
 		{
-			if ((unit.getRemainingActionCooldownTicks() < 100 && !(strategy.m_self->getLife() > strategy.m_self->getMaxLife() * 0.75)) || DISTANCE < MY_RANGE / 1.5)
+			if (strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.5)
 				PW = -300.0;
 			else
-				PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+				PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
 		else
 		{
@@ -380,10 +380,10 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	{
 		if (DISTANCE <= ENEMY_RANGE)
 		{
-			if ((unit.getRemainingActionCooldownTicks() < 100 && !(strategy.m_self->getLife() > strategy.m_self->getMaxLife() * 0.75)) || DISTANCE < MY_RANGE / 1.5)
+			if (strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.5)
 				PW = -300.0;
 			else
-				PW = (PW * 120.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+				PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
 		else
 		{

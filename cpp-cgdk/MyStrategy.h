@@ -38,4 +38,7 @@ public:
 	void BestShoot(const model::CircularUnit & unit, bool turn);
 
 	int m_nLastReceivedTickIndex = -1;
+
+	bool m_bHealMode = false;
+	bool m_bVeryHealMode = false;
 };
