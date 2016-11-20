@@ -42,13 +42,20 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_nLastReceivedTickIndex = m_world->getTickIndex();
 
 	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+	{
 		m_bHealMode = true;
-	if (m_self->getLife() < m_self->getMaxLife() * 0.15)
-		m_bVeryHealMode = true;
-	if (m_self->getLife() >= m_self->getMaxLife() * 0.3)
-		m_bVeryHealMode = false;
-	if (m_self->getLife() >= m_self->getMaxLife() * 0.8)
+		if (m_nLastHealTick + 100 > m_world->getTickIndex())
+			m_bDoubleHealMode = true;
+	}
+	//if (m_self->getLife() < m_self->getMaxLife() * 0.15)
+	//	m_bVeryHealMode = true;
+	//if (m_self->getLife() >= m_self->getMaxLife() * 0.2)
+	//	m_bVeryHealMode = false;
+	if (m_self->getLife() >= m_self->getMaxLife() * (m_bDoubleHealMode ? 0.8 : 0.6))
+	{
 		m_bHealMode = false;
+		m_bDoubleHealMode = false;
+	}
 
 	if (m_world->getTickIndex() == 500 || (m_world->getTickIndex() + 1000) % 2500 == 0)
 	{
