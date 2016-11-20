@@ -332,7 +332,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 2800.0 };
 	}
 
-	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.first) > 1000.0)
+	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) > 1000.0)
 	{
 		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
 	}

@@ -262,6 +262,14 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
+	for (auto & wizards : strategy.m_world->getWizards())
+	{
+		if (wizards.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (wizards.getDistanceTo(unit) <= strategy.m_game->getWizardCastRange())
+			PW += 1.0;
+	}
+
 	if (PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
