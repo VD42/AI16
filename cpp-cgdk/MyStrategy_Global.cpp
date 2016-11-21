@@ -139,16 +139,49 @@ void CGlobal::ChooseLane()
 
 std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 {
-	bool priority = false;
+	//bool priority = false;
+
+	const model::Building * base = nullptr;
+	for (auto & building : m_strategy.m_world->getBuildings())
+	{
+		if (building.getType() == model::BUILDING_FACTION_BASE && building.getFaction() == m_strategy.m_self->getFaction())
+		{
+			base = &building;
+			break;
+		}
+	}
+
+	std::pair<std::pair<double, double>, bool> result = { { 0.0, 0.0 }, false };
+	double distance = 40000.0;
+
+	if (!base)
+		return result;
 
 	if (m_lane == model::LANE_TOP)
 	{
-		if (m_top == LaneState::TOWER_1) return { { (m_strategy.m_self->getY() < 700.0 ? m_T1.first : 250.0), m_T1.second }, priority };
-		if (m_top == LaneState::TOWER_2) return { { (m_strategy.m_self->getY() < 700.0 ? m_T2.first : 250.0), m_T2.second }, priority };
+		if (m_top == LaneState::TOWER_1)
+		{
+			if (base->getDistanceTo(m_T1.first, m_T1.second) < distance)
+			{
+				result.first = { m_T1.first, m_T1.second };
+				result.second = false;
+				distance = base->getDistanceTo(m_T1.first, m_T1.second);
+			}
+		}
+		if (m_top == LaneState::TOWER_2)
+		{
+			if (base->getDistanceTo(m_T2.first, m_T2.second) < distance)
+			{
+				result.first = { m_T2.first, m_T2.second };
+				result.second = false;
+				distance = base->getDistanceTo(m_T2.first, m_T2.second);
+			}
+		}
 		if (m_top == LaneState::BASE)
 		{
 			double baseX = m_BS.first - 200.0;
 			double baseY = m_BS.second - 150.0;
+			bool priority = false;
 
 			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
@@ -156,17 +189,66 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 				priority = true;
 			}
 
-			return { { (m_strategy.m_self->getY() < 700.0 ? baseX : 250.0), baseY }, priority };
+			if (base->getDistanceTo(baseX, baseY) < distance)
+			{
+				result.first = { baseX, baseY };
+				result.second = priority;
+				distance = base->getDistanceTo(baseX, baseY);
+			}
 		}
+		for (auto & minion : m_strategy.m_world->getMinions())
+		{
+			if (minion.getFaction() == m_strategy.m_self->getFaction() || minion.getFaction() == model::FACTION_NEUTRAL)
+				continue;
+			if (GetLane(minion) != model::LANE_TOP)
+				continue;
+			if (base->getDistanceTo(minion.getX(), minion.getY()) < distance)
+			{
+				result.first = { minion.getX(), minion.getY() };
+				result.second = false;
+				distance = base->getDistanceTo(minion.getX(), minion.getY());
+			}
+		}
+		for (auto & wizard : m_strategy.m_world->getWizards())
+		{
+			if (wizard.getFaction() == m_strategy.m_self->getFaction())
+				continue;
+			if (GetLane(wizard) != model::LANE_TOP)
+				continue;
+			if (base->getDistanceTo(wizard.getX(), wizard.getY()) < distance)
+			{
+				result.first = { wizard.getX(), wizard.getY() };
+				result.second = false;
+				distance = base->getDistanceTo(wizard.getX(), wizard.getY());
+			}
+		}
+		return { { (m_strategy.m_self->getY() < 700.0 ? result.first.first : 250.0), result.first.second }, result.second };
 	}
 	else if (m_lane == model::LANE_MIDDLE)
 	{
-		if (m_mid == LaneState::TOWER_1) return { { m_M1.first, m_M1.second }, priority };
-		if (m_mid == LaneState::TOWER_2) return { { m_M2.first, m_M2.second }, priority };
+		if (m_mid == LaneState::TOWER_1)
+		{
+			if (base->getDistanceTo(m_M1.first, m_M1.second) < distance)
+			{
+				result.first = { m_M1.first, m_M1.second };
+				result.second = false;
+				distance = base->getDistanceTo(m_M1.first, m_M1.second);
+			}
+		}
+		if (m_mid == LaneState::TOWER_2)
+		{
+			if (base->getDistanceTo(m_M2.first, m_M2.second) < distance)
+			{
+				result.first = { m_M2.first, m_M2.second };
+				result.second = false;
+				distance = base->getDistanceTo(m_M2.first, m_M2.second);
+			}
+		}
 		if (m_mid == LaneState::BASE)
 		{
 			double baseX = m_BS.first - 200.0;
 			double baseY = m_BS.second + 200.0;
+			bool priority = false;
 
 			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
@@ -175,17 +257,66 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 				priority = true;
 			}
 
-			return { { baseX, baseY }, priority };
+			if (base->getDistanceTo(baseX, baseY) < distance)
+			{
+				result.first = { baseX, baseY };
+				result.second = priority;
+				distance = base->getDistanceTo(baseX, baseY);
+			}
 		}
+		for (auto & minion : m_strategy.m_world->getMinions())
+		{
+			if (minion.getFaction() == m_strategy.m_self->getFaction() || minion.getFaction() == model::FACTION_NEUTRAL)
+				continue;
+			if (GetLane(minion) != model::LANE_MIDDLE)
+				continue;
+			if (base->getDistanceTo(minion.getX(), minion.getY()) < distance)
+			{
+				result.first = { minion.getX(), minion.getY() };
+				result.second = false;
+				distance = base->getDistanceTo(minion.getX(), minion.getY());
+			}
+		}
+		for (auto & wizard : m_strategy.m_world->getWizards())
+		{
+			if (wizard.getFaction() == m_strategy.m_self->getFaction())
+				continue;
+			if (GetLane(wizard) != model::LANE_MIDDLE)
+				continue;
+			if (base->getDistanceTo(wizard.getX(), wizard.getY()) < distance)
+			{
+				result.first = { wizard.getX(), wizard.getY() };
+				result.second = false;
+				distance = base->getDistanceTo(wizard.getX(), wizard.getY());
+			}
+		}
+		return { { result.first.first, result.first.second }, result.second };
 	}
 	else if (m_lane == model::LANE_BOTTOM)
 	{
-		if (m_bot == LaneState::TOWER_1) return { { m_B1.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B1.second : m_strategy.m_game->getMapSize() - 250.0) }, priority };
-		if (m_bot == LaneState::TOWER_2) return { { m_B2.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? m_B2.second : m_strategy.m_game->getMapSize() - 250.0) }, priority };
+		if (m_bot == LaneState::TOWER_1)
+		{
+			if (base->getDistanceTo(m_B1.first, m_B1.second) < distance)
+			{
+				result.first = { m_B1.first, m_B1.second };
+				result.second = false;
+				distance = base->getDistanceTo(m_B1.first, m_B1.second);
+			}
+		}
+		if (m_bot == LaneState::TOWER_2)
+		{
+			if (base->getDistanceTo(m_B2.first, m_B2.second) < distance)
+			{
+				result.first = { m_B2.first, m_B2.second };
+				result.second = false;
+				distance = base->getDistanceTo(m_B2.first, m_B2.second);
+			}
+		}
 		if (m_bot == LaneState::BASE)
 		{
 			double baseX = m_BS.first + 150.0;
 			double baseY = m_BS.second + 200.0;
+			bool priority = false;
 
 			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
@@ -193,10 +324,42 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 				priority = true;
 			}
 
-			return { { baseX, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? baseY : m_strategy.m_game->getMapSize() - 250.0) }, priority };
+			if (base->getDistanceTo(baseX, baseY) < distance)
+			{
+				result.first = { baseX, baseY };
+				result.second = priority;
+				distance = base->getDistanceTo(baseX, baseY);
+			}
 		}
+		for (auto & minion : m_strategy.m_world->getMinions())
+		{
+			if (minion.getFaction() == m_strategy.m_self->getFaction() || minion.getFaction() == model::FACTION_NEUTRAL)
+				continue;
+			if (GetLane(minion) != model::LANE_BOTTOM)
+				continue;
+			if (base->getDistanceTo(minion.getX(), minion.getY()) < distance)
+			{
+				result.first = { minion.getX(), minion.getY() };
+				result.second = false;
+				distance = base->getDistanceTo(minion.getX(), minion.getY());
+			}
+		}
+		for (auto & wizard : m_strategy.m_world->getWizards())
+		{
+			if (wizard.getFaction() == m_strategy.m_self->getFaction())
+				continue;
+			if (GetLane(wizard) != model::LANE_BOTTOM)
+				continue;
+			if (base->getDistanceTo(wizard.getX(), wizard.getY()) < distance)
+			{
+				result.first = { wizard.getX(), wizard.getY() };
+				result.second = false;
+				distance = base->getDistanceTo(wizard.getX(), wizard.getY());
+			}
+		}
+		return { { result.first.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? result.first.second : m_strategy.m_game->getMapSize() - 250.0) }, result.second };
 	}
-	return { { m_BS.first, m_BS.second }, priority };
+	return result;
 }
 
 bool CGlobal::EnemyTowerNotExists(std::pair<double, double> position)

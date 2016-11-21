@@ -54,4 +54,6 @@ public:
 	bool OwnLaneControl();
 
 	void ReCheckLane();
+
+	//std::vector<int, model::LaneType> m_tWizardLanes;
 };
