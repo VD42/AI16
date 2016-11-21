@@ -55,5 +55,5 @@ public:
 
 	void ReCheckLane();
 
-	//std::vector<int, model::LaneType> m_tWizardLanes;
+	bool m_bEgoistMode = true;
 };

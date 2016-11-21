@@ -80,13 +80,16 @@ void CGlobal::ChooseLane()
 		m_bLaneChoosed = true; // no rechoose lane! but master wizard can do it!
 	}
 
-	for (auto & message : m_strategy.m_self->getMessages())
+	if (!m_bEgoistMode)
 	{
-		if (message.getLane() == model::_LANE_UNKNOWN_)
-			continue;
-		m_bMasterNotSilent = true;
-		m_lane = message.getLane();
-		m_bLaneChoosed = true;
+		for (auto & message : m_strategy.m_self->getMessages())
+		{
+			if (message.getLane() == model::_LANE_UNKNOWN_)
+				continue;
+			m_bMasterNotSilent = true;
+			m_lane = message.getLane();
+			m_bLaneChoosed = true;
+		}
 	}
 
 	if (m_bLaneChoosed)
@@ -139,8 +142,6 @@ void CGlobal::ChooseLane()
 
 std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 {
-	//bool priority = false;
-
 	const model::Building * base = nullptr;
 	for (auto & building : m_strategy.m_world->getBuildings())
 	{
@@ -634,6 +635,8 @@ void CGlobal::SetTowerCords()
 
 bool CGlobal::OwnLaneControl()
 {
+	if (m_bEgoistMode)
+		return true;
 	if (m_strategy.m_self->isMaster())
 		return true;
 	if (m_bMasterNotSilent)
@@ -690,6 +693,57 @@ void CGlobal::ReCheckLane()
 
 	printf("FW: T - %d / M - %d / B - %d\r\n", nTopWizards, nMidWizards, nBotWizards);
 	printf("EW: T - %d / M - %d / B - %d\r\n", nTopWizardsEnemy, nMidWizardsEnemy, nBotWizardsEnemy);
+
+	if (m_bEgoistMode)
+	{
+		if (m_lane == model::LANE_TOP)
+		{
+			if (nMidWizardsEnemy < nTopWizardsEnemy)
+			{
+				m_lane = model::LANE_MIDDLE;
+				m_bLaneChoosed = true;
+				return;
+			}
+			if(nBotWizardsEnemy < nTopWizardsEnemy)
+			{
+				m_lane = model::LANE_BOTTOM;
+				m_bLaneChoosed = true;
+				return;
+			}
+		}
+		if (m_lane == model::LANE_MIDDLE)
+		{
+			if (nTopWizardsEnemy < nMidWizardsEnemy)
+			{
+				m_lane = model::LANE_TOP;
+				m_bLaneChoosed = true;
+				return;
+			}
+			if (nBotWizardsEnemy < nMidWizardsEnemy)
+			{
+				m_lane = model::LANE_BOTTOM;
+				m_bLaneChoosed = true;
+				return;
+			}
+		}
+		if (m_lane == model::LANE_BOTTOM)
+		{
+			if (nMidWizardsEnemy < nBotWizardsEnemy)
+			{
+				m_lane = model::LANE_MIDDLE;
+				m_bLaneChoosed = true;
+				return;
+			}
+			if (nTopWizardsEnemy < nBotWizardsEnemy)
+			{
+				m_lane = model::LANE_TOP;
+				m_bLaneChoosed = true;
+				return;
+			}
+		}
+		m_bLaneChoosed = true;
+		return;
+	}
 
 	if (nTopWizardsEnemy + nMidWizardsEnemy + nBotWizardsEnemy == 5)
 	{
