@@ -315,13 +315,13 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 		}
 		if (m_bot == LaneState::BASE)
 		{
-			double baseX = m_BS.first + 150.0;
+			double baseX = m_BS.first + 250.0;
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
 			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
-				baseX = m_BS.second + 800.0;
+				baseY = m_BS.second + 800.0;
 				priority = true;
 			}
 
