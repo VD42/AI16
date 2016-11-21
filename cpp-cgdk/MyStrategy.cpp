@@ -337,7 +337,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
 	}
 
-	if (m_world->getTickIndex() == 10)
+	if (m_world->getTickIndex() == 300)
 	{
 		m_bCreepStop = true;
 		m_CreepStopLane = m_global.m_lane;
