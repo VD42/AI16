@@ -41,7 +41,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	m_nLastReceivedTickIndex = m_world->getTickIndex();
 
-	if (m_self->getLife() < m_self->getMaxLife() * 0.4)
+	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.4)
 	{
 		m_bHealMode = true;
 		if (m_nLastHealTick + 100 > m_world->getTickIndex())
