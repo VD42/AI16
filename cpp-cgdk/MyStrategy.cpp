@@ -57,11 +57,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_bDoubleHealMode = false;
 	}
 
-	if (m_world->getTickIndex() == 500 || (m_world->getTickIndex() + 1000) % 2500 == 0)
-	{
-		m_global.ReCheckLane();
-	}
-
 	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
 	if (m_LastPositions.size() > 150)
 		m_LastPositions.pop_back();
@@ -99,6 +94,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_global.ChooseLane();
 	m_global.Update();
 	auto waypoint = m_global.GetWaypoint();
+
+	if (m_world->getTickIndex() == 500 || (m_world->getTickIndex() + 1000) % 2500 == 0)
+	{
+		m_global.ReCheckLane();
+	}
 
 	std::pair<double, double> result = { 0.0, 0.0 };
 

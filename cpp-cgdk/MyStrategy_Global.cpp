@@ -574,6 +574,14 @@ void CGlobal::Update()
 				m_bBonusB = false;
 		}
 	}
+
+	for (auto & wizard : m_strategy.m_world->getWizards())
+	{
+		if (wizard.getFaction() == m_strategy.m_self->getFaction())
+			m_mapFriendlyWizardsLane[wizard.getId()] = GetLane(wizard);
+		else
+			m_mapEnemyWizardsLane[wizard.getId()] = GetLane(wizard);
+	}
 }
 
 void CGlobal::SetTowerCords()
@@ -669,26 +677,25 @@ void CGlobal::ReCheckLane()
 	int nTopWizardsEnemy = 0;
 	int nMidWizardsEnemy = 0;
 	int nBotWizardsEnemy = 0;
-	for (auto & unit : m_strategy.m_world->getWizards())
+
+	for (auto & lane : m_mapFriendlyWizardsLane)
 	{
-		if (unit.getFaction() == m_strategy.m_self->getFaction())
-		{
-			if (GetLane(unit) == model::LANE_TOP)
-				nTopWizards++;
-			else if (GetLane(unit) == model::LANE_MIDDLE)
-				nMidWizards++;
-			else if (GetLane(unit) == model::LANE_BOTTOM)
-				nBotWizards++;
-		}
-		else
-		{
-			if (GetLane(unit) == model::LANE_TOP)
-				nTopWizardsEnemy++;
-			else if (GetLane(unit) == model::LANE_MIDDLE)
-				nMidWizardsEnemy++;
-			else if (GetLane(unit) == model::LANE_BOTTOM)
-				nBotWizardsEnemy++;
-		}
+		if (lane.second == model::LANE_TOP)
+			nTopWizards++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizards++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizards++;
+	}
+
+	for (auto & lane : m_mapEnemyWizardsLane)
+	{
+		if (lane.second == model::LANE_TOP)
+			nTopWizardsEnemy++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizardsEnemy++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizardsEnemy++;
 	}
 
 	printf("FW: T - %d / M - %d / B - %d\r\n", nTopWizards, nMidWizards, nBotWizards);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Strategy.h"
+#include <map>
 
 
 class MyStrategy;
@@ -56,4 +57,7 @@ public:
 	void ReCheckLane();
 
 	bool m_bEgoistMode = true;
+
+	std::map<int, model::LaneType> m_mapFriendlyWizardsLane;
+	std::map<int, model::LaneType> m_mapEnemyWizardsLane;
 };
