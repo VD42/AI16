@@ -60,7 +60,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
 	if (m_LastPositions.size() > 150)
 		m_LastPositions.pop_back();
-	if (!m_FreeMode && m_world->getTickIndex() >= 150 && m_nLastHealTick < m_world->getTickIndex() - 150 && m_LastShootTick < m_world->getTickIndex() - 150)
+	if (!m_FreeMode && !m_bCreepStop && m_world->getTickIndex() >= 150 && m_nLastHealTick < m_world->getTickIndex() - 150 && m_LastShootTick < m_world->getTickIndex() - 150)
 	{
 		bool good = false;
 		for (auto & val : m_LastPositions)
@@ -335,6 +335,107 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) > 1000.0)
 	{
 		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
+	}
+
+	if (m_world->getTickIndex() == 10)
+	{
+		m_bCreepStop = true;
+		m_CreepStopLane = m_global.m_lane;
+	}
+
+	if (m_bCreepStop)
+	{
+		if (m_global.m_lane != m_CreepStopLane || m_world->getTickIndex() >= 1500)
+		{
+			m_bCreepStop = false;
+		}
+		else
+		{
+			if (m_CreepStopLane == model::LANE_TOP)
+			{
+				if (m_world->getTickIndex() <= 750)
+				{
+					waypoint.first.first = 200.0;
+					waypoint.first.second = m_game->getMapSize() - 1200.0;
+				}
+				else
+				{
+					double minX = 0.0;
+					double minY = 4000.0;
+					for (auto & minion : m_world->getMinions())
+					{
+						if (minion.getFaction() != m_self->getFaction())
+							continue;
+						if (m_global.GetLane(minion) != m_CreepStopLane)
+							continue;
+						if (minion.getY() < minY)
+						{
+							minX = minion.getX();
+							minY = minion.getY();
+						}
+					}
+					waypoint.first.first = minX;
+					waypoint.first.second = minY - m_game->getMinionRadius() - m_game->getWizardRadius();
+				}
+			}
+			else if (m_CreepStopLane == model::LANE_MIDDLE)
+			{
+				if (m_world->getTickIndex() <= 750)
+				{
+					waypoint.first.first = 1000.0;
+					waypoint.first.second = m_game->getMapSize() - 1000.0;
+				}
+				else
+				{
+					double maxD = 0.0;
+					double maxX = 0.0;
+					double maxY = 0.0;
+					for (auto & minion : m_world->getMinions())
+					{
+						if (minion.getFaction() != m_self->getFaction())
+							continue;
+						if (m_global.GetLane(minion) != m_CreepStopLane)
+							continue;
+						double D = minion.getX() * (1.0 / std::sqrt(2.0)) + (m_game->getMapSize() - minion.getY()) * (1.0 / std::sqrt(2.0));
+						if (D > maxD)
+						{
+							maxX = minion.getX();
+							maxY = minion.getY();
+							maxD = D;
+						}
+					}
+					waypoint.first.first = maxX + (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+					waypoint.first.second = maxY - (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+				}
+			}
+			else if (m_CreepStopLane == model::LANE_BOTTOM)
+			{
+				if (m_world->getTickIndex() <= 750)
+				{
+					waypoint.first.first = 1200.0;
+					waypoint.first.second = m_game->getMapSize() - 200.0;
+				}
+				else
+				{
+					double maxX = 0.0;
+					double maxY = 0.0;
+					for (auto & minion : m_world->getMinions())
+					{
+						if (minion.getFaction() != m_self->getFaction())
+							continue;
+						if (m_global.GetLane(minion) != m_CreepStopLane)
+							continue;
+						if (minion.getX() > maxX)
+						{
+							maxX = minion.getX();
+							maxY = minion.getY();
+						}
+					}
+					waypoint.first.first = maxX + m_game->getMinionRadius() + m_game->getWizardRadius();
+					waypoint.first.second = maxY;
+				}
+			}
+		}
 	}
 
 	AddPower("base", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));

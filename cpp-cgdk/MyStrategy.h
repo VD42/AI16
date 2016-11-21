@@ -42,4 +42,7 @@ public:
 	bool m_bHealMode = false;
 	bool m_bVeryHealMode = false;
 	bool m_bDoubleHealMode = false;
+
+	bool m_bCreepStop = false;
+	model::LaneType m_CreepStopLane = model::_LANE_UNKNOWN_;
 };
