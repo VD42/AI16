@@ -320,7 +320,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	for (auto & unit : m_world->getBonuses())
 	{
-		AddPower("bonus", result, CalcPower(unit, 250.0));
+		if (m_self->getDistanceTo(unit) < 500.0)
+			AddPower("bonus", result, CalcPower(unit, 3000.0));
 	}
 
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
