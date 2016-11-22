@@ -453,6 +453,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_F
 
 const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEUTRAL_CREEP_ORC = [](MyStrategy & strategy, const model::Minion & unit)
 {
+	if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
+		return 0.0;
+
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() * 5.0 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
@@ -480,18 +483,45 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	if (PW > 0.0)
 	{
 		if (DISTANCE >= MY_RANGE)
-			PW = 0.0;
+		{
+			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+		}
 		else if (DISTANCE < MY_RANGE / 1.5)
-			PW = -0.5;
+		{
+			if (PW < 0.5)
+			{
+				PW = -175.0;
+			}
+			else
+			{
+				bool bFound = false;
+				for (auto & wizard : strategy.m_world->getWizards())
+				{
+					if (wizard.getFaction() == strategy.m_self->getFaction())
+						continue;
+					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (bFound)
+					PW = -175.0;
+				else
+					PW = 10.0;
+			}
+		}
 		else
+		{
 			PW = 0.0;
+		}
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -1.0;
+			PW = -300.0;
 		else
-			PW = 0.0;
+			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
 
 	return PW;
@@ -499,6 +529,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 
 const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEUTRAL_CREEP_FETISH = [](MyStrategy & strategy, const model::Minion & unit)
 {
+	if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
+		return 0.0;
+
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() * 1.5 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
@@ -526,18 +559,45 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	if (PW > 0.0)
 	{
 		if (DISTANCE >= MY_RANGE)
-			PW = 0.0;
+		{
+			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+		}
 		else if (DISTANCE < MY_RANGE / 1.5)
-			PW = -0.5;
+		{
+			if (PW < 0.5)
+			{
+				PW = -175.0;
+			}
+			else
+			{
+				bool bFound = false;
+				for (auto & wizard : strategy.m_world->getWizards())
+				{
+					if (wizard.getFaction() == strategy.m_self->getFaction())
+						continue;
+					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					{
+						bFound = true;
+						break;
+					}
+				}
+				if (bFound)
+					PW = -175.0;
+				else
+					PW = 10.0;
+			}
+		}
 		else
+		{
 			PW = 0.0;
+		}
 	}
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -1.0;
+			PW = -300.0;
 		else
-			PW = 0.0;
+			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
 
 	return PW;

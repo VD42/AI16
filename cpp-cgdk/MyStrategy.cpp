@@ -321,18 +321,16 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("bonus", result, CalcPower(unit, 200.0));
 	}
 
-	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) - 100.0))
+	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
 	{
-		if (m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
-			waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 1200.0 };
+		waypoint.first = { 1200.0 + ((m_world->getTickIndex() - 2) % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 25.0 : 0.0), 1200.0 };
 	}
 	else if (m_global.m_bBonusB)
 	{
-		if (m_self->getDistanceTo(2800.0, 2800.0) < m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) - 250.0 && m_self->getDistanceTo(2800.0, 2800.0) < m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) - 250.0)
-			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 50.0 : 0.0), 2800.0 };
+		waypoint.first = { 2800.0 - ((m_world->getTickIndex() - 2) % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 25.0 : 0.0), 2800.0 };
 	}
 
-	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) > 1000.0)
+	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < 1000.0)
 	{
 		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
 	}
@@ -472,9 +470,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode)
-			continue;
-		if (unit.getFaction() == model::FACTION_NEUTRAL && (D - m_self->getRadius() - unit.getRadius() > 25.0 || (!m_FreeMode && std::abs(m_self->getAngleTo(unit)) > PI / 5.0)))
+		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
 			continue;
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)

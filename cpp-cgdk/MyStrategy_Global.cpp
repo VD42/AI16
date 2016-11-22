@@ -1,5 +1,6 @@
 #include "MyStrategy_Global.h"
 #include "MyStrategy.h"
+#include <algorithm>
 
 
 CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLaneChoosed(false), m_strategy(strategy), m_top(LaneState::TOWER_1), m_mid(LaneState::TOWER_1), m_bot(LaneState::TOWER_1), m_bVaidCords(false), m_bBonusT(false), m_bBonusB(false), m_bLaneRush(false), m_bMasterNotSilent(false)
@@ -548,19 +549,12 @@ void CGlobal::Update()
 		}*/
 	}
 
-	if ((m_strategy.m_world->getTickIndex() - 1) % 2500 >= 2400)
-	{
-		m_bBonusT = true;
-		m_bBonusB = true;
-	}
-	else if ((m_strategy.m_world->getTickIndex() - 1) % 2500 > 2000)
-	{
-		m_bBonusT = false;
-		m_bBonusB = false;
-	}
 	if (m_bBonusT)
 	{
-		if ((m_strategy.m_world->getTickIndex() - 1) % 2500 < 2400)
+		if (m_strategy.m_world->getTickIndex() - m_bBonusTStart >= 2500)
+			m_bBonusT = false;
+
+		if (m_bBonusT && (m_strategy.m_world->getTickIndex() - 1) / 2500 > (m_bBonusTStart - 1) / 2500)
 		{
 			if (BonusNotExists(std::make_pair(1200.0, 1200.0)))
 				m_bBonusT = false;
@@ -568,11 +562,25 @@ void CGlobal::Update()
 	}
 	if (m_bBonusB)
 	{
-		if ((m_strategy.m_world->getTickIndex() - 1) % 2500 < 2400)
+		if (m_strategy.m_world->getTickIndex() - m_bBonusBStart >= 2500)
+			m_bBonusB = false;
+
+		if (m_bBonusB && (m_strategy.m_world->getTickIndex() - 1) / 2500 > (m_bBonusBStart - 1) / 2500)
 		{
 			if (BonusNotExists(std::make_pair(2800.0, 2800.0)))
 				m_bBonusB = false;
 		}
+	}
+
+	if (!m_bBonusT && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min((int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0), 2000)))
+	{
+		m_bBonusT = true;
+		m_bBonusTStart = m_strategy.m_world->getTickIndex();
+	}
+	if (!m_bBonusB && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min((int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0), 2000)))
+	{
+		m_bBonusB = true;
+		m_bBonusBStart = m_strategy.m_world->getTickIndex();
 	}
 
 	for (auto & wizard : m_strategy.m_world->getWizards())
