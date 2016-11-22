@@ -323,11 +323,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
 	{
-		waypoint.first = { 1200.0 + ((m_world->getTickIndex() - 2) % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 25.0 : 0.0), 1200.0 };
+		waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.0 : 0.0), 1200.0 };
 	}
 	else if (m_global.m_bBonusB)
 	{
-		waypoint.first = { 2800.0 - ((m_world->getTickIndex() - 2) % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 25.0 : 0.0), 2800.0 };
+		waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.0 : 0.0), 2800.0 };
 	}
 
 	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < 1000.0)
