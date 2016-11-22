@@ -572,12 +572,12 @@ void CGlobal::Update()
 		}
 	}
 
-	if (!m_bBonusT && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min((int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0), 2000)))
+	if (!m_bBonusT && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min(std::min((int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0), (int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0)), 2000)))
 	{
 		m_bBonusT = true;
 		m_bBonusTStart = m_strategy.m_world->getTickIndex();
 	}
-	if (!m_bBonusB && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min((int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0), 2000)))
+	if (!m_bBonusB && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min(std::min((int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0), (int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0)), 2000)))
 	{
 		m_bBonusB = true;
 		m_bBonusBStart = m_strategy.m_world->getTickIndex();

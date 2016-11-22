@@ -95,7 +95,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_global.Update();
 	auto waypoint = m_global.GetWaypoint();
 
-	if (m_world->getTickIndex() == 500 || (m_world->getTickIndex() + 1000) % 2500 == 0)
+	if (m_world->getTickIndex() > 3000 && (m_world->getTickIndex() + 1000) % 2500 == 0)
 	{
 		m_global.ReCheckLane();
 	}
