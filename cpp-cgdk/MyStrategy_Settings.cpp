@@ -274,7 +274,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
-			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+			PW = ((PW + (strategy.m_self->getLife() > (unit.getLife() / 2.0) ? 1.0 : 0.0) + (HAVE_SHIELD(strategy, *strategy.m_self) ? 1.0 : 0.0) + (HAVE_EMPOWER(strategy, *strategy.m_self) ? 1.0 : 0.0)) * 150.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
 		else if (DISTANCE < MY_RANGE / 1.5)
 		{
@@ -315,7 +315,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 			if (bFound)
 				PW = -175.0;
 			else
-				PW = 10.0;
+				PW = 75.0;
 		}
 		else
 		{
@@ -327,7 +327,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 		if (DISTANCE <= ENEMY_RANGE)
 			PW = -300.0;
 		else
-			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+			PW = 75.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
 
 	return PW;

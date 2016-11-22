@@ -307,6 +307,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 	}
 
+	/*
 	for (auto & unit : m_world->getProjectiles()) // test
 	{
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
@@ -315,10 +316,11 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 		AddPower("projectile", result, CalcPower(unit, CSettings::PW_PROJECTILE(*this, unit)));
 	}
+	*/
 
 	for (auto & unit : m_world->getBonuses())
 	{
-		AddPower("bonus", result, CalcPower(unit, 200.0));
+		AddPower("bonus", result, CalcPower(unit, 250.0));
 	}
 
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
@@ -489,7 +491,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = 150.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = 15000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -504,7 +506,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = (unit.getType() == model::BUILDING_FACTION_BASE  ? 200.0 : 50.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = (unit.getType() == model::BUILDING_FACTION_BASE  ? 10000.0 : 50.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
