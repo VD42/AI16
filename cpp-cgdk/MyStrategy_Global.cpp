@@ -16,6 +16,11 @@ CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLane
 
 model::LaneType CGlobal::GetLane(const model::LivingUnit & unit)
 {
+	if (unit.getDistanceTo(1200.0, 1200.0) < 300.0)
+		return model::_LANE_UNKNOWN_;
+	if (unit.getDistanceTo(2800.0, 2800.0) < 300.0)
+		return model::_LANE_UNKNOWN_;
+
 	std::pair<double, double> T1 = { 0.0, 2000.0 };
 	std::pair<double, double> T2 = { 2000.0, 0.0 };
 	std::pair<double, double> M1 = { 1600.0, 2400.0 };
@@ -586,9 +591,15 @@ void CGlobal::Update()
 	for (auto & wizard : m_strategy.m_world->getWizards())
 	{
 		if (wizard.getFaction() == m_strategy.m_self->getFaction())
-			m_mapFriendlyWizardsLane[wizard.getId()] = GetLane(wizard);
+		{
+			if (GetLane(wizard) != model::_LANE_UNKNOWN_)
+				m_mapFriendlyWizardsLane[wizard.getId()] = GetLane(wizard);
+		}
 		else
-			m_mapEnemyWizardsLane[wizard.getId()] = GetLane(wizard);
+		{
+			if (GetLane(wizard) != model::_LANE_UNKNOWN_)
+				m_mapEnemyWizardsLane[wizard.getId()] = GetLane(wizard);
+		}
 	}
 }
 
