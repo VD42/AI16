@@ -472,8 +472,7 @@ bool MyStrategy::Shoot()
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
-		if (D > m_self->getCastRange())
+		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius())
 			continue;
 		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
 			continue;
@@ -491,8 +490,7 @@ bool MyStrategy::Shoot()
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
-		if (D > m_self->getCastRange())
+		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius())
 			continue;
 		double P = 1000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
@@ -508,8 +506,7 @@ bool MyStrategy::Shoot()
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
-		if (D > m_self->getCastRange())
+		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius())
 			continue;
 		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 20000.0 : 10000.0);
 		if (P > MAX_PRIORITY)
@@ -521,8 +518,8 @@ bool MyStrategy::Shoot()
 
 	for (auto & unit : m_world->getTrees())
 	{
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
-		if (D > m_self->getCastRange())
+		double D = m_self->getDistanceTo(unit);
+		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius())
 			continue;
 		if (D - m_self->getRadius() - unit.getRadius() > 25.0 || (!m_FreeMode && std::abs(m_self->getAngleTo(unit)) > PI / 5.0))
 			continue;
