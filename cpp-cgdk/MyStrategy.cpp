@@ -557,8 +557,8 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 
 		for (auto & unit : m_world->getTrees())
 		{
-			double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
-			if (D > m_self->getCastRange())
+			double D = m_self->getDistanceTo(unit);
+			if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius())
 				continue;
 			if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
 				continue;
