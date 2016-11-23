@@ -12,8 +12,8 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() * 5.0 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() + strategy.m_self->getRadius() + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed() + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -40,11 +40,11 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			if (PW < 0.5)
 			{
-				PW = -175.0;
+				PW = -1750.0;
 			}
 			else
 			{
@@ -60,9 +60,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 					}
 				}
 				if (bFound)
-					PW = -175.0;
+					PW = -1750.0;
 				else
-					PW = 10.0;
+					PW = 100.0;
 			}
 		}
 		else
@@ -73,7 +73,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -300.0;
+			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -85,8 +85,8 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() * 1.5 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() + strategy.m_game->getDartRadius() + strategy.m_self->getRadius() + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed() + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -113,11 +113,11 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			if (PW < 0.5)
 			{
-				PW = -175.0;
+				PW = -1750.0;
 			}
 			else
 			{
@@ -133,9 +133,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 					}
 				}
 				if (bFound)
-					PW = -175.0;
+					PW = -1750.0;
 				else
-					PW = 10.0;
+					PW = 100.0;
 			}
 		}
 		else
@@ -146,7 +146,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -300.0;
+			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -158,8 +158,8 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -186,11 +186,11 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		{
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			if (PW < 1.5)
 			{
-				PW = -175.0;
+				PW = -1750.0;
 			}
 			else
 			{
@@ -206,9 +206,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 					}
 				}
 				if (bFound)
-					PW = -175.0;
+					PW = -1750.0;
 				else
-					PW = 10.0;
+					PW = 100.0;
 			}
 		}
 		else
@@ -231,8 +231,8 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 					break;
 				}
 			}
-			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.5)
-				PW = -300.0;
+			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.2)
+				PW = -3000.0;
 			else
 				PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
@@ -249,8 +249,8 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_game->getWizardForwardSpeed() * 2.0;
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_self->getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_game->getWizardForwardSpeed() * 2.0 + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -276,7 +276,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 		{
 			PW = ((PW + (strategy.m_self->getLife() > (unit.getLife() / 2.0) ? 1.0 : 0.0) + (HAVE_SHIELD(strategy, *strategy.m_self) ? 1.0 : 0.0) + (HAVE_EMPOWER(strategy, *strategy.m_self) ? 1.0 : 0.0)) * 150.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			bool bFound = false;
 			for (auto & wizard : strategy.m_world->getWizards())
@@ -313,7 +313,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 				}
 			}
 			if (bFound)
-				PW = -175.0;
+				PW = -1750.0;
 			else
 				PW = 75.0;
 		}
@@ -325,7 +325,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -300.0;
+			PW = -3000.0;
 		else
 			PW = 75.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -337,8 +337,8 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -365,11 +365,11 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		{
 			PW = (PW * 120.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			if (PW < 1.5)
 			{
-				PW = -175.0;
+				PW = -1750.0;
 			}
 			else
 			{
@@ -385,9 +385,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 					}
 				}
 				if (bFound)
-					PW = -175.0;
+					PW = -1750.0;
 				else
-					PW = 10.0;
+					PW = 100.0;
 			}
 		}
 		else
@@ -410,8 +410,8 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 					break;
 				}
 			}
-			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.5)
-				PW = -300.0;
+			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.2)
+				PW = -3000.0;
 			else
 				PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
@@ -458,8 +458,8 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() * 5.0 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getOrcWoodcutterAttackRange() + strategy.m_self->getRadius() + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed() + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -486,11 +486,11 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			if (PW < 0.5)
 			{
-				PW = -175.0;
+				PW = -1750.0;
 			}
 			else
 			{
@@ -506,9 +506,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 					}
 				}
 				if (bFound)
-					PW = -175.0;
+					PW = -1750.0;
 				else
-					PW = 10.0;
+					PW = 100.0;
 			}
 		}
 		else
@@ -519,7 +519,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -300.0;
+			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
@@ -534,8 +534,8 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() * 1.5 + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() - unit.getRadius() + strategy.m_game->getMagicMissileRadius();
+	double ENEMY_RANGE = strategy.m_game->getFetishBlowdartAttackRange() + strategy.m_game->getDartRadius() + strategy.m_self->getRadius() + strategy.m_game->getWizardForwardSpeed() + strategy.m_game->getMinionSpeed() + 1.0;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 1.0;
 
 	double PW = 0.0;
 
@@ -562,11 +562,11 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / 1.5)
+		else if (DISTANCE < MY_RANGE / 1.2)
 		{
 			if (PW < 0.5)
 			{
-				PW = -175.0;
+				PW = -1750.0;
 			}
 			else
 			{
@@ -582,9 +582,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 					}
 				}
 				if (bFound)
-					PW = -175.0;
+					PW = -1750.0;
 				else
-					PW = 10.0;
+					PW = 100.0;
 			}
 		}
 		else
@@ -595,7 +595,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-			PW = -300.0;
+			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
