@@ -478,6 +478,8 @@ bool MyStrategy::Shoot()
 		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
 			continue;
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (unit.getLife() <= 12)
+			P = 100000.0;
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -492,7 +494,9 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = 15000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = 1000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (unit.getLife() <= 12)
+			P = 100000.0;
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -507,7 +511,7 @@ bool MyStrategy::Shoot()
 		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
 		if (D > m_self->getCastRange())
 			continue;
-		double P = (unit.getType() == model::BUILDING_FACTION_BASE  ? 10000.0 : 50.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 20000.0 : 10000.0);
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;

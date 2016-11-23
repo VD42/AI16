@@ -67,7 +67,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
@@ -140,7 +140,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
@@ -213,7 +213,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
@@ -319,7 +319,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
@@ -392,7 +392,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
@@ -513,7 +513,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
@@ -589,7 +589,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 		}
 		else
 		{
-			PW = 0.0;
+			PW = -10.0;
 		}
 	}
 	else
