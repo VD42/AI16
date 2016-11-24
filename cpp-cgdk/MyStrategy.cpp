@@ -308,6 +308,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 	}
 
+	m_bNoShoot = false;
+
 	for (auto & unit : m_world->getProjectiles())
 	{
 		double D = m_self->getDistanceTo(unit);
@@ -324,7 +326,10 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		{
 			double tD = m_self->getDistanceTo(X, Y);
 			if (tD < m_self->getRadius() + unit.getRadius() + 1.0)
+			{
+				m_bNoShoot = true;
 				AddPower("missile", result, CalcPower(X, Y, -100000.0));
+			}
 			X += unit.getSpeedX();
 			Y += unit.getSpeedY();
 		}
@@ -477,6 +482,9 @@ void MyStrategy::AddPower(std::string comment, std::pair<double, double> & resul
 
 bool MyStrategy::Shoot()
 {
+	if (m_bNoShoot)
+		return false;
+
 	const model::CircularUnit * target = nullptr;
 	double MAX_PRIORITY = 0.0;
 

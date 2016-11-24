@@ -45,4 +45,6 @@ public:
 
 	bool m_bCreepStop = false;
 	model::LaneType m_CreepStopLane = model::_LANE_UNKNOWN_;
+
+	bool m_bNoShoot = false;
 };
