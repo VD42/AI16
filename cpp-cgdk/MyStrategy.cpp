@@ -207,7 +207,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		if (unit.isMe())
 			continue;
 
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+		double D = m_self->getDistanceTo(unit);
 		if (D > m_self->getVisionRange())
 			continue;
 
@@ -239,7 +239,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	for (auto & unit : m_world->getMinions())
 	{
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+		double D = m_self->getDistanceTo(unit);
 		if (D > m_self->getVisionRange())
 			continue;
 
@@ -299,7 +299,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	for (auto & unit : m_world->getTrees())
 	{
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+		double D = m_self->getDistanceTo(unit);
 		if (D > m_self->getVisionRange())
 			continue;
 
@@ -308,16 +308,27 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 	}
 
-	/*
-	for (auto & unit : m_world->getProjectiles()) // test
+	for (auto & unit : m_world->getProjectiles())
 	{
-		double D = std::hypot(m_self->getX() - unit.getX(), m_self->getY() - unit.getY());
+		double D = m_self->getDistanceTo(unit);
 		if (D > m_self->getVisionRange())
 			continue;
 
-		AddPower("projectile", result, CalcPower(unit, CSettings::PW_PROJECTILE(*this, unit)));
+		if (unit.getType() != model::PROJECTILE_MAGIC_MISSILE)
+			continue;
+
+		double X = unit.getX();
+		double Y = unit.getY();
+
+		for (int i = 0; i <= 13; i++)
+		{
+			double tD = m_self->getDistanceTo(X, Y);
+			if (tD < m_self->getRadius() + unit.getRadius() + 1.0)
+				AddPower("missile", result, CalcPower(X, Y, -100000.0));
+			X += unit.getSpeedX();
+			Y += unit.getSpeedY();
+		}
 	}
-	*/
 
 	for (auto & unit : m_world->getBonuses())
 	{
