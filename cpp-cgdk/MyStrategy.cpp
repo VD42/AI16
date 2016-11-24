@@ -591,7 +591,7 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 			if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius())
 				continue;
 
-			if (std::abs(wizard.getAngleTo(*m_self)) > PI / 4.0)
+			if (std::abs(wizard.getAngleTo(*m_self)) > PI / 2.0)
 				continue;
 
 			bFound = true;
@@ -660,6 +660,10 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 
 void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 {
+	bool bWizard = false;
+	if (dynamic_cast<const model::Wizard *>(&unit))
+		bWizard = true;
+
 	double D = m_self->getDistanceTo(unit);
 	double angle = m_self->getAngleTo(unit);
 	if (turn)
@@ -675,8 +679,8 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	else if (m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[2] == 0)
 	{
 		double T = std::min(13.0, D / m_game->getMagicMissileSpeed());
-		double newX = unit.getX() + unit.getSpeedX() * T;
-		double newY = unit.getY() + unit.getSpeedY() * T;
+		double newX = bWizard ? unit.getX() : unit.getX() + unit.getSpeedX() * T;
+		double newY = bWizard ? unit.getY() : unit.getY() + unit.getSpeedY() * T;
 		double newD = std::hypot(m_self->getX() - newX, m_self->getY() - newY);
 		double newAngle = m_self->getAngleTo(newX, newY);
 		if (turn)
