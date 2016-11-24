@@ -600,10 +600,11 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 			BestShoot(*tree, false);
 		}
 	}
-	
-	m_move->setSpeed(0.0);
-	m_move->setStrafeSpeed(0.0);
 
+	m_move->setSpeed(std::cos(angle) * 40.0);
+	m_move->setStrafeSpeed(std::sin(angle) * 30.0);
+
+	/*
 	if (-PI / 4.0 <= angle && angle <= PI / 4.0)
 	{
 		m_move->setSpeed(m_game->getWizardForwardSpeed() * 10.0);
@@ -624,6 +625,7 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 	{
 		m_move->setSpeed(-m_game->getWizardBackwardSpeed() * 10.0);
 	}
+	*/
 }
 
 void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
