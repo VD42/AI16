@@ -641,6 +641,9 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 		}
 	}
 
+	m_move->setSpeed(std::cos(angle) * 4.0 * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0)));
+	m_move->setStrafeSpeed(std::sin(angle) * 3.0 * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0)));
+
 	/*
 	if (-PI / 4.0 <= angle && angle <= PI / 4.0)
 	{
