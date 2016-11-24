@@ -61,7 +61,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
 	if (m_LastPositions.size() > 150)
 		m_LastPositions.pop_back();
-	if (!m_FreeMode && !m_bCreepStop && m_world->getTickIndex() >= 150 && m_nLastHealTick < m_world->getTickIndex() - 150 && m_LastShootTick < m_world->getTickIndex() - 150)
+
+	if (!m_FreeMode && !m_bCreepStop && m_world->getTickIndex() >= 150 && m_nLastHealTick < m_world->getTickIndex() - 150 && m_LastShootTick < m_world->getTickIndex() - 150 && m_self->getDistanceTo(1200.0, 1200.0) > m_self->getRadius() + m_game->getBonusRadius() + 60.0 && m_self->getDistanceTo(2800.0, 2800.0) > m_self->getRadius() + m_game->getBonusRadius() + 60.0)
 	{
 		bool good = false;
 		for (auto & val : m_LastPositions)
@@ -317,6 +318,9 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			continue;
 
 		if (unit.getType() != model::PROJECTILE_MAGIC_MISSILE)
+			continue;
+
+		if (m_self->getAngleTo(unit) < PI / 4.0)
 			continue;
 
 		double X = unit.getX();
@@ -576,7 +580,33 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 
 	if (!shoot)
 	{
-		m_move->setTurn(angle);
+		bool bFound = false;
+		double evAngle = 0.0;;
+		for (auto & wizard : m_world->getWizards())
+		{
+			if (wizard.getFaction() == m_self->getFaction())
+				continue;
+
+			double D = m_self->getDistanceTo(wizard);
+			if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius())
+				continue;
+
+			if (std::abs(wizard.getAngleTo(*m_self)) > PI / 4.0)
+				continue;
+
+			bFound = true;
+			evAngle = m_self->getAngleTo(wizard);
+			break;
+		}
+
+		if (bFound)
+		{
+			m_move->setTurn(evAngle - PI / 2.0);
+		}
+		else
+		{
+			m_move->setTurn(angle);
+		}
 
 		const model::Tree * tree = nullptr;
 		double minD = 40000.0;
