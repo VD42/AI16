@@ -12,7 +12,7 @@ private:
 	void AddPower(std::string comment, std::pair<double, double> & result, std::pair<double, double> add);
 
 	bool Shoot();
-	void Step(std::pair<double, double> direction, bool shoot);
+	void Step(std::pair<double, double> direction, bool shoot, bool have_priority_angle, double priority_angle);
 
 public:
 	CGlobal m_global;
