@@ -631,8 +631,15 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 		}
 	}
 
-	m_move->setSpeed(std::cos(angle) * 40.0);
-	m_move->setStrafeSpeed(std::sin(angle) * 30.0);
+	bool nHaste = false;
+	for (auto & status : m_self->getStatuses())
+	{
+		if (status.getType() == model::STATUS_HASTENED)
+		{
+			nHaste = true;
+			break;
+		}
+	}
 
 	/*
 	if (-PI / 4.0 <= angle && angle <= PI / 4.0)
