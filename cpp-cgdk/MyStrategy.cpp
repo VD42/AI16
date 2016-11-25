@@ -320,9 +320,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		if (unit.getType() != model::PROJECTILE_MAGIC_MISSILE)
 			continue;
 
-		if (m_self->getAngleTo(unit) < PI / 4.0)
-			continue;
-
 		double X = unit.getX();
 		double Y = unit.getY();
 
@@ -333,6 +330,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			{
 				m_bNoShoot = true;
 				AddPower("missile", result, CalcPower(X, Y, -100000.0));
+				printf("Tick %d: found projectile, trying to evade!\r\n", m_world->getTickIndex());
 			}
 			X += unit.getSpeedX();
 			Y += unit.getSpeedY();
@@ -345,50 +343,15 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			AddPower("bonus", result, CalcPower(unit, 100.0));
 	}
 
-	bool have_priority_angle = false;
-	double priority_angle = 0.0;
-
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
 	{
 		if (m_self->getDistanceTo(1200.0, 1200.0) <= 1800.0)
-		{
-			if ((m_world->getTickIndex() - 1) % 2500 > 2000)
-			{
-				have_priority_angle = true;
-				priority_angle = m_self->getAngleTo(1200.0, 1200.0);
-				waypoint.first = { 1200.0 + (m_game->getBonusRadius() + m_self->getRadius() + 2.5), 1200.0 };
-			}
-			else
-			{
-				if (m_world->getTickIndex() % 2500 < 2)
-				{
-					have_priority_angle = true;
-					priority_angle = m_self->getAngleTo(1200.0, 1200.0);
-				}
-				waypoint.first = { 1200.0, 1200.0 };
-			}
-		}
+			waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 1200.0 };
 	}
 	else if (m_global.m_bBonusB)
 	{
 		if (m_self->getDistanceTo(2800.0, 2800.0) <= 1800.0)
-		{
-			if ((m_world->getTickIndex() - 1) % 2500 > 2000)
-			{
-				have_priority_angle = true;
-				priority_angle = m_self->getAngleTo(2800.0, 2800.0);
-				waypoint.first = { 2800.0 - (m_game->getBonusRadius() + m_self->getRadius() + 2.5), 2800.0 };
-			}
-			else
-			{
-				if (m_world->getTickIndex() % 2500 < 2)
-				{
-					have_priority_angle = true;
-					priority_angle = m_self->getAngleTo(2800.0, 2800.0);
-				}
-				waypoint.first = { 2800.0, 2800.0 };
-			}
-		}
+			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
 	}
 
 	if (pEnMinUnit && enMinBase < 750.0 && m_self->getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < 1000.0)
@@ -499,7 +462,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	AddPower("base", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
 
-	Step(result, Shoot(), have_priority_angle, priority_angle);
+	Step(result, Shoot());
 }
 
 std::pair<double, double> MyStrategy::CalcPower(double X, double Y, double PW)
@@ -609,49 +572,49 @@ bool MyStrategy::Shoot()
 	return true;
 }
 
-void MyStrategy::Step(std::pair<double, double> direction, bool shoot, bool have_priority_angle, double priority_angle)
+void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 
 	if (!shoot)
 	{
-		if (have_priority_angle)
+		bool bFound = false;
+		double evAngle = 0.0;;
+		for (auto & wizard : m_world->getWizards())
 		{
-			m_move->setTurn(priority_angle);
+			if (wizard.getFaction() == m_self->getFaction())
+				continue;
+
+			double D = m_self->getDistanceTo(wizard);
+			if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius())
+				continue;
+
+			if (D < m_self->getRadius() + m_game->getMagicMissileRadius() + 400.0)
+				continue;
+
+			if (std::abs(wizard.getAngleTo(*m_self)) > PI / 2.0)
+				continue;
+
+			bFound = true;
+			evAngle = m_self->getAngleTo(wizard);
+			break;
+		}
+
+		if (bFound)
+		{
+			printf("Tick %d: found appropriate wizard!\r\n", m_world->getTickIndex());
+			m_move->setTurn(evAngle < 0.0 ? evAngle + PI / 2.0 : evAngle - PI / 2.0);
 		}
 		else
 		{
-			bool bFound = false;
-			double evAngle = 0.0;;
-			for (auto & wizard : m_world->getWizards())
-			{
-				if (wizard.getFaction() == m_self->getFaction())
-					continue;
+			m_move->setTurn(angle);
+		}
 
-				double D = m_self->getDistanceTo(wizard);
-				if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius())
-					continue;
+		const model::Tree * tree = nullptr;
+		double minD = 40000.0;
 
-				if (std::abs(wizard.getAngleTo(*m_self)) > PI / 2.0)
-					continue;
-
-				bFound = true;
-				evAngle = m_self->getAngleTo(wizard);
-				break;
-			}
-
-			if (bFound)
-			{
-				m_move->setTurn(evAngle - PI / 2.0);
-			}
-			else
-			{
-				m_move->setTurn(angle);
-			}
-
-			const model::Tree * tree = nullptr;
-			double minD = 40000.0;
-
+		if (m_self->getDistanceTo(1200.0 + m_game->getBonusRadius() + m_self->getRadius() + 5.9, 1200.0) > 10.0 && m_self->getDistanceTo(2800.0 - m_game->getBonusRadius() - m_self->getRadius() - 5.9, 2800.0) > 10.0)
+		{
 			for (auto & unit : m_world->getTrees())
 			{
 				double D = m_self->getDistanceTo(unit);
@@ -665,11 +628,11 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot, bool have
 					tree = &unit;
 				}
 			}
+		}
 
-			if (tree)
-			{
-				BestShoot(*tree, false);
-			}
+		if (tree)
+		{
+			BestShoot(*tree, false);
 		}
 	}
 

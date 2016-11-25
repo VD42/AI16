@@ -229,7 +229,10 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 				distance = base->getDistanceTo(wizard.getX(), wizard.getY());
 			}
 		}
-		return { { (m_strategy.m_self->getY() < 700.0 ? result.first.first : 250.0), result.first.second }, result.second };
+		if (m_strategy.m_self->getX() < m_strategy.m_self->getY() - 400.0 && result.first.first > result.first.second + 400.0)
+			return { { 250.0, 250.0 }, result.second };
+		else
+			return { { result.first.first, result.first.second }, result.second };
 	}
 	else if (m_lane == model::LANE_MIDDLE)
 	{
@@ -297,7 +300,10 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 				distance = base->getDistanceTo(wizard.getX(), wizard.getY());
 			}
 		}
-		return { { result.first.first, result.first.second }, result.second };
+		if (m_strategy.m_self->getX() < m_strategy.m_self->getY() - 400.0 && result.first.first > result.first.second + 400.0)
+			return { { 2000.0, 2000.0 }, result.second };
+		else
+			return { { result.first.first, result.first.second }, result.second };
 	}
 	else if (m_lane == model::LANE_BOTTOM)
 	{
@@ -364,7 +370,10 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 				distance = base->getDistanceTo(wizard.getX(), wizard.getY());
 			}
 		}
-		return { { result.first.first, (m_strategy.m_self->getX() > m_strategy.m_game->getMapSize() - 700.0 ? result.first.second : m_strategy.m_game->getMapSize() - 250.0) }, result.second };
+		if (m_strategy.m_self->getX() < m_strategy.m_self->getY() - 400.0 && result.first.first > result.first.second + 400.0)
+			return{ { m_strategy.m_game->getMapSize() - 250.0, m_strategy.m_game->getMapSize() - 250.0 }, result.second };
+		else
+			return { { result.first.first, result.first.second }, result.second };
 	}
 	return result;
 }
@@ -577,12 +586,12 @@ void CGlobal::Update()
 		}
 	}
 
-	if (!m_bBonusT && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min(std::min((int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0), (int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0)), 2000)))
+	if (!m_bBonusT && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min(std::min((int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0), (int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0)), 2000)) && m_strategy.m_world->getTickIndex() < 17990)
 	{
 		m_bBonusT = true;
 		m_bBonusTStart = m_strategy.m_world->getTickIndex();
 	}
-	if (!m_bBonusB && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min(std::min((int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0), (int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0)), 2000)))
+	if (!m_bBonusB && (m_strategy.m_world->getTickIndex() - 1) % 2500 >= (2500 - std::min(std::min((int)(m_strategy.m_self->getDistanceTo(2800.0, 2800.0) / 3.0), (int)(m_strategy.m_self->getDistanceTo(1200.0, 1200.0) / 3.0)), 2000)) && m_strategy.m_world->getTickIndex() < 17990)
 	{
 		m_bBonusB = true;
 		m_bBonusBStart = m_strategy.m_world->getTickIndex();
