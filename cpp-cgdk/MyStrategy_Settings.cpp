@@ -189,7 +189,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 1.0)
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -197,7 +197,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		}
 		else if (DISTANCE < MY_RANGE / 1.2)
 		{
-			if (PW < 1.5)
+			if (PW < 2.5)
 			{
 				PW = -1750.0;
 			}
@@ -228,27 +228,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-		{
-			bool bFound = false;
-			for (auto & wizard : strategy.m_world->getWizards())
-			{
-				if (wizard.getFaction() == strategy.m_self->getFaction())
-					continue;
-				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.2)
-				PW = -3000.0;
-			else
-				PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		}
+			PW = -3000.0;
 		else
-		{
 			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		}
 	}
 
 	return PW;
@@ -372,7 +354,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 1.0)
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -380,7 +362,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		}
 		else if (DISTANCE < MY_RANGE / 1.2)
 		{
-			if (PW < 1.5)
+			if (PW < 2.5)
 			{
 				PW = -1750.0;
 			}
@@ -411,27 +393,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	else
 	{
 		if (DISTANCE <= ENEMY_RANGE)
-		{
-			bool bFound = false;
-			for (auto & wizard : strategy.m_world->getWizards())
-			{
-				if (wizard.getFaction() == strategy.m_self->getFaction())
-					continue;
-				if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if (bFound || strategy.m_self->getLife() < strategy.m_self->getMaxLife() * 0.6 || DISTANCE < MY_RANGE / 1.2)
-				PW = -3000.0;
-			else
-				PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		}
+			PW = -3000.0;
 		else
-		{
 			PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
-		}
 	}
 
 	return PW;
