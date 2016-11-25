@@ -601,6 +601,11 @@ void CGlobal::Update()
 	{
 		if (wizard.getFaction() == m_strategy.m_self->getFaction())
 		{
+			if (wizard.isMe())
+			{
+				m_mapFriendlyWizardsLane[wizard.getId()] = m_lane;
+				continue;
+			}
 			if (GetLane(wizard) != model::_LANE_UNKNOWN_)
 				m_mapFriendlyWizardsLane[wizard.getId()] = GetLane(wizard);
 		}
@@ -691,7 +696,7 @@ bool CGlobal::Tower2Exists()
 	return true;
 }
 
-void CGlobal::ReCheckLane()
+void CGlobal::ReCheckLane(bool after_death)
 {
 	if (!OwnLaneControl() && !m_bLaneRush)
 		return;
@@ -739,7 +744,7 @@ void CGlobal::ReCheckLane()
 				m_bLaneChoosed = true;
 				return;
 			}
-			if(nBotWizardsEnemy < nTopWizardsEnemy)
+			if(after_death && nBotWizardsEnemy < nTopWizardsEnemy)
 			{
 				m_lane = model::LANE_BOTTOM;
 				m_bLaneChoosed = true;
@@ -769,7 +774,7 @@ void CGlobal::ReCheckLane()
 				m_bLaneChoosed = true;
 				return;
 			}
-			if (nTopWizardsEnemy < nBotWizardsEnemy)
+			if (after_death && nTopWizardsEnemy < nBotWizardsEnemy)
 			{
 				m_lane = model::LANE_TOP;
 				m_bLaneChoosed = true;

@@ -33,15 +33,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_bSeedReady = true;
 	}
 
-	if (m_nLastReceivedTickIndex + 1 != m_world->getTickIndex())
-	{
-		m_global.ReCheckLane();
-		m_global.m_bBonusB = true;
-		m_global.m_bBonusT = true;
-	}
-
-	m_nLastReceivedTickIndex = m_world->getTickIndex();
-
 	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.4)
 	{
 		m_bHealMode = true;
@@ -95,12 +86,15 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_global.SetTowerCords();
 	m_global.ChooseLane();
 	m_global.Update();
-	auto waypoint = m_global.GetWaypoint();
+
+	if (m_nLastReceivedTickIndex + 1 != m_world->getTickIndex())
+		m_global.ReCheckLane(true);
+	m_nLastReceivedTickIndex = m_world->getTickIndex();
 
 	if (m_world->getTickIndex() > 3000 && (m_world->getTickIndex() + 1000) % 2500 == 0)
-	{
-		m_global.ReCheckLane();
-	}
+		m_global.ReCheckLane(false);
+
+	auto waypoint = m_global.GetWaypoint();
 
 	std::pair<double, double> result = { 0.0, 0.0 };
 

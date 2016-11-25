@@ -54,7 +54,7 @@ public:
 	bool m_bMasterNotSilent;
 	bool OwnLaneControl();
 
-	void ReCheckLane();
+	void ReCheckLane(bool after_death);
 
 	bool m_bEgoistMode = true;
 
