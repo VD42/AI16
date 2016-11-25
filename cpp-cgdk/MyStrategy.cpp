@@ -101,6 +101,22 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	if (m_FreeMode)
 		AddPower("back", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
 
+	int nFoots = 0;
+	for (auto & pos : m_LastPositions)
+	{
+		if (nFoots == 0)
+		{
+			nFoots++;
+			continue;
+		}
+		if (std::abs(m_self->getX() - pos.first) < 0.1 || std::abs(m_self->getY() - pos.second) < 0.1)
+			continue;
+		nFoots++;
+		AddPower("foot", result, CalcPower(pos.first, pos.second, -10.0));
+		if (nFoots > 11)
+			break;
+	}
+
 	if (m_self->getX() - m_self->getRadius() < 3.0)
 	{
 		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
