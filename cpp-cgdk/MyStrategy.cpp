@@ -514,7 +514,7 @@ bool MyStrategy::Shoot()
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
 		double D = m_self->getDistanceTo(unit);
-		double T = std::min(13.0, D / m_game->getMagicMissileSpeed());
+		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double R = std::ceil(T) * m_game->getMinionSpeed();
 		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
@@ -522,7 +522,7 @@ bool MyStrategy::Shoot()
 			continue;
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
-			P = 100000.0;
+			P = 1000000.0;
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -535,13 +535,13 @@ bool MyStrategy::Shoot()
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
 		double D = m_self->getDistanceTo(unit);
-		double T = std::min(13.0, D / m_game->getMagicMissileSpeed());
+		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double R = std::ceil(T) * m_game->getWizardForwardSpeed();
 		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
-		double P = 1000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		double P = 20000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
-			P = 100000.0;
+			P = 1000000.0;
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -555,7 +555,7 @@ bool MyStrategy::Shoot()
 			continue;
 		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
-		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 20000.0 : 10000.0);
+		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -692,7 +692,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	}
 	else if (m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[2] == 0)
 	{
-		double T = std::min(13.0, D / m_game->getMagicMissileSpeed());
+		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double newX = bWizard ? unit.getX() : unit.getX() + unit.getSpeedX() * T;
 		double newY = bWizard ? unit.getY() : unit.getY() + unit.getSpeedY() * T;
 		double newD = std::hypot(m_self->getX() - newX, m_self->getY() - newY);
