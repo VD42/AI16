@@ -18,7 +18,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(13.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -95,7 +95,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(13.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -168,7 +168,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -240,12 +240,12 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_self->getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_game->getWizardForwardSpeed() * 2.0 + 1.0;
+	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_self->getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_game->getWizardForwardSpeed() * 2.0 + 1.0 + CGlobal::RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(13.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getWizardForwardSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -333,7 +333,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -430,7 +430,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_F
 
 const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEUTRAL_CREEP_ORC = [](MyStrategy & strategy, const model::Minion & unit)
 {
-	if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
+	if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
 		return 0.0;
 
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
@@ -440,7 +440,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(13.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -510,7 +510,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 
 const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEUTRAL_CREEP_FETISH = [](MyStrategy & strategy, const model::Minion & unit)
 {
-	if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getRemainingActionCooldownTicks() > 0))
+	if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
 		return 0.0;
 
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
@@ -520,7 +520,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(13.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1;
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -629,4 +629,47 @@ bool CSettings::HAVE_EMPOWER(MyStrategy & strategy, const model::Wizard & wizard
 			return true;
 	}
 	return false;
+}
+
+
+const std::vector<model::SkillType> CSettings::GET_SKILLS_ORDER()
+{
+	return {
+		// first
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_1,
+		model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1,
+		model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_1,
+		model::SKILL_RANGE_BONUS_PASSIVE_1,
+		model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_1,
+
+		// machine gun
+		model::SKILL_RANGE_BONUS_AURA_1,
+		model::SKILL_RANGE_BONUS_PASSIVE_2,
+		model::SKILL_RANGE_BONUS_AURA_2,
+		model::SKILL_ADVANCED_MAGIC_MISSILE,
+
+		// second
+		model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1,
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_1,
+		model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1,
+		model::SKILL_STAFF_DAMAGE_BONUS_AURA_1,
+
+		// third
+		model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2,
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_2,
+		model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2,
+		model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_2,
+
+		// fourth
+		model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2,
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_2,
+		model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2,
+		model::SKILL_STAFF_DAMAGE_BONUS_AURA_2,
+		
+		// ultimates
+		model::SKILL_HASTE,
+		model::SKILL_SHIELD,
+		model::SKILL_FROST_BOLT,
+		model::SKILL_FIREBALL
+	};
 }

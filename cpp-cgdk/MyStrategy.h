@@ -47,4 +47,8 @@ public:
 	model::LaneType m_CreepStopLane = model::_LANE_UNKNOWN_;
 
 	bool m_bNoShoot = false;
+
+	std::vector<model::SkillType> m_tSkillsOrder;
+
+	int m_nLastLevel = 0;
 };

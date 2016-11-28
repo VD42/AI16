@@ -31,4 +31,6 @@ public:
 
 	static bool HAVE_EMPOWER(MyStrategy & strategy, const model::Wizard & wizard);
 	static bool HAVE_SHIELD(MyStrategy & strategy, const model::Wizard & wizard);
+
+	static const std::vector<model::SkillType> GET_SKILLS_ORDER();
 };

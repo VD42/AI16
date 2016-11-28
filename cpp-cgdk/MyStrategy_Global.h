@@ -63,4 +63,7 @@ public:
 
 	int m_bBonusTStart = -1;
 	int m_bBonusBStart = -1;
+
+	static int SpeedLevel(const model::Wizard & wizard);
+	static int RangeLevel(const model::Wizard & wizard);
 };

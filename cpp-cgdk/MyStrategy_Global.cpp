@@ -920,3 +920,41 @@ void CGlobal::ReCheckLane(bool after_death)
 
 	m_bLaneChoosed = true;
 }
+
+int CGlobal::SpeedLevel(const model::Wizard & wizard)
+{
+	// TODO: need normal aura control
+
+	int nSpeedLevel = 0;
+	for (auto & skill : wizard.getSkills())
+	{
+		if (skill == model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1)
+			nSpeedLevel++;
+		if (skill == model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1)
+			nSpeedLevel++;
+		if (skill == model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2)
+			nSpeedLevel++;
+		if (skill == model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2)
+			nSpeedLevel++;
+	}
+	return nSpeedLevel;
+}
+
+int CGlobal::RangeLevel(const model::Wizard & wizard)
+{
+	// TODO: need normal aura control
+
+	int nRangeLevel = 0;
+	for (auto & skill : wizard.getSkills())
+	{
+		if (skill == model::SKILL_RANGE_BONUS_PASSIVE_1)
+			nRangeLevel++;
+		if (skill == model::SKILL_RANGE_BONUS_AURA_1)
+			nRangeLevel++;
+		if (skill == model::SKILL_RANGE_BONUS_PASSIVE_2)
+			nRangeLevel++;
+		if (skill == model::SKILL_RANGE_BONUS_AURA_2)
+			nRangeLevel++;
+	}
+	return nRangeLevel;
+}
