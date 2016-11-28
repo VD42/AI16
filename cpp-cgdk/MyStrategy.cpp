@@ -668,31 +668,8 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 	double ver = std::cos(angle);
 	double hor = std::sin(angle);
 
-	m_move->setSpeed(ver * (hor > 0.0 ? 4.0 : 3.0) * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + CGlobal::SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
+	m_move->setSpeed(ver * (ver > 0.0 ? 4.0 : 3.0) * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + CGlobal::SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
 	m_move->setStrafeSpeed(hor * 3.0 * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + CGlobal::SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
-
-	/*
-	if (-PI / 4.0 <= angle && angle <= PI / 4.0)
-	{
-		m_move->setSpeed(m_game->getWizardForwardSpeed() * 10.0);
-	}
-	else if (PI / 4.0 < angle && angle <= 3.0 * PI / 4.0)
-	{
-		m_move->setStrafeSpeed(m_game->getWizardStrafeSpeed() * 10.0);
-	}
-	else if (angle > 3.0 * PI / 4.0)
-	{
-		m_move->setSpeed(-m_game->getWizardBackwardSpeed() * 10.0);
-	}
-	else if (-PI / 4.0 >= angle && angle > -3.0 * PI / 4.0)
-	{
-		m_move->setStrafeSpeed(-m_game->getWizardStrafeSpeed() * 10.0);
-	}
-	else if (angle < -3.0 * PI / 4.0)
-	{
-		m_move->setSpeed(-m_game->getWizardBackwardSpeed() * 10.0);
-	}
-	*/
 }
 
 void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
