@@ -14,7 +14,7 @@ CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLane
 	m_BS = { 0.0, 0.0 };
 }
 
-model::LaneType CGlobal::GetLane(const model::LivingUnit & unit)
+model::LaneType CGlobal::GetLane(const model::CircularUnit & unit)
 {
 	if (unit.getDistanceTo(1200.0, 1200.0) < 300.0)
 		return model::_LANE_UNKNOWN_;

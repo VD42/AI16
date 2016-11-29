@@ -40,7 +40,7 @@ public:
 	bool m_bBonusB;
 
 	CGlobal(MyStrategy & strategy);
-    model::LaneType GetLane(const model::LivingUnit & unit);
+    model::LaneType GetLane(const model::CircularUnit & unit);
 	void ChooseLane();
 	std::pair<std::pair<double, double>, bool> GetWaypoint();
 	void Update();
