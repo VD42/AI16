@@ -58,8 +58,8 @@ public:
 
 	bool m_bEgoistMode = false;
 
-	std::map<int, model::LaneType> m_mapFriendlyWizardsLane;
-	std::map<int, model::LaneType> m_mapEnemyWizardsLane;
+	std::map<long long, model::LaneType> m_mapFriendlyWizardsLane;
+	std::map<long long, model::LaneType> m_mapEnemyWizardsLane;
 
 	int m_bBonusTStart = -1;
 	int m_bBonusBStart = -1;

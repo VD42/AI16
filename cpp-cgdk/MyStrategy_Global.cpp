@@ -776,11 +776,11 @@ void CGlobal::ReCheckLane(bool after_death)
 
 		std::vector<model::Message> m_tMessages;
 
-		std::vector<std::pair<int, model::LaneType>> tOrder;
+		std::vector<std::pair<long long, model::LaneType>> tOrder;
 
 		for (auto & wizard : m_mapFriendlyWizardsLane)
 			tOrder.push_back(std::make_pair(wizard.first, wizard.second));
-		std::sort(tOrder.begin(), tOrder.end(), [](const std::pair<int, model::LaneType> & a, const std::pair<int, model::LaneType> & b) { return a.first < b.first; });
+		std::sort(tOrder.begin(), tOrder.end(), [](const std::pair<long long, model::LaneType> & a, const std::pair<long long, model::LaneType> & b) { return a.first < b.first; });
 
 		for (auto & wizard : tOrder)
 		{
