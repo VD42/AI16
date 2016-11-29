@@ -60,7 +60,7 @@ void CGlobal::ChooseLane()
 {
 	if (m_lane == model::_LANE_UNKNOWN_)
 	{
-		/*if (m_strategy.m_self->isMaster())
+		if (!m_bEgoistMode && m_strategy.m_self->isMaster())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -72,7 +72,7 @@ void CGlobal::ChooseLane()
 			};
 			m_strategy.m_move->setMessages(m_tMessages);
 			return;
-		}*/
+		}
 
 		volatile int rand_number = rand();
 		int l = rand_number % 3;
@@ -100,50 +100,6 @@ void CGlobal::ChooseLane()
 
 	if (m_bLaneChoosed)
 		return;
-
-	int nTopWizards = 0;
-	int nMidWizards = 0;
-	int nBotWizards = 0;
-	for (auto & unit : m_strategy.m_world->getWizards())
-	{
-		if (unit.getFaction() == m_strategy.m_self->getFaction())
-			continue;
-		
-		if (GetLane(unit) == model::LANE_TOP)
-			nTopWizards++;
-		else if (GetLane(unit) == model::LANE_MIDDLE)
-			nMidWizards++;
-		else if (GetLane(unit) == model::LANE_BOTTOM)
-			nBotWizards++;
-	}
-
-	if (nTopWizards + nMidWizards + nBotWizards < 4)
-		return;
-
-	if (nTopWizards < nBotWizards)
-	{
-		if (nTopWizards < nMidWizards)
-		{
-			m_lane = model::LANE_TOP;
-		}
-		else
-		{
-			m_lane = model::LANE_MIDDLE;
-		}
-	}
-	else
-	{
-		if (nBotWizards < nMidWizards)
-		{
-			m_lane = model::LANE_BOTTOM;
-		}
-		else
-		{
-			m_lane = model::LANE_MIDDLE;
-		}
-	}
-
-	m_bLaneChoosed = true;
 }
 
 std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
@@ -701,9 +657,6 @@ void CGlobal::ReCheckLane(bool after_death)
 	if (!OwnLaneControl() && !m_bLaneRush)
 		return;
 
-	if (m_strategy.m_self->getDistanceTo(m_BS.first, m_BS.second) < 1000.0)
-		return;
-
 	int nTopWizards = 0;
 	int nMidWizards = 0;
 	int nBotWizards = 0;
@@ -736,6 +689,9 @@ void CGlobal::ReCheckLane(bool after_death)
 
 	if (m_bEgoistMode)
 	{
+		if (m_strategy.m_self->getDistanceTo(m_BS.first, m_BS.second) < 1000.0)
+			return;
+
 		if (m_lane == model::LANE_TOP)
 		{
 			if (nMidWizardsEnemy < nTopWizardsEnemy)
@@ -785,6 +741,62 @@ void CGlobal::ReCheckLane(bool after_death)
 		return;
 	}
 
+	if (m_strategy.m_self->isMaster())
+	{
+		for (auto & wizard : m_mapFriendlyWizardsLane)
+		{
+			if (wizard.second == model::LANE_TOP && nTopWizardsEnemy < nTopWizards && nMidWizardsEnemy > nMidWizards)
+			{
+				wizard.second = model::LANE_MIDDLE;
+				nTopWizards--;
+				nMidWizards++;
+			}
+			else if (wizard.second == model::LANE_BOTTOM && nBotWizardsEnemy < nBotWizards && nMidWizardsEnemy > nMidWizards)
+			{
+				wizard.second = model::LANE_MIDDLE;
+				nBotWizards--;
+				nMidWizards++;
+			}
+			else if (wizard.second == model::LANE_MIDDLE && nMidWizardsEnemy < nMidWizards)
+			{
+				if (nTopWizardsEnemy > nTopWizards)
+				{
+					wizard.second = model::LANE_TOP;
+					nMidWizards--;
+					nTopWizards++;
+				}
+				else if (nBotWizardsEnemy > nBotWizards)
+				{
+					wizard.second = model::LANE_BOTTOM;
+					nMidWizards--;
+					nBotWizards++;
+				}
+			}
+		}
+
+		std::vector<model::Message> m_tMessages;
+
+		std::vector<std::pair<int, model::LaneType>> tOrder;
+
+		for (auto & wizard : m_mapFriendlyWizardsLane)
+			tOrder.push_back(std::make_pair(wizard.first, wizard.second));
+		std::sort(tOrder.begin(), tOrder.end(), [](const std::pair<int, model::LaneType> & a, const std::pair<int, model::LaneType> & b) { return a.first < b.first; });
+
+		for (auto & wizard : tOrder)
+		{
+			if (wizard.first == m_strategy.m_self->getId())
+				m_lane = wizard.second;
+			else
+				m_tMessages.push_back(model::Message(wizard.second, model::_SKILL_UNKNOWN_, std::vector<signed char>()));
+		}
+
+		m_strategy.m_move->setMessages(m_tMessages);
+
+		m_bLaneChoosed = true;
+
+		return;
+	}
+
 	if (nTopWizardsEnemy + nMidWizardsEnemy + nBotWizardsEnemy == 5)
 	{
 		if (m_lane == model::LANE_TOP)
@@ -793,8 +805,6 @@ void CGlobal::ReCheckLane(bool after_death)
 			{
 				if (nMidWizards < nMidWizardsEnemy)
 					m_lane = model::LANE_MIDDLE;
-				else if (nBotWizards < nBotWizardsEnemy)
-					m_lane = model::LANE_BOTTOM;
 			}
 			m_bLaneChoosed = true;
 			return;
@@ -819,8 +829,6 @@ void CGlobal::ReCheckLane(bool after_death)
 			{
 				if (nMidWizards < nMidWizardsEnemy)
 					m_lane = model::LANE_MIDDLE;
-				else if (nTopWizards < nTopWizardsEnemy)
-					m_lane = model::LANE_TOP;
 			}
 			m_bLaneChoosed = true;
 			return;
@@ -836,13 +844,6 @@ void CGlobal::ReCheckLane(bool after_death)
 		}
 
 		if (m_lane == model::LANE_MIDDLE && nMidWizards > 1 && nMidWizards >= nMidWizardsEnemy)
-		{
-			m_lane = model::LANE_TOP;
-			m_bLaneChoosed = true;
-			return;
-		}
-
-		if (m_lane == model::LANE_BOTTOM && nBotWizards > 1 && nBotWizards >= nBotWizardsEnemy)
 		{
 			m_lane = model::LANE_TOP;
 			m_bLaneChoosed = true;
@@ -881,13 +882,6 @@ void CGlobal::ReCheckLane(bool after_death)
 			return;
 		}
 
-		if (m_lane == model::LANE_TOP && nTopWizards > 1 && nTopWizards >= nTopWizardsEnemy)
-		{
-			m_lane = model::LANE_BOTTOM;
-			m_bLaneChoosed = true;
-			return;
-		}
-
 		if (m_lane == model::LANE_MIDDLE && nMidWizards > 1 && nMidWizards >= nMidWizardsEnemy)
 		{
 			m_lane = model::LANE_BOTTOM;
@@ -900,8 +894,6 @@ void CGlobal::ReCheckLane(bool after_death)
 	{
 		if (nMidWizards < nBotWizards)
 			m_lane = model::LANE_MIDDLE;
-		else
-			m_lane = model::LANE_BOTTOM;
 	}
 	if (nMidWizards >= 3 && m_lane == model::LANE_MIDDLE)
 	{
@@ -914,8 +906,6 @@ void CGlobal::ReCheckLane(bool after_death)
 	{
 		if (nMidWizards < nTopWizards)
 			m_lane = model::LANE_MIDDLE;
-		else
-			m_lane = model::LANE_TOP;
 	}
 
 	m_bLaneChoosed = true;

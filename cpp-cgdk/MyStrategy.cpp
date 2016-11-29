@@ -119,8 +119,16 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_global.ReCheckLane(true);
 	m_nLastReceivedTickIndex = m_world->getTickIndex();
 
-	if (m_world->getTickIndex() > 3000 && (m_world->getTickIndex() + 1000) % 2500 == 0)
-		m_global.ReCheckLane(false);
+	if (m_global.m_bEgoistMode)
+	{
+		if (m_world->getTickIndex() > 3000 && (m_world->getTickIndex() + 1000) % 2500 == 0)
+			m_global.ReCheckLane(false);
+	}
+	else
+	{
+		if (m_world->getTickIndex() > 1500 && m_world->getTickIndex() % 1000 == 0)
+			m_global.ReCheckLane(false);
+	}
 
 	auto waypoint = m_global.GetWaypoint();
 

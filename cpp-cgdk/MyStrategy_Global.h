@@ -56,7 +56,7 @@ public:
 
 	void ReCheckLane(bool after_death);
 
-	bool m_bEgoistMode = true;
+	bool m_bEgoistMode = false;
 
 	std::map<int, model::LaneType> m_mapFriendlyWizardsLane;
 	std::map<int, model::LaneType> m_mapEnemyWizardsLane;
