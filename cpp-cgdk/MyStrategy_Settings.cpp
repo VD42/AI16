@@ -631,56 +631,58 @@ bool CSettings::HAVE_EMPOWER(MyStrategy & strategy, const model::Wizard & wizard
 	return false;
 }
 
+bool CSettings::HAVE_HASTE(MyStrategy & strategy, const model::Wizard & wizard)
+{
+	for (auto status : wizard.getStatuses())
+	{
+		if (status.getType() == model::STATUS_HASTENED)
+			return true;
+	}
+	return false;
+}
+
 
 const std::vector<model::SkillType> CSettings::GET_SKILLS_ORDER()
 {
 	return {
-		// powerful machine gun!!! bam!!! bam!!! bam!!!
+
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_1,
+		model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1,
+
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_1,
+		model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1,
+
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_2,
+		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_2,
+
+		model::SKILL_SHIELD,
 
 		model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_1,
-		model::SKILL_RANGE_BONUS_PASSIVE_1,
-
-		// speed
-		model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_1,
-		// end speed
-
-		model::SKILL_RANGE_BONUS_AURA_1,
-		model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1,
-
-		// speed
-		model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_1,
-		// end speed
-
-		model::SKILL_RANGE_BONUS_PASSIVE_2,
-		model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2,
-
-		model::SKILL_RANGE_BONUS_AURA_2,
-		model::SKILL_ADVANCED_MAGIC_MISSILE,
-
-		model::SKILL_STAFF_DAMAGE_BONUS_AURA_2,
-
-		// first
-		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_1,
-		model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_1,
-
-		// second
-		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_1,
-		model::SKILL_STAFF_DAMAGE_BONUS_AURA_1,
-
-		// third
 		model::SKILL_MOVEMENT_BONUS_FACTOR_PASSIVE_2,
-		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_PASSIVE_2,
-		model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_2,
 
-		// fourth
+		model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_1,
 		model::SKILL_MOVEMENT_BONUS_FACTOR_AURA_2,
-		model::SKILL_MAGICAL_DAMAGE_ABSORPTION_AURA_2,
-		model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2,
-		
-		// ultimates
+
 		model::SKILL_HASTE,
-		model::SKILL_SHIELD,
-		model::SKILL_FROST_BOLT,  // magical damage
-		model::SKILL_FIREBALL // staff damage
+
+		model::SKILL_MAGICAL_DAMAGE_BONUS_PASSIVE_2,
+		model::SKILL_MAGICAL_DAMAGE_BONUS_AURA_2,
+
+		model::SKILL_FROST_BOLT,
+
+		//////////////////////////////////////////////////////////
+
+		model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_1,
+		model::SKILL_STAFF_DAMAGE_BONUS_AURA_1,
+		model::SKILL_STAFF_DAMAGE_BONUS_PASSIVE_2,
+		model::SKILL_STAFF_DAMAGE_BONUS_AURA_2,
+		model::SKILL_FIREBALL,
+
+		model::SKILL_RANGE_BONUS_PASSIVE_1,
+		model::SKILL_RANGE_BONUS_AURA_1,
+		model::SKILL_RANGE_BONUS_PASSIVE_2,
+		model::SKILL_RANGE_BONUS_AURA_2,
+		model::SKILL_ADVANCED_MAGIC_MISSILE
+
 	};
 }

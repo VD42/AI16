@@ -8,6 +8,7 @@
 #include <time.h>
 #include <limits>
 #include <algorithm>
+#include <set>
 
 #include "MyStrategy_Settings.h"
 
@@ -25,12 +26,30 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	m_game = &game;
 	m_move = &move;
 
+	m_move->setAction(model::ACTION_NONE);
+
+	std::set<model::SkillType> setCurrentSkills;
+	setCurrentSkills.insert(m_self->getSkills().begin(), m_self->getSkills().end());
+	
 	if (m_nLastLevel < m_self->getLevel())
 	{
 		m_move->setSkillToLearn(m_tSkillsOrder.back());
 		printf("Level up, learning: %d\r\n", m_move->getSkillToLearn());
+		setCurrentSkills.insert(m_move->getSkillToLearn());
 		m_tSkillsOrder.pop_back();
 		m_nLastLevel++;
+	}
+
+	if (m_move->getAction() == model::ACTION_NONE && !CSettings::HAVE_SHIELD(*this, *m_self) && setCurrentSkills.find(model::SKILL_SHIELD) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[6] == 0)
+	{
+		m_move->setStatusTargetId(m_self->getId());
+		m_move->setAction(model::ACTION_SHIELD);
+	}
+
+	if (m_move->getAction() == model::ACTION_NONE && !CSettings::HAVE_HASTE(*this, *m_self) && setCurrentSkills.find(model::SKILL_HASTE) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[5] == 0)
+	{
+		m_move->setStatusTargetId(m_self->getId());
+		m_move->setAction(model::ACTION_HASTE);
 	}
 
 	m_tPowers.clear();
@@ -687,7 +706,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	}
 	if (D - unit.getRadius() < m_game->getStaffRange() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[1] == 0)
 	{
-		if (std::abs(angle) < m_game->getStaffSector() / 2.0)
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
 			m_move->setAction(model::ACTION_STAFF);
 	}
 	else if (m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[2] == 0)
@@ -699,7 +718,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 		double newAngle = m_self->getAngleTo(newX, newY);
 		if (turn)
 			m_move->setTurn(newAngle);
-		if (std::abs(newAngle) < m_game->getStaffSector() / 2.0)
+		if (std::abs(newAngle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
 		{
 			m_move->setAction(model::ACTION_MAGIC_MISSILE);
 			m_move->setCastAngle(newAngle);
