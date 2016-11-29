@@ -255,14 +255,12 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			continue;
 
 		double D = m_self->getDistanceTo(unit);
-		if (D > m_self->getVisionRange())
-			continue;
 
 		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		if (unit.getFaction() == m_self->getFaction())
 		{
-			AddPower("friendly wizard", result, CalcPower(unit, CSettings::PW_FRIENDLY_WIZARD(*this, unit)));
+			AddPower("friendly wizard", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_FRIENDLY_WIZARD(*this, unit)));
 		}
 		else
 		{
@@ -279,7 +277,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			}
 			else
 			{
-				AddPower("enemy wizard", result, CalcPower(unit, CSettings::PW_ENEMY_WIZARD(*this, unit)));
+				AddPower("enemy wizard", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_ENEMY_WIZARD(*this, unit)));
 			}
 		}
 	}
@@ -287,17 +285,15 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	for (auto & unit : m_world->getMinions())
 	{
 		double D = m_self->getDistanceTo(unit);
-		if (D > m_self->getVisionRange())
-			continue;
 
 		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		if (unit.getType() == model::MINION_ORC_WOODCUTTER)
 		{
 			if (unit.getFaction() == m_self->getFaction())
-				AddPower("friendly creep", result, CalcPower(unit, CSettings::PW_FRIENDLY_CREEP_ORC(*this, unit)));
+				AddPower("friendly creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_FRIENDLY_CREEP_ORC(*this, unit)));
 			else if (unit.getFaction() == model::FACTION_NEUTRAL)
-				AddPower("neutral creep", result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP_ORC(*this, unit)));
+				AddPower("neutral creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_NEUTRAL_CREEP_ORC(*this, unit)));
 			else
 			{
 				if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
@@ -313,16 +309,16 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				}
 				else
 				{
-					AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_ORC(*this, unit)));
+					AddPower("enemy creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_ENEMY_CREEP_ORC(*this, unit)));
 				}
 			}
 		}
 		else if (unit.getType() == model::MINION_FETISH_BLOWDART)
 		{
 			if (unit.getFaction() == m_self->getFaction())
-				AddPower("friendly creep", result, CalcPower(unit, CSettings::PW_FRIENDLY_CREEP_FETISH(*this, unit)));
+				AddPower("friendly creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_FRIENDLY_CREEP_FETISH(*this, unit)));
 			else if (unit.getFaction() == model::FACTION_NEUTRAL)
-				AddPower("neutral creep", result, CalcPower(unit, CSettings::PW_NEUTRAL_CREEP_FETISH(*this, unit)));
+				AddPower("neutral creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_NEUTRAL_CREEP_FETISH(*this, unit)));
 			else
 			{
 				if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
@@ -338,7 +334,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				}
 				else
 				{
-					AddPower("enemy creep", result, CalcPower(unit, CSettings::PW_ENEMY_CREEP_FETISH(*this, unit)));
+					AddPower("enemy creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_ENEMY_CREEP_FETISH(*this, unit)));
 				}
 			}
 		}
@@ -347,7 +343,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	for (auto & unit : m_world->getTrees())
 	{
 		double D = m_self->getDistanceTo(unit);
-		if (D > m_self->getVisionRange())
+		if (D > 2.0 * m_self->getVisionRange())
 			continue;
 
 		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
@@ -360,7 +356,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	for (auto & unit : m_world->getProjectiles())
 	{
 		double D = m_self->getDistanceTo(unit);
-		if (D > m_self->getVisionRange())
+		if (D > 2.0 * m_self->getVisionRange())
 			continue;
 
 		if (unit.getType() != model::PROJECTILE_MAGIC_MISSILE)
