@@ -948,3 +948,23 @@ int CGlobal::RangeLevel(const model::Wizard & wizard)
 	}
 	return nRangeLevel;
 }
+
+bool CGlobal::CanGoToBonus()
+{
+	int nWizards = 0;
+	int nWizardsEnemy = 0;
+
+	for (auto & lane : m_mapFriendlyWizardsLane)
+	{
+		if (lane.second == m_lane)
+			nWizards++;
+	}
+
+	for (auto & lane : m_mapEnemyWizardsLane)
+	{
+		if (lane.second == m_lane)
+			nWizardsEnemy++;
+	}
+
+	return (nWizardsEnemy <= nWizards);
+}

@@ -66,4 +66,6 @@ public:
 
 	static int SpeedLevel(const model::Wizard & wizard);
 	static int RangeLevel(const model::Wizard & wizard);
+
+	bool CanGoToBonus();
 };
