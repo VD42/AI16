@@ -264,7 +264,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 		else
 		{
-			if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
+			if (!waypoint.second && D <= m_self->getVisionRange() && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
 				waypoint.first = { unit.getX(), unit.getY() };
 			if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
 			{
@@ -296,7 +296,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				AddPower("neutral creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_NEUTRAL_CREEP_ORC(*this, unit)));
 			else
 			{
-				if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
+				if (!waypoint.second && D <= m_self->getVisionRange() && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
 					waypoint.first = { unit.getX(), unit.getY() };
 				if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
 				{
@@ -321,7 +321,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				AddPower("neutral creep", result, CalcPower(unit, D > 2.0 * m_self->getVisionRange() ? 0.0 : CSettings::PW_NEUTRAL_CREEP_FETISH(*this, unit)));
 			else
 			{
-				if (!waypoint.second && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
+				if (!waypoint.second && D <= m_self->getVisionRange() && m_self->getDistanceTo(unit) < m_self->getDistanceTo(waypoint.first.first, waypoint.first.second))
 					waypoint.first = { unit.getX(), unit.getY() };
 				if (unit.getDistanceTo(m_game->getMapSize() - m_global.m_BS.first, m_game->getMapSize() - m_global.m_BS.second) < enMinBase)
 				{
