@@ -40,16 +40,60 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_nLastLevel++;
 	}
 
-	if (m_move->getAction() == model::ACTION_NONE && !CSettings::HAVE_SHIELD(*this, *m_self) && setCurrentSkills.find(model::SKILL_SHIELD) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[6] == 0)
+	if (m_move->getAction() == model::ACTION_NONE && setCurrentSkills.find(model::SKILL_SHIELD) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[6] == 0)
 	{
-		m_move->setStatusTargetId(m_self->getId());
-		m_move->setAction(model::ACTION_SHIELD);
+		if (!CSettings::HAVE_SHIELD(*this, *m_self))
+		{
+			m_move->setStatusTargetId(m_self->getId());
+			m_move->setAction(model::ACTION_SHIELD);
+		}
+		else
+		{
+			for (auto & unit : m_world->getWizards())
+			{
+				if (unit.isMe())
+					continue;
+				if (unit.getFaction() != m_self->getFaction())
+					continue;
+				if (m_self->getDistanceTo(unit) > m_self->getCastRange())
+					continue;
+				if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
+					continue;
+				if (CSettings::HAVE_SHIELD(*this, unit))
+					continue;
+				m_move->setStatusTargetId(unit.getId());
+				m_move->setAction(model::ACTION_SHIELD);
+				break;
+			}
+		}
 	}
 
-	if (m_move->getAction() == model::ACTION_NONE && !CSettings::HAVE_HASTE(*this, *m_self) && setCurrentSkills.find(model::SKILL_HASTE) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[5] == 0)
+	if (m_move->getAction() == model::ACTION_NONE && setCurrentSkills.find(model::SKILL_HASTE) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[5] == 0)
 	{
-		m_move->setStatusTargetId(m_self->getId());
-		m_move->setAction(model::ACTION_HASTE);
+		if (!CSettings::HAVE_HASTE(*this, *m_self))
+		{
+			m_move->setStatusTargetId(m_self->getId());
+			m_move->setAction(model::ACTION_HASTE);
+		}
+		else
+		{
+			for (auto & unit : m_world->getWizards())
+			{
+				if (unit.isMe())
+					continue;
+				if (unit.getFaction() != m_self->getFaction())
+					continue;
+				if (m_self->getDistanceTo(unit) > m_self->getCastRange())
+					continue;
+				if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
+					continue;
+				if (CSettings::HAVE_HASTE(*this, unit))
+					continue;
+				m_move->setStatusTargetId(unit.getId());
+				m_move->setAction(model::ACTION_HASTE);
+				break;
+			}
+		}
 	}
 
 	m_tPowers.clear();
