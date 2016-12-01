@@ -5,7 +5,7 @@
 
 const std::function<double(MyStrategy&, const model::Tree&)> CSettings::PW_TREE = [](MyStrategy & strategy, const model::Tree & unit)
 {
-	return -0.5;
+	return -(unit.getLife() / 10.0);
 };
 
 
@@ -26,8 +26,8 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	{
 		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
 			continue;
-		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
-		if (MINION_DISTANCE < DISTANCE)
+		double MINION_DISTANCE = minion.getDistanceTo(unit);
+		if (MINION_DISTANCE <= DISTANCE)
 			PW += 1.0;
 	}
 
@@ -35,8 +35,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	{
 		if (building.getFaction() != strategy.m_self->getFaction())
 			continue;
-		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
-			PW += 1.0;
+		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getOrcWoodcutterAttackRange() + building.getRadius() + 1.0;
+		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
+			PW += 10.0;
 	}
 
 	if (PW > 0.0)
@@ -64,7 +65,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 						break;
 					}
 				}
-				if (bFound)
+				if (bFound && PW < 10.0)
 					PW = -1750.0;
 				else
 					PW = 100.0;
@@ -103,8 +104,8 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	{
 		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
 			continue;
-		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
-		if (MINION_DISTANCE < DISTANCE)
+		double MINION_DISTANCE = minion.getDistanceTo(unit);
+		if (MINION_DISTANCE <= DISTANCE)
 			PW += 1.0;
 	}
 
@@ -112,8 +113,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	{
 		if (building.getFaction() != strategy.m_self->getFaction())
 			continue;
-		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
-			PW += 1.0;
+		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getFetishBlowdartAttackRange() + strategy.m_game->getDartRadius() + building.getRadius() + 1.0;
+		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
+			PW += 10.0;
 	}
 
 	if (PW > 0.0)
@@ -141,7 +143,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 						break;
 					}
 				}
-				if (bFound)
+				if (bFound && PW < 10.0)
 					PW = -1750.0;
 				else
 					PW = 100.0;
@@ -176,16 +178,8 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	{
 		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
 			continue;
-		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
-		if (MINION_DISTANCE - unit.getRadius() < DISTANCE - strategy.m_self->getRadius())
-			PW += 1.0;
-	}
-
-	for (auto & building : strategy.m_world->getBuildings())
-	{
-		if (building.getFaction() != strategy.m_self->getFaction())
-			continue;
-		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+		double MINION_DISTANCE = minion.getDistanceTo(unit);
+		if (MINION_DISTANCE <= strategy.m_game->getGuardianTowerAttackRange())
 			PW += 1.0;
 	}
 
@@ -265,6 +259,15 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 			PW += 1.0;
 	}
 
+	for (auto & building : strategy.m_world->getBuildings())
+	{
+		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getWizardCastRange() + building.getRadius() + strategy.m_game->getMagicMissileRadius() + CGlobal::RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel() + 1.0;
+		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
+			PW += 10.0;
+	}
+
 	if (PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
 	{
 		if (DISTANCE >= MY_RANGE)
@@ -307,7 +310,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 					}
 				}
 			}
-			if (bFound)
+			if (bFound && PW < 10.0)
 				PW = -1750.0;
 			else
 				PW = 75.0;
@@ -341,16 +344,8 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	{
 		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
 			continue;
-		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
-		if (MINION_DISTANCE < DISTANCE)
-			PW += 1.0;
-	}
-
-	for (auto & building : strategy.m_world->getBuildings())
-	{
-		if (building.getFaction() != strategy.m_self->getFaction())
-			continue;
-		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
+		double MINION_DISTANCE = minion.getDistanceTo(unit);
+		if (MINION_DISTANCE <= strategy.m_game->getGuardianTowerAttackRange())
 			PW += 1.0;
 	}
 
@@ -446,10 +441,10 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 
 	for (auto & minion : strategy.m_world->getMinions())
 	{
-		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
+		if (minion.getFaction() != strategy.m_self->getFaction())
 			continue;
-		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
-		if (MINION_DISTANCE < DISTANCE)
+		double MINION_DISTANCE = minion.getDistanceTo(unit);
+		if (MINION_DISTANCE <= DISTANCE)
 			PW += 1.0;
 	}
 
@@ -457,8 +452,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	{
 		if (building.getFaction() != strategy.m_self->getFaction())
 			continue;
-		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
-			PW += 1.0;
+		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getOrcWoodcutterAttackRange() + building.getRadius() + 1.0;
+		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
+			PW += 10.0;
 	}
 
 	if (PW > 0.0)
@@ -486,7 +482,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 						break;
 					}
 				}
-				if (bFound)
+				if (bFound && PW < 10.0)
 					PW = -1750.0;
 				else
 					PW = 100.0;
@@ -526,10 +522,10 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 
 	for (auto & minion : strategy.m_world->getMinions())
 	{
-		if (minion.getFaction() != strategy.m_self->getFaction() && minion.getFaction() != model::FACTION_NEUTRAL)
+		if (minion.getFaction() != strategy.m_self->getFaction())
 			continue;
-		double MINION_DISTANCE = std::hypot(minion.getX() - unit.getX(), minion.getY() - unit.getY());
-		if (MINION_DISTANCE < DISTANCE)
+		double MINION_DISTANCE = minion.getDistanceTo(unit);
+		if (MINION_DISTANCE <= DISTANCE)
 			PW += 1.0;
 	}
 
@@ -537,8 +533,9 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	{
 		if (building.getFaction() != strategy.m_self->getFaction())
 			continue;
-		if (building.getDistanceTo(unit) <= (building.getType() == model::BUILDING_GUARDIAN_TOWER ? strategy.m_game->getGuardianTowerAttackRange() : strategy.m_game->getFactionBaseAttackRange()))
-			PW += 1.0;
+		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getFetishBlowdartAttackRange() + strategy.m_game->getDartRadius() + building.getRadius() + 1.0;
+		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
+			PW += 10.0;
 	}
 
 	if (PW > 0.0)
@@ -566,7 +563,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 						break;
 					}
 				}
-				if (bFound)
+				if (bFound && PW < 10.0)
 					PW = -1750.0;
 				else
 					PW = 100.0;
