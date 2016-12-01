@@ -3,6 +3,7 @@
 #include "Strategy.h"
 #include "MyStrategy_Global.h"
 #include <deque>
+#include <set>
 
 class MyStrategy : public Strategy
 {
@@ -51,4 +52,6 @@ public:
 	std::vector<model::SkillType> m_tSkillsOrder;
 
 	int m_nLastLevel = 0;
+
+	std::set<model::SkillType> m_setCurrentSkills;
 };

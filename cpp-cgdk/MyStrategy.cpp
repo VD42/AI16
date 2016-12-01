@@ -8,7 +8,6 @@
 #include <time.h>
 #include <limits>
 #include <algorithm>
-#include <set>
 
 #include "MyStrategy_Settings.h"
 
@@ -28,19 +27,19 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	m_move->setAction(model::ACTION_NONE);
 
-	std::set<model::SkillType> setCurrentSkills;
-	setCurrentSkills.insert(m_self->getSkills().begin(), m_self->getSkills().end());
+	m_setCurrentSkills.clear();
+	m_setCurrentSkills.insert(m_self->getSkills().begin(), m_self->getSkills().end());
 	
 	if (m_nLastLevel < m_self->getLevel())
 	{
 		m_move->setSkillToLearn(m_tSkillsOrder.back());
 		printf("Level up, learning: %d\r\n", m_move->getSkillToLearn());
-		setCurrentSkills.insert(m_move->getSkillToLearn());
+		m_setCurrentSkills.insert(m_move->getSkillToLearn());
 		m_tSkillsOrder.pop_back();
 		m_nLastLevel++;
 	}
 
-	if (m_move->getAction() == model::ACTION_NONE && setCurrentSkills.find(model::SKILL_SHIELD) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[6] == 0)
+	if (m_move->getAction() == model::ACTION_NONE && m_setCurrentSkills.find(model::SKILL_SHIELD) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[6] == 0 && m_self->getMana() >= m_game->getShieldManacost())
 	{
 		if (!CSettings::HAVE_SHIELD(*this, *m_self))
 		{
@@ -68,7 +67,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 	}
 
-	if (m_move->getAction() == model::ACTION_NONE && setCurrentSkills.find(model::SKILL_HASTE) != setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[5] == 0)
+	if (m_move->getAction() == model::ACTION_NONE && m_setCurrentSkills.find(model::SKILL_HASTE) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[5] == 0 && m_self->getMana() >= m_game->getHasteManacost())
 	{
 		if (!CSettings::HAVE_HASTE(*this, *m_self))
 		{
@@ -745,6 +744,9 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	bool bWizard = false;
 	if (dynamic_cast<const model::Wizard *>(&unit))
 		bWizard = true;
+	bool bBuilding = false;
+	if (dynamic_cast<const model::Building *>(&unit))
+		bBuilding = true;
 
 	double D = m_self->getDistanceTo(unit);
 	double angle = m_self->getAngleTo(unit);
@@ -753,12 +755,56 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 		m_LastShootTick = m_world->getTickIndex();
 		m_move->setTurn(angle);
 	}
+
+	bool bCanUseFireball = true;
+	for (auto & minion : m_world->getMinions())
+	{
+		if (minion.getFaction() != m_self->getFaction())
+			continue;
+		if (minion.getDistanceTo(unit) < unit.getRadius() + 100.0)
+		{
+			bCanUseFireball = false;
+			break;
+		}
+	}
+	if (bCanUseFireball)
+	{
+		for (auto & wizard : m_world->getWizards())
+		{
+			if (wizard.getFaction() != m_self->getFaction())
+				continue;
+			if (wizard.getDistanceTo(unit) < unit.getRadius() + 100.0)
+			{
+				bCanUseFireball = false;
+				break;
+			}
+		}
+	}
+
 	if (D - unit.getRadius() < m_game->getStaffRange() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[1] == 0)
 	{
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
 			m_move->setAction(model::ACTION_STAFF);
 	}
-	else if (m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[2] == 0)
+	else if (m_setCurrentSkills.find(model::SKILL_FROST_BOLT) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[3] == 0 && bWizard && m_self->getMana() >= m_game->getFrostBoltManacost())
+	{
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
+		{
+			m_move->setAction(model::ACTION_FROST_BOLT);
+			m_move->setCastAngle(angle);
+			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getFrostBoltRadius());
+		}
+	}
+	else if (m_setCurrentSkills.find(model::SKILL_FIREBALL) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[4] == 0 && bCanUseFireball && (bWizard || bBuilding) && m_self->getMana() >= m_game->getFireballManacost())
+	{
+		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
+		{
+			m_move->setAction(model::ACTION_FIREBALL);
+			m_move->setCastAngle(angle);
+			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getFireballRadius());
+		}
+	}
+	else if (m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[2] == 0 && m_self->getMana() >= m_game->getMagicMissileManacost())
 	{
 		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double newX = bWizard ? unit.getX() : unit.getX() + unit.getSpeedX() * T;

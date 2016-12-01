@@ -5,7 +5,7 @@
 
 const std::function<double(MyStrategy&, const model::Tree&)> CSettings::PW_TREE = [](MyStrategy & strategy, const model::Tree & unit)
 {
-	return -(unit.getLife() / 10.0);
+	return -(unit.getLife() / 50.0);
 };
 
 
