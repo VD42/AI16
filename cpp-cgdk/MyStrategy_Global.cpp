@@ -146,7 +146,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second - 150.0;
 			bool priority = false;
 
-			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if (!m_bLaneRush && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseX = m_BS.first - 800.0;
 				priority = true;
@@ -216,7 +216,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
-			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if (!m_bLaneRush && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseX = m_BS.first - 800.0;
 				baseY = m_BS.second + 800.0;
@@ -287,7 +287,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
-			if ((m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if (!m_bLaneRush && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseY = m_BS.second + 800.0;
 				priority = true;
