@@ -120,6 +120,17 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 	if (!base)
 		return result;
 
+	int nCloseToBase = 0;
+	for (auto & wizard : m_strategy.m_world->getWizards())
+	{
+		if (wizard.getFaction() != m_strategy.m_self->getFaction())
+			continue;
+		if (wizard.isMe())
+			continue;
+		if (wizard.getDistanceTo(m_BS.first, m_BS.second) < 1300.0)
+			nCloseToBase++;
+	}
+
 	if (m_lane == model::LANE_TOP)
 	{
 		if (m_top == LaneState::TOWER_1)
@@ -146,7 +157,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second - 150.0;
 			bool priority = false;
 
-			if (!m_bLaneRush && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if ((!m_bLaneRush || nCloseToBase < 2) && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseX = m_BS.first - 800.0;
 				priority = true;
@@ -216,7 +227,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
-			if (!m_bLaneRush && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if ((!m_bLaneRush || nCloseToBase < 2) && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseX = m_BS.first - 800.0;
 				baseY = m_BS.second + 800.0;
@@ -287,7 +298,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
-			if (!m_bLaneRush && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if ((!m_bLaneRush || nCloseToBase < 2) && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseY = m_BS.second + 800.0;
 				priority = true;
