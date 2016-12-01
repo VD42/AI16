@@ -183,6 +183,17 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
+	for (auto & wizard : strategy.m_world->getWizards())
+	{
+		if (wizard.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (wizard.isMe())
+			continue;
+		double WIZARD_DISTANCE = wizard.getDistanceTo(unit);
+		if (WIZARD_DISTANCE <= strategy.m_game->getGuardianTowerAttackRange())
+			PW += 1.0;
+	}
+
 	if (PW > 1.0)
 	{
 		if (DISTANCE >= MY_RANGE)
@@ -346,6 +357,17 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			continue;
 		double MINION_DISTANCE = minion.getDistanceTo(unit);
 		if (MINION_DISTANCE <= strategy.m_game->getGuardianTowerAttackRange())
+			PW += 1.0;
+	}
+
+	for (auto & wizard : strategy.m_world->getWizards())
+	{
+		if (wizard.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (wizard.isMe())
+			continue;
+		double WIZARD_DISTANCE = wizard.getDistanceTo(unit);
+		if (WIZARD_DISTANCE <= strategy.m_game->getGuardianTowerAttackRange())
 			PW += 1.0;
 	}
 

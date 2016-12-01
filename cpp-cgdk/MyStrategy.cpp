@@ -105,7 +105,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		m_bSeedReady = true;
 	}
 
-	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.4)
+	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.25)
 	{
 		m_bHealMode = true;
 		if (m_nLastHealTick + 100 > m_world->getTickIndex())
@@ -115,7 +115,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	//	m_bVeryHealMode = true;
 	//if (m_self->getLife() >= m_self->getMaxLife() * 0.2)
 	//	m_bVeryHealMode = false;
-	if (m_self->getLife() >= m_self->getMaxLife() * (m_bDoubleHealMode ? 0.8 : 0.6))
+	if (m_self->getLife() >= m_self->getMaxLife() * (m_bDoubleHealMode ? 0.6 : 0.4))
 	{
 		m_bHealMode = false;
 		m_bDoubleHealMode = false;
