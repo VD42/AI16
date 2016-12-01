@@ -584,7 +584,7 @@ bool MyStrategy::Shoot()
 		double D = m_self->getDistanceTo(unit);
 		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double R = std::ceil(T) * m_game->getMinionSpeed();
-		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
+		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
 		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
 			continue;
@@ -605,7 +605,7 @@ bool MyStrategy::Shoot()
 		double D = m_self->getDistanceTo(unit);
 		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double R = std::ceil(T) * m_game->getWizardForwardSpeed();
-		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
+		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
 		double P = 20000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
@@ -621,7 +621,7 @@ bool MyStrategy::Shoot()
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
-		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
+		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
 		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
 		if (P > MAX_PRIORITY)
@@ -634,7 +634,7 @@ bool MyStrategy::Shoot()
 	for (auto & unit : m_world->getTrees())
 	{
 		double D = m_self->getDistanceTo(unit);
-		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
+		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
 		if (D - m_self->getRadius() - unit.getRadius() > 25.0 || (!m_FreeMode && std::abs(m_self->getAngleTo(unit)) > PI / 5.0))
 			continue;
@@ -673,7 +673,7 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 				continue;
 
 			double D = m_self->getDistanceTo(wizard);
-			if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + CGlobal::RangeLevel(wizard) * m_game->getRangeBonusPerSkillLevel())
+			if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + m_global.RangeLevel(wizard) * m_game->getRangeBonusPerSkillLevel())
 				continue;
 
 			if (D < m_self->getRadius() + m_game->getMagicMissileRadius() + 400.0)
@@ -705,7 +705,7 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 			for (auto & unit : m_world->getTrees())
 			{
 				double D = m_self->getDistanceTo(unit);
-				if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() + CGlobal::RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel() - 0.1)
+				if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel() - 0.1)
 					continue;
 				if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
 					continue;
@@ -736,8 +736,8 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 	double ver = std::cos(angle);
 	double hor = std::sin(angle);
 
-	m_move->setSpeed(ver * (ver > 0.0 ? 4.0 : 3.0) * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + CGlobal::SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
-	m_move->setStrafeSpeed(hor * 3.0 * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + CGlobal::SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
+	m_move->setSpeed(ver * (ver > 0.0 ? 4.0 : 3.0) * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + m_global.SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
+	m_move->setStrafeSpeed(hor * 3.0 * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + m_global.SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
 }
 
 void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)

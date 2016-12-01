@@ -18,7 +18,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(15.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -96,7 +96,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(15.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -170,7 +170,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -245,12 +245,12 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_self->getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_game->getWizardForwardSpeed() * 2.0 + 1.0 + CGlobal::RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_self->getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_game->getWizardForwardSpeed() * 2.0 + 1.0 + strategy.m_global.RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(15.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getWizardForwardSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -274,7 +274,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	{
 		if (building.getFaction() != strategy.m_self->getFaction())
 			continue;
-		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getWizardCastRange() + building.getRadius() + strategy.m_game->getMagicMissileRadius() + CGlobal::RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel() + 1.0;
+		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getWizardCastRange() + building.getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_global.RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel() + 1.0;
 		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
 			PW += 10.0;
 	}
@@ -347,7 +347,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -457,7 +457,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(15.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
@@ -538,7 +538,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	double D = strategy.m_self->getDistanceTo(unit);
 	double T = std::min(15.0, D / strategy.m_game->getMagicMissileSpeed());
 	double R = std::ceil(T) * strategy.m_game->getMinionSpeed();
-	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + CGlobal::RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
+	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - R - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
 
