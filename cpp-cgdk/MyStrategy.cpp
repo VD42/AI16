@@ -107,6 +107,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.25)
 	{
 		m_bHealMode = true;
+		m_bVeryHealMode = true;
 		if (m_nLastHealTick + 100 > m_world->getTickIndex())
 			m_bDoubleHealMode = true;
 	}
@@ -118,6 +119,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	{
 		m_bHealMode = false;
 		m_bDoubleHealMode = false;
+		m_bVeryHealMode = false;
 	}
 
 	m_LastPositions.push_front(std::make_pair(m_self->getX(), m_self->getY()));
@@ -725,12 +727,6 @@ bool MyStrategy::Shoot()
 void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
-
-	if (std::hypot(direction.first, direction.second) > 5000.0)
-	{
-		printf("GOGOGO! (%f)\r\n", std::hypot(direction.first, direction.second));
-		shoot = false;
-	}
 
 	if (!shoot)
 	{
