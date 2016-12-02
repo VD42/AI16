@@ -78,7 +78,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -156,7 +156,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -169,7 +169,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
+	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed() + 20.0;
 	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
@@ -232,7 +232,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -273,6 +273,8 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	for (auto & building : strategy.m_world->getBuildings())
 	{
 		if (building.getFaction() != strategy.m_self->getFaction())
+			continue;
+		if (building.getType() != model::BUILDING_FACTION_BASE)
 			continue;
 		double ENEMY_RANGE_TO_BUILDING = strategy.m_game->getWizardCastRange() + building.getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_global.RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel() + 1.0;
 		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
@@ -333,7 +335,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 75.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -346,7 +348,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 {
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
-	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed() + 1.0;
+	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed() + 20.0;
 	double MY_RANGE = strategy.m_self->getCastRange() + unit.getRadius() - strategy.m_game->getMagicMissileRadius() - 0.1 + strategy.m_global.RangeLevel(*strategy.m_self) * strategy.m_game->getRangeBonusPerSkillLevel();
 
 	double PW = 0.0;
@@ -409,7 +411,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -517,7 +519,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -598,7 +600,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	}
 	else
 	{
-		if (DISTANCE <= ENEMY_RANGE)
+		if (DISTANCE <= std::max(MY_RANGE / 1.2, ENEMY_RANGE))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
