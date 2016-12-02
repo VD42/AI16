@@ -585,8 +585,72 @@ bool MyStrategy::Shoot()
 		double R = std::ceil(T) * m_game->getMinionSpeed();
 		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
-		if (unit.getFaction() == model::FACTION_NEUTRAL && !m_FreeMode && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
-			continue;
+		if (unit.getFaction() == model::FACTION_NEUTRAL)
+		{
+			if (!(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
+			{
+				const model::CircularUnit * tarMinND = nullptr;
+				double minND = 400000.0;
+				for (auto & u : m_world->getWizards())
+				{
+					if (unit.getDistanceTo(u) < minND)
+					{
+						minND = unit.getDistanceTo(u);
+						tarMinND = &u;
+					}
+				}
+				for (auto & u : m_world->getMinions())
+				{
+					if (u.getFaction() == model::FACTION_NEUTRAL)
+						continue;
+					if (unit.getDistanceTo(u) < minND)
+					{
+						minND = unit.getDistanceTo(u);
+						tarMinND = &u;
+					}
+				}
+				for (auto & u : m_world->getBuildings())
+				{
+					if (unit.getDistanceTo(u) < minND)
+					{
+						minND = unit.getDistanceTo(u);
+						tarMinND = &u;
+					}
+				}
+				if (tarMinND && tarMinND->getFaction() != m_self->getFaction() && minND < tarMinND->getRadius() + 300.0)
+				{
+					if (dynamic_cast<const model::Wizard *>(tarMinND))
+					{
+						double P = 20000.0 * ((dynamic_cast<const model::Wizard *>(tarMinND)->getMaxLife() - dynamic_cast<const model::Wizard *>(tarMinND)->getLife() + 1.0) / dynamic_cast<const model::Wizard *>(tarMinND)->getMaxLife());
+						if (P > MAX_PRIORITY)
+						{
+							target = &unit;
+							MAX_PRIORITY = P;
+						}
+					}
+					if (dynamic_cast<const model::Minion *>(tarMinND))
+					{
+						double P = 100.0 * ((dynamic_cast<const model::Minion *>(tarMinND)->getMaxLife() - dynamic_cast<const model::Minion *>(tarMinND)->getLife() + 1.0) / dynamic_cast<const model::Minion *>(tarMinND)->getMaxLife());
+						if (P > MAX_PRIORITY)
+						{
+							target = &unit;
+							MAX_PRIORITY = P;
+						}
+					}
+					if (dynamic_cast<const model::Building *>(tarMinND))
+					{
+						double P = (dynamic_cast<const model::Building *>(tarMinND)->getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
+						if (P > MAX_PRIORITY)
+						{
+							target = &unit;
+							MAX_PRIORITY = P;
+						}
+					}
+				}
+			}
+			if (!m_FreeMode && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
+				continue;
+		}
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
 			P = 1000000.0;
@@ -661,6 +725,12 @@ bool MyStrategy::Shoot()
 void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
+
+	if (std::hypot(direction.first, direction.second) > 5000.0)
+	{
+		printf("GOGOGO! (%f)\r\n", std::hypot(direction.first, direction.second));
+		shoot = false;
+	}
 
 	if (!shoot)
 	{
