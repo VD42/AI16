@@ -506,7 +506,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 							continue;
 						if (m_global.GetLane(minion) != m_CreepStopLane)
 							continue;
-						double D = minion.getX() * (1.0 / std::sqrt(2.0)) + (m_game->getMapSize() - minion.getY()) * (1.0 / std::sqrt(2.0));
+						double D = minion.getX() + m_game->getMapSize() - minion.getY();
 						if (D > maxD)
 						{
 							maxX = minion.getX();
