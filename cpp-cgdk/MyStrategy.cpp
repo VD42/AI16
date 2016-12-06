@@ -823,7 +823,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	}
 
 	bool bCanUseFireball = true;
-	for (auto & minion : m_world->getMinions())
+	/*for (auto & minion : m_world->getMinions())
 	{
 		if (minion.getFaction() != m_self->getFaction())
 			continue;
@@ -832,7 +832,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 			bCanUseFireball = false;
 			break;
 		}
-	}
+	}*/
 	if (bCanUseFireball)
 	{
 		for (auto & wizard : m_world->getWizards())
