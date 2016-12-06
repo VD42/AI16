@@ -107,6 +107,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.25)
 	{
 		m_bHealMode = true;
+		m_bVeryHealMode = true;
 		if (m_nLastHealTick + 100 > m_world->getTickIndex())
 			m_bDoubleHealMode = true;
 	}
