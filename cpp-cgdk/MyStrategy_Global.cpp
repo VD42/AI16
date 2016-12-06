@@ -62,13 +62,25 @@ void CGlobal::ChooseLane()
 	{
 		if (!m_bEgoistMode && m_strategy.m_self->isMaster())
 		{
-			m_lane = model::LANE_MIDDLE;
+			/*m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
 			std::vector<model::Message> m_tMessages = {
 				model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
 				model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
 				model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
 				model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+			};
+			m_strategy.m_move->setMessages(m_tMessages);
+			*/
+
+			m_bLaneRush = true;
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			std::vector<model::Message> m_tMessages = {
+				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
+				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>())
 			};
 			m_strategy.m_move->setMessages(m_tMessages);
 			return;
@@ -973,6 +985,9 @@ int CGlobal::RangeLevel(const model::Wizard & wizard)
 
 bool CGlobal::CanGoToBonus()
 {
+	if (m_bLaneRush)
+		return false;
+
 	int nWizards = 0;
 	int nWizardsEnemy = 0;
 
