@@ -54,4 +54,6 @@ public:
 	int m_nLastLevel = 0;
 
 	std::set<model::SkillType> m_setCurrentSkills;
+
+	int GetAttackingCount();
 };

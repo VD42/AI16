@@ -107,7 +107,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.25)
 	{
 		m_bHealMode = true;
-		m_bVeryHealMode = true;
 		if (m_nLastHealTick + 100 > m_world->getTickIndex())
 			m_bDoubleHealMode = true;
 	}
@@ -728,6 +727,12 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 
+	if (GetAttackingCount() > 2)
+	{
+		printf("Tick %d: found dangerous situation!\r\n", m_world->getTickIndex());
+		shoot = false;
+	}
+
 	if (!shoot)
 	{
 		bool bFound = false;
@@ -886,4 +891,30 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 			m_move->setMinCastDistance(newD - unit.getRadius() + m_game->getMagicMissileRadius());
 		}
 	}
+}
+
+int MyStrategy::GetAttackingCount()
+{
+	int nCount = 0;
+	for (auto & unit : m_world->getMinions())
+	{
+		if (unit.getFaction() == m_self->getFaction())
+			continue;
+		if (unit.getFaction() == model::FACTION_NEUTRAL && !(unit.getSpeedX() > 0.0 || unit.getSpeedY() > 0.0 || unit.getLife() < unit.getMaxLife() || unit.getRemainingActionCooldownTicks() > 0))
+			continue;
+		if (unit.getDistanceTo(*m_self) > (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackRange() + m_self->getRadius() : m_game->getFetishBlowdartAttackRange() + m_self->getRadius() + m_game->getDartRadius()))
+			continue;
+		if (std::abs(unit.getAngleTo(*m_self)) <= (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackSector() / 2.0 : m_game->getFetishBlowdartAttackSector()))
+			nCount++;
+	}
+	for (auto & unit : m_world->getWizards())
+	{
+		if (unit.getFaction() == m_self->getFaction())
+			continue;
+		if (unit.getDistanceTo(*m_self) > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + m_global.RangeLevel(unit) * m_game->getRangeBonusPerSkillLevel())
+			continue;
+		if (std::abs(unit.getAngleTo(*m_self)) <= m_game->getStaffSector() / 2.0)
+			nCount++;
+	}
+	return nCount;
 }
