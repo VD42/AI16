@@ -728,9 +728,9 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 
-	if (GetAttackingCount() > 2)
+	if (IsDangerous())
 	{
-		printf("Tick %d: found dangerous situation!\r\n", m_world->getTickIndex());
+		printf("Tick %d: found dangerous situation (%f / %f)!\r\n", m_world->getTickIndex(), GetAttackingCount(), GetMaxDangerous());
 		shoot = false;
 	}
 
@@ -894,9 +894,9 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 	}
 }
 
-int MyStrategy::GetAttackingCount()
+double MyStrategy::GetAttackingCount()
 {
-	int nCount = 0;
+	double nCount = 0.0;
 	for (auto & unit : m_world->getMinions())
 	{
 		if (unit.getFaction() == m_self->getFaction())
@@ -905,17 +905,43 @@ int MyStrategy::GetAttackingCount()
 			continue;
 		if (unit.getDistanceTo(*m_self) > (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackRange() + m_self->getRadius() : m_game->getFetishBlowdartAttackRange() + m_self->getRadius() + m_game->getDartRadius()))
 			continue;
-		if (std::abs(unit.getAngleTo(*m_self)) <= (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackSector() / 2.0 : m_game->getFetishBlowdartAttackSector()))
-			nCount++;
+		if (std::abs(unit.getAngleTo(*m_self)) > (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackSector() / 2.0 : m_game->getFetishBlowdartAttackSector()))
+			continue;
+		nCount += 1.0;
 	}
+	std::set<long long> setWizards;
 	for (auto & unit : m_world->getWizards())
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
 		if (unit.getDistanceTo(*m_self) > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + m_global.RangeLevel(unit) * m_game->getRangeBonusPerSkillLevel())
 			continue;
-		if (std::abs(unit.getAngleTo(*m_self)) <= m_game->getStaffSector() / 2.0)
-			nCount++;
+		if (std::abs(unit.getAngleTo(*m_self)) > m_game->getStaffSector() / 2.0)
+			continue;
+		nCount += 1.5;
+		setWizards.insert(unit.getId());
+	}
+	for (auto & unit : m_world->getProjectiles())
+	{
+		if (unit.getFaction() == m_self->getFaction())
+			continue;
+		if (unit.getType() == model::PROJECTILE_DART)
+			continue;
+		if (setWizards.find(unit.getOwnerUnitId()) != setWizards.end())
+			continue;
+		if (unit.getDistanceTo(*m_self) > m_self->getRadius() + 100.0)
+			continue;
+		nCount += 1.5;
 	}
 	return nCount;
+}
+
+double MyStrategy::GetMaxDangerous()
+{
+	return ((double)m_self->getLife() / (double)m_self->getMaxLife()) * 5.0;
+}
+
+bool MyStrategy::IsDangerous()
+{
+	return (GetAttackingCount() > GetMaxDangerous());
 }

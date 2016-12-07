@@ -40,7 +40,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 10.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -118,7 +118,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 			PW += 10.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -194,7 +194,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
-	if (PW > 1.0)
+	if (PW > 1.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -281,7 +281,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 			PW += 10.0;
 	}
 
-	if (PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self))
+	if ((PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self)) && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -373,7 +373,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
-	if (PW > 1.0)
+	if (PW > 1.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -481,7 +481,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 			PW += 10.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -562,7 +562,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 			PW += 10.0;
 	}
 
-	if (PW > 0.0)
+	if (PW > 0.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{

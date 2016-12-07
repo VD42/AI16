@@ -55,5 +55,7 @@ public:
 
 	std::set<model::SkillType> m_setCurrentSkills;
 
-	int GetAttackingCount();
+	double GetAttackingCount();
+	double GetMaxDangerous();
+	bool IsDangerous();
 };
