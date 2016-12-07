@@ -376,7 +376,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		if (D > 2.0 * m_self->getVisionRange())
 			continue;
 
-		if (unit.getType() != model::PROJECTILE_MAGIC_MISSILE)
+		if (unit.getType() == model::PROJECTILE_DART)
 			continue;
 
 		double X = unit.getX();
