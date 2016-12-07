@@ -413,7 +413,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
 	}
 
-	if (pEnMinUnit && enMinBase < 1300.0 && m_global.OwnLaneControl())
+	if (!m_global.m_bEgoistMode && pEnMinUnit && enMinBase < 1300.0 && m_global.OwnLaneControl())
 	{
 		m_global.m_lane = m_global.GetLane(*pEnMinUnit);
 		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };

@@ -60,6 +60,13 @@ void CGlobal::ChooseLane()
 {
 	if (m_lane == model::_LANE_UNKNOWN_)
 	{
+		if (m_bEgoistMode)
+		{
+			m_lane = model::LANE_MIDDLE;
+			m_bLaneChoosed = true;
+			return;
+		}
+
 		if (!m_bEgoistMode && m_strategy.m_self->isMaster())
 		{
 			/*m_lane = model::LANE_MIDDLE;
