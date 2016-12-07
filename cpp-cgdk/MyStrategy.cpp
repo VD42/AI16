@@ -709,25 +709,29 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 	if (!shoot)
 	{
 		bool bFound = false;
-		double evAngle = 0.0;;
-		for (auto & wizard : m_world->getWizards())
+		double evAngle = 0.0;
+
+		if (!IsDangerous())
 		{
-			if (wizard.getFaction() == m_self->getFaction())
-				continue;
+			for (auto & wizard : m_world->getWizards())
+			{
+				if (wizard.getFaction() == m_self->getFaction())
+					continue;
 
-			double D = m_self->getDistanceTo(wizard);
-			if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + m_global.RangeLevel(wizard) * m_game->getRangeBonusPerSkillLevel())
-				continue;
+				double D = m_self->getDistanceTo(wizard);
+				if (D > m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + m_global.RangeLevel(wizard) * m_game->getRangeBonusPerSkillLevel())
+					continue;
 
-			if (D < m_self->getRadius() + m_game->getMagicMissileRadius() + 400.0)
-				continue;
+				if (D < m_self->getRadius() + m_game->getMagicMissileRadius() + 400.0)
+					continue;
 
-			if (std::abs(wizard.getAngleTo(*m_self)) > PI / 2.0)
-				continue;
+				if (std::abs(wizard.getAngleTo(*m_self)) > PI / 2.0)
+					continue;
 
-			bFound = true;
-			evAngle = m_self->getAngleTo(wizard);
-			break;
+				bFound = true;
+				evAngle = m_self->getAngleTo(wizard);
+				break;
+			}
 		}
 
 		if (bFound)
@@ -762,6 +766,7 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 
 		if (tree)
 		{
+			m_move->setAction(model::ACTION_NONE);
 			BestShoot(*tree, false);
 		}
 	}
