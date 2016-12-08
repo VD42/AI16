@@ -444,20 +444,38 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				{
 					double minX = 0.0;
 					double minY = 4000.0;
+					double pminX = 0.0;
+					double pminY = 4000.0;
+					long long newM = -1;
 					for (auto & minion : m_world->getMinions())
 					{
 						if (minion.getFaction() != m_self->getFaction())
 							continue;
 						if (m_global.GetLane(minion) != m_CreepStopLane)
 							continue;
+						if (minion.getId() == m_CSTID)
+						{
+							pminX = minion.getX();
+							pminY = minion.getY();
+						}
 						if (minion.getY() < minY)
 						{
 							minX = minion.getX();
 							minY = minion.getY();
+							newM = minion.getId();
 						}
 					}
-					waypoint.first.first = minX;
-					waypoint.first.second = minY - m_game->getMinionRadius() - m_game->getWizardRadius();
+					if (minY < pminY - 2 * m_game->getMinionRadius())
+					{
+						waypoint.first.first = minX;
+						waypoint.first.second = minY - m_game->getMinionRadius() - m_game->getWizardRadius();
+						m_CSTID = newM;
+					}
+					else
+					{
+						waypoint.first.first = pminX;
+						waypoint.first.second = pminY - m_game->getMinionRadius() - m_game->getWizardRadius();
+					}
 				}
 			}
 			else if (m_CreepStopLane == model::LANE_MIDDLE)
@@ -472,22 +490,43 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 					double maxD = 0.0;
 					double maxX = 0.0;
 					double maxY = 0.0;
+					double pmaxD = 0.0;
+					double pmaxX = 0.0;
+					double pmaxY = 0.0;
+					long long newM = -1;
 					for (auto & minion : m_world->getMinions())
 					{
 						if (minion.getFaction() != m_self->getFaction())
 							continue;
 						if (m_global.GetLane(minion) != m_CreepStopLane)
 							continue;
+						if (minion.getId() == m_CSMID)
+						{
+							pmaxX = minion.getX();
+							pmaxY = minion.getY();
+							pmaxD = minion.getX() + m_game->getMapSize() - minion.getY();
+						}
 						double D = minion.getX() + m_game->getMapSize() - minion.getY();
 						if (D > maxD)
 						{
 							maxX = minion.getX();
 							maxY = minion.getY();
 							maxD = D;
+							newM = minion.getId();
 						}
 					}
-					waypoint.first.first = maxX + (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
-					waypoint.first.second = maxY - (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+					if (maxD > pmaxD + 2 * sqrt(2) * m_game->getMinionRadius())
+					{
+						waypoint.first.first = maxX + (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+						waypoint.first.second = maxY - (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+						m_CSMID = newM;
+					}
+					else
+					{
+						waypoint.first.first = pmaxX + (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+						waypoint.first.second = pmaxY - (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
+					}
+
 				}
 			}
 			else if (m_CreepStopLane == model::LANE_BOTTOM)
@@ -501,20 +540,38 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				{
 					double maxX = 0.0;
 					double maxY = 0.0;
+					double pmaxX = 0.0;
+					double pmaxY = 0.0;
+					long long newM = -1;
 					for (auto & minion : m_world->getMinions())
 					{
 						if (minion.getFaction() != m_self->getFaction())
 							continue;
 						if (m_global.GetLane(minion) != m_CreepStopLane)
 							continue;
+						if (minion.getId() == m_CSBID)
+						{
+							pmaxX = minion.getX();
+							pmaxY = minion.getY();
+						}
 						if (minion.getX() > maxX)
 						{
 							maxX = minion.getX();
 							maxY = minion.getY();
+							newM = minion.getId();
 						}
 					}
-					waypoint.first.first = maxX + m_game->getMinionRadius() + m_game->getWizardRadius();
-					waypoint.first.second = maxY;
+					if (maxX > pmaxX + 2 * m_game->getMinionRadius())
+					{
+						waypoint.first.first = maxX + m_game->getMinionRadius() + m_game->getWizardRadius();
+						waypoint.first.second = maxY;
+						m_CSBID = newM;
+					}
+					else
+					{
+						waypoint.first.first = pmaxX + m_game->getMinionRadius() + m_game->getWizardRadius();
+						waypoint.first.second = pmaxY;
+					}
 				}
 			}
 		}

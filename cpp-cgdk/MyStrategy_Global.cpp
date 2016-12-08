@@ -67,19 +67,15 @@ void CGlobal::ChooseLane()
 			return;
 		}
 
-		if (!m_bEgoistMode && m_strategy.m_self->isMaster())
+		if (!MasterControl())
 		{
-			/*m_lane = model::LANE_MIDDLE;
+			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
-			std::vector<model::Message> m_tMessages = {
-				model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-				model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-				model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-				model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, std::vector<signed char>())
-			};
-			m_strategy.m_move->setMessages(m_tMessages);
-			*/
+			return;
+		}
 
+		if (!m_bEgoistMode && MasterControl())
+		{
 			m_bLaneRush = true;
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -105,7 +101,7 @@ void CGlobal::ChooseLane()
 		m_bLaneChoosed = true; // no rechoose lane! but master wizard can do it!
 	}
 
-	if (!m_bEgoistMode)
+	if (!m_bEgoistMode && m_bEnableMasterHeard)
 	{
 		for (auto & message : m_strategy.m_self->getMessages())
 		{
@@ -481,7 +477,7 @@ void CGlobal::Update()
 	if (m_top == LaneState::TOWER_2 && EnemyTowerNotExists(m_T2))
 	{
 		m_top = LaneState::BASE;
-		if (m_strategy.m_self->isMaster() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		if (MasterControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_TOP;
 			m_bLaneChoosed = true;
@@ -503,7 +499,7 @@ void CGlobal::Update()
 	if (m_mid == LaneState::TOWER_2 && EnemyTowerNotExists(m_M2))
 	{
 		m_mid = LaneState::BASE;
-		if (m_strategy.m_self->isMaster() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		if (MasterControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
@@ -525,7 +521,7 @@ void CGlobal::Update()
 	if (m_bot == LaneState::TOWER_2 && EnemyTowerNotExists(m_B2))
 	{
 		m_bot = LaneState::BASE;
-		if (m_strategy.m_self->isMaster() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
+		if (MasterControl() && !m_bLaneRush && m_strategy.m_world->getTickIndex() < 10000 && Tower2Exists())
 		{
 			m_lane = model::LANE_BOTTOM;
 			m_bLaneChoosed = true;
@@ -762,7 +758,7 @@ void CGlobal::ReCheckLane(bool after_death)
 		return;
 	}
 
-	if (m_strategy.m_self->isMaster())
+	if (MasterControl())
 	{
 		for (auto & wizard : m_mapFriendlyWizardsLane)
 		{
@@ -1011,4 +1007,13 @@ bool CGlobal::CanGoToBonus()
 	}
 
 	return (nWizardsEnemy <= nWizards);
+}
+
+bool CGlobal::MasterControl()
+{
+	if (!m_bEnableMasterControl)
+		return false;
+	if (!m_strategy.m_self->isMaster())
+		return false;
+	return true;
 }

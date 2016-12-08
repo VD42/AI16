@@ -68,4 +68,9 @@ public:
 	int RangeLevel(const model::Wizard & wizard);
 
 	bool CanGoToBonus();
+
+	bool MasterControl();
+	bool m_bEnableMasterControl = false;
+
+	bool m_bEnableMasterHeard = false;
 };
