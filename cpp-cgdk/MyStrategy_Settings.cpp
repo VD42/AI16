@@ -46,7 +46,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			if (PW < 0.5)
 			{
@@ -78,7 +78,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -124,7 +124,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			if (PW < 0.5)
 			{
@@ -156,7 +156,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -200,7 +200,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		{
 			PW = (PW * 100.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			if (PW < 2.5)
 			{
@@ -232,7 +232,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -287,7 +287,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 		{
 			PW = ((PW + (strategy.m_self->getLife() > (unit.getLife() / 2.0) ? 1.0 : 0.0) + (HAVE_SHIELD(strategy, *strategy.m_self) ? 1.0 : 0.0) + (HAVE_EMPOWER(strategy, *strategy.m_self) ? 1.0 : 0.0)) * 150.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			bool bFound = false;
 			for (auto & wizard : strategy.m_world->getWizards())
@@ -335,7 +335,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 75.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -379,7 +379,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		{
 			PW = (PW * 120.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			if (PW < 2.5)
 			{
@@ -411,7 +411,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -487,7 +487,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			if (PW < 0.5)
 			{
@@ -519,7 +519,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -568,7 +568,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 		{
 			PW = (PW * 200.0) / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 		}
-		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF)
+		else if (DISTANCE < MY_RANGE / RANGE_WINDOW_COEF(strategy))
 		{
 			if (PW < 0.5)
 			{
@@ -600,7 +600,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF, ENEMY_RANGE))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -700,4 +700,9 @@ const std::vector<model::SkillType> CSettings::GET_SKILLS_ORDER()
 	};
 }
 
-const double CSettings::RANGE_WINDOW_COEF = 1.1;
+double CSettings::RANGE_WINDOW_COEF(MyStrategy & strategy)
+{
+	double coef = (double)strategy.m_self->getRemainingActionCooldownTicks() / (double)strategy.m_game->getWizardActionCooldownTicks(); // [0, 1] 0 - action, 1 - wait
+	double val = 0.9 + (1.0 - coef) * 0.2;
+	return val;
+}

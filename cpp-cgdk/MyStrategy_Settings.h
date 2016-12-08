@@ -35,5 +35,5 @@ public:
 
 	static const std::vector<model::SkillType> GET_SKILLS_ORDER();
 
-	static const double RANGE_WINDOW_COEF;
+	static double RANGE_WINDOW_COEF(MyStrategy & strategy);
 };
