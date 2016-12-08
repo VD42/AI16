@@ -685,6 +685,11 @@ bool MyStrategy::Shoot()
 		double P = (unit.getFaction() == model::FACTION_NEUTRAL ? 15.0 : 100.0) * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
 			P = 1000000.0;
+		if (
+			unit.getDistanceTo(*m_self) <= (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackRange() + m_self->getRadius() : m_game->getFetishBlowdartAttackRange() + m_self->getRadius() + m_game->getDartRadius())
+			&& std::abs(unit.getAngleTo(*m_self)) <= (unit.getType() == model::MINION_ORC_WOODCUTTER ? m_game->getOrcWoodcutterAttackSector() / 2.0 : m_game->getFetishBlowdartAttackSector())
+		)
+			P = 15000000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -704,6 +709,11 @@ bool MyStrategy::Shoot()
 		double P = 20000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (unit.getLife() <= 12)
 			P = 1000000.0;
+		if (
+			unit.getDistanceTo(*m_self) <= m_game->getWizardCastRange() + m_self->getRadius() + m_game->getMagicMissileRadius() + m_global.RangeLevel(unit) * m_game->getRangeBonusPerSkillLevel()
+			&& std::abs(unit.getAngleTo(*m_self)) <= m_game->getStaffSector() / 2.0
+		)
+			P = 50000000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
