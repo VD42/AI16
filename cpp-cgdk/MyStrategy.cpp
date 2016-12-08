@@ -848,11 +848,23 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 		}
 	}
 
+	double max = 1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + m_global.SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel();
+
 	double ver = std::cos(angle);
 	double hor = std::sin(angle);
 
-	m_move->setSpeed(ver * (ver > 0.0 ? 4.0 : 3.0) * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + m_global.SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
-	m_move->setStrafeSpeed(hor * 3.0 * (1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + m_global.SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel()));
+	if (ver > 0.0)
+	{
+		double tg = tan(angle);
+		double k = ((4.0 * max) * (3.0 * max)) * sqrt((tg * tg + 1.0) / ((3.0 * max) * (3.0 * max) + (4.0 * max) * (4.0 * max) * tg * tg));
+		m_move->setSpeed(ver * k);
+		m_move->setStrafeSpeed(hor * k);
+	}
+	else
+	{
+		m_move->setSpeed(ver * 3.0 * max);
+		m_move->setStrafeSpeed(hor * 3.0 * max);
+	}
 }
 
 void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
