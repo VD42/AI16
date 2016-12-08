@@ -830,6 +830,26 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 		}
 	}
 
+	int nCreepsCount = 0;
+	for (auto & creep : m_world->getMinions())
+	{
+		if (creep.getId() == unit.getId())
+			continue;
+		if (creep.getFaction() == m_self->getFaction())
+			continue;
+		if (creep.getDistanceTo(unit) < unit.getRadius() - creep.getRadius() + m_game->getFireballExplosionMinDamageRange())
+			nCreepsCount += 1;
+	}
+	for (auto & wizard : m_world->getWizards())
+	{
+		if (wizard.getId() == unit.getId())
+			continue;
+		if (wizard.getFaction() == m_self->getFaction())
+			continue;
+		if (wizard.getDistanceTo(unit) < unit.getRadius() - wizard.getRadius() + m_game->getFireballExplosionMinDamageRange())
+			nCreepsCount += 2;
+	}
+
 	if (D - unit.getRadius() < m_game->getStaffRange() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[1] == 0)
 	{
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
@@ -844,7 +864,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getFrostBoltRadius());
 		}
 	}
-	else if (m_setCurrentSkills.find(model::SKILL_FIREBALL) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[4] == 0 && bCanUseFireball && (bWizard || bBuilding) && m_self->getMana() >= m_game->getFireballManacost())
+	else if (m_setCurrentSkills.find(model::SKILL_FIREBALL) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[4] == 0 && bCanUseFireball && (bWizard || bBuilding || (nCreepsCount > 2)) && m_self->getMana() >= m_game->getFireballManacost())
 	{
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
 		{
