@@ -18,6 +18,17 @@ MyStrategy::MyStrategy() : m_global(*this), m_bSeedReady(false)
 	std::reverse(m_tSkillsOrder.begin(), m_tSkillsOrder.end());
 }
 
+class Brake : public model::CircularUnit
+{
+public:
+	Brake(double x, double y) : model::CircularUnit(0, x, y, 0.0, 0.0, 0.0, model::FACTION_OTHER, 0.0)
+	{
+	}
+	Brake(double x, double y, double r) : model::CircularUnit(0, x, y, 0.0, 0.0, 0.0, model::FACTION_OTHER, r)
+	{
+	}
+};
+
 void MyStrategy::move(const model::Wizard & self, const model::World & world, const model::Game & game, model::Move & move)
 {
 	m_self = &self;
@@ -198,40 +209,20 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			break;
 	}
 
-	if (m_self->getX() - m_self->getRadius() < 3.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
-	}
-	else if (m_self->getX() - m_self->getRadius() <= 20.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, (10000.0 / ((m_self->getX() - m_self->getRadius() - 2.0) * (m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
-	}
+	std::vector<model::CircularUnit> tBrakes = {
+		Brake(m_self->getX(), 0.0),
+		Brake(m_self->getX(), m_game->getMapSize()),
+		Brake(0.0, m_self->getY()),
+		Brake(m_game->getMapSize(), m_self->getY()),
+		Brake(0.0, 0.0, m_self->getRadius()),
+		Brake(0.0, m_game->getMapSize(), m_self->getRadius()),
+		Brake(m_game->getMapSize(), 0.0, m_self->getRadius()),
+		Brake(m_game->getMapSize(), m_game->getMapSize(), m_self->getRadius())
+	};
 
-	if (m_self->getX() + m_self->getRadius() > m_game->getMapSize() - 3.0)
+	for (auto & unit : tBrakes)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, 10000.0));
-	}
-	else if (m_self->getX() + m_self->getRadius() >= m_game->getMapSize() - 20.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, (10000.0 / ((m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
-	}
-
-	if (m_self->getY() - m_self->getRadius() < 3.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX(), m_self->getY() + 1.0, 10000.0));
-	}
-	else if (m_self->getY() - m_self->getRadius() <= 20.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, (10000.0 / ((m_self->getY() - m_self->getRadius() - 2.0) * (m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
-	}
-
-	if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 3.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
-	}
-	else if (m_self->getY() + m_self->getRadius() >= m_game->getMapSize() - 20.0)
-	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, (10000.0 / ((m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
+		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 	}
 
 	double enMinBase = 40000.0;

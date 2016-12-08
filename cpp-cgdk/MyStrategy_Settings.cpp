@@ -615,9 +615,9 @@ const std::function<double(MyStrategy&, const model::CircularUnit&)> CSettings::
 	double D = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY()) - strategy.m_self->getRadius() - unit.getRadius();
 	if (D > 20.0)
 		return 0.0;
-	if (D < 3.0)
+	if (D < 1.0)
 		return -10000.0;
-	return -((10000.0 / ((D - 2.0) * (D - 2.0))) - 30.8);
+	return -((10000.0 / (D * D)) - 24.9);
 };
 
 
