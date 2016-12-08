@@ -799,32 +799,32 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 		else
 		{
 			m_move->setTurn(angle);
-		}
 
-		const model::Tree * tree = nullptr;
-		double minD = 40000.0;
+			const model::Tree * tree = nullptr;
+			double minD = 40000.0;
 
-		if (m_self->getDistanceTo(1200.0 + m_game->getBonusRadius() + m_self->getRadius() + 5.9, 1200.0) > 10.0 && m_self->getDistanceTo(2800.0 - m_game->getBonusRadius() - m_self->getRadius() - 5.9, 2800.0) > 10.0)
-		{
-			for (auto & unit : m_world->getTrees())
+			if (m_self->getDistanceTo(1200.0 + m_game->getBonusRadius() + m_self->getRadius() + 5.9, 1200.0) > 10.0 && m_self->getDistanceTo(2800.0 - m_game->getBonusRadius() - m_self->getRadius() - 5.9, 2800.0) > 10.0)
 			{
-				double D = m_self->getDistanceTo(unit);
-				if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel() - 0.1)
-					continue;
-				if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
-					continue;
-				if (D < minD)
+				for (auto & unit : m_world->getTrees())
 				{
-					minD = D;
-					tree = &unit;
+					double D = m_self->getDistanceTo(unit);
+					if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel() - 0.1)
+						continue;
+					if (std::abs(m_self->getAngleTo(unit)) > m_game->getStaffSector() / 2.0)
+						continue;
+					if (D < minD)
+					{
+						minD = D;
+						tree = &unit;
+					}
 				}
 			}
-		}
 
-		if (tree)
-		{
-			m_move->setAction(model::ACTION_NONE);
-			BestShoot(*tree, false);
+			if (tree)
+			{
+				m_move->setAction(model::ACTION_NONE);
+				BestShoot(*tree, false);
+			}
 		}
 	}
 
