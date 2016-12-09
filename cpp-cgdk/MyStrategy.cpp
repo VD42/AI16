@@ -372,6 +372,9 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	for (auto & unit : m_world->getProjectiles())
 	{
+		if (unit.getFaction() == m_self->getFaction())
+			continue;
+
 		double D = m_self->getDistanceTo(unit);
 		if (D > 2.0 * m_self->getVisionRange())
 			continue;
