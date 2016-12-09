@@ -469,7 +469,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 							newM = minion.getId();
 						}
 					}
-					if (minY < pminY - 2 * m_game->getMinionRadius())
+					if (minY < pminY - m_game->getMinionRadius())
 					{
 						waypoint.first.first = minX;
 						waypoint.first.second = minY - m_game->getMinionRadius() - m_game->getWizardRadius();
@@ -519,7 +519,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 							newM = minion.getId();
 						}
 					}
-					if (maxD > pmaxD + 2 * sqrt(2) * m_game->getMinionRadius())
+					if (maxD > pmaxD + sqrt(2) * m_game->getMinionRadius())
 					{
 						waypoint.first.first = maxX + (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
 						waypoint.first.second = maxY - (m_game->getMinionRadius() + m_game->getWizardRadius()) * (1.0 / std::sqrt(2.0));
@@ -565,7 +565,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 							newM = minion.getId();
 						}
 					}
-					if (maxX > pmaxX + 2 * m_game->getMinionRadius())
+					if (maxX > pmaxX + m_game->getMinionRadius())
 					{
 						waypoint.first.first = maxX + m_game->getMinionRadius() + m_game->getWizardRadius();
 						waypoint.first.second = maxY;
