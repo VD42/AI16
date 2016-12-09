@@ -13,7 +13,7 @@ private:
 	void AddPower(std::string comment, std::pair<double, double> & result, std::pair<double, double> add);
 
 	bool Shoot();
-	void Step(std::pair<double, double> direction, bool shoot);
+	void Step(std::pair<double, double> direction, std::pair<double, double> collision, bool shoot);
 
 public:
 	CGlobal m_global;

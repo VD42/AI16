@@ -178,6 +178,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	auto waypoint = m_global.GetWaypoint();
 
 	std::pair<double, double> result = { 0.0, 0.0 };
+	std::pair<double, double> collision_result = { 0.0, 0.0 };
 
 	if (m_FreeMode)
 		AddPower("back", result, CalcPower(0.0, m_game->getMapSize(), 2000.0)); // back
@@ -200,38 +201,38 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	if (m_self->getX() - m_self->getRadius() < 3.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, 10000.0));
 	}
 	else if (m_self->getX() - m_self->getRadius() <= 20.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, (10000.0 / ((m_self->getX() - m_self->getRadius() - 2.0) * (m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() + 1.0, m_self->getY() + 0.0, (10000.0 / ((m_self->getX() - m_self->getRadius() - 2.0) * (m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
 	}
 
 	if (m_self->getX() + m_self->getRadius() > m_game->getMapSize() - 3.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, 10000.0));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, 10000.0));
 	}
 	else if (m_self->getX() + m_self->getRadius() >= m_game->getMapSize() - 20.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, (10000.0 / ((m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() - 1.0, m_self->getY() + 0.0, (10000.0 / ((m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getX() - m_self->getRadius() - 2.0))) - 30.8));
 	}
 
 	if (m_self->getY() - m_self->getRadius() < 3.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX(), m_self->getY() + 1.0, 10000.0));
+		AddPower("brake", collision_result, CalcPower(m_self->getX(), m_self->getY() + 1.0, 10000.0));
 	}
 	else if (m_self->getY() - m_self->getRadius() <= 20.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, (10000.0 / ((m_self->getY() - m_self->getRadius() - 2.0) * (m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() + 0.0, m_self->getY() + 1.0, (10000.0 / ((m_self->getY() - m_self->getRadius() - 2.0) * (m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
 	}
 
 	if (m_self->getY() + m_self->getRadius() > m_game->getMapSize() - 3.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, 10000.0));
 	}
 	else if (m_self->getY() + m_self->getRadius() >= m_game->getMapSize() - 20.0)
 	{
-		AddPower("brake", result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, (10000.0 / ((m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
+		AddPower("brake", collision_result, CalcPower(m_self->getX() + 0.0, m_self->getY() - 1.0, (10000.0 / ((m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0) * (m_game->getMapSize() - m_self->getY() - m_self->getRadius() - 2.0))) - 30.8));
 	}
 
 	double enMinBase = 40000.0;
@@ -269,7 +270,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	for (auto & unit : m_tBuildings)
 	{
-		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+		AddPower("collision", collision_result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		if (unit.getFaction() == m_self->getFaction())
 		{
@@ -294,7 +295,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 		double D = m_self->getDistanceTo(unit);
 
-		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+		AddPower("collision", collision_result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		if (unit.getFaction() == m_self->getFaction())
 		{
@@ -317,7 +318,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	{
 		double D = m_self->getDistanceTo(unit);
 
-		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+		AddPower("collision", collision_result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		if (unit.getType() == model::MINION_ORC_WOODCUTTER)
 		{
@@ -363,7 +364,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		if (D > 2.0 * m_self->getVisionRange())
 			continue;
 
-		AddPower("collision", result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
+		AddPower("collision", collision_result, CalcPower(unit, CSettings::PW_CIRCULAR_UNIT(*this, unit)));
 
 		AddPower("tree", result, CalcPower(unit, CSettings::PW_TREE(*this, unit)));
 	}
@@ -580,9 +581,9 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 	}
 
-	AddPower("base", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
+	AddPower("waypoint", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
 
-	Step(result, Shoot());
+	Step(result, collision_result, Shoot());
 }
 
 std::pair<double, double> MyStrategy::CalcPower(double X, double Y, double PW)
@@ -766,7 +767,7 @@ bool MyStrategy::Shoot()
 	return true;
 }
 
-void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
+void MyStrategy::Step(std::pair<double, double> direction, std::pair<double, double> collision, bool shoot)
 {
 	double angle = m_self->getAngleTo(m_self->getX() + direction.first, m_self->getY() + direction.second);
 
@@ -850,6 +851,8 @@ void MyStrategy::Step(std::pair<double, double> direction, bool shoot)
 			break;
 		}
 	}
+
+	angle = m_self->getAngleTo(m_self->getX() + direction.first + collision.first, m_self->getY() + direction.second + collision.second);
 
 	double max = 1.0 + (nHaste ? m_game->getHastenedMovementBonusFactor() : 0.0) + m_global.SpeedLevel(*m_self) * m_game->getMovementBonusFactorPerSkillLevel();
 
