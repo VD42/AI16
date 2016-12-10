@@ -33,7 +33,7 @@ public:
 	static bool HAVE_SHIELD(MyStrategy & strategy, const model::Wizard & wizard);
 	static bool HAVE_HASTE(MyStrategy & strategy, const model::Wizard & wizard);
 
-	static const std::vector<model::SkillType> GET_SKILLS_ORDER();
+	static const std::vector<model::SkillType> GET_SKILLS_ORDER(MyStrategy & strategy);
 
 	static double RANGE_WINDOW_COEF(MyStrategy & strategy);
 };

@@ -14,7 +14,7 @@
 
 MyStrategy::MyStrategy() : m_global(*this), m_bSeedReady(false)
 {
-	m_tSkillsOrder = CSettings::GET_SKILLS_ORDER();
+	m_tSkillsOrder = CSettings::GET_SKILLS_ORDER(*this);
 	std::reverse(m_tSkillsOrder.begin(), m_tSkillsOrder.end());
 }
 
