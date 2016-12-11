@@ -910,7 +910,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 		{
 			if (wizard.getFaction() != m_self->getFaction())
 				continue;
-			if (wizard.getDistanceTo(unit) < unit.getRadius() + 100.0)
+			if (wizard.getDistanceTo(unit) < unit.getRadius() + m_game->getFireballExplosionMinDamageRange())
 			{
 				bCanUseFireball = false;
 				break;
@@ -935,7 +935,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 		if (wizard.getFaction() == m_self->getFaction())
 			continue;
 		if (wizard.getDistanceTo(unit) < unit.getRadius() - wizard.getRadius() + m_game->getFireballExplosionMinDamageRange())
-			nCreepsCount += 2;
+			nCreepsCount += 1;
 	}
 
 	if (D - unit.getRadius() < m_game->getStaffRange() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[1] == 0)
@@ -952,7 +952,7 @@ void MyStrategy::BestShoot(const model::CircularUnit & unit, bool turn)
 			m_move->setMinCastDistance(D - unit.getRadius() + m_game->getFrostBoltRadius());
 		}
 	}
-	else if (m_setCurrentSkills.find(model::SKILL_FIREBALL) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[4] == 0 && bCanUseFireball && (bWizard || bBuilding || (nCreepsCount > 2)) && m_self->getMana() >= m_game->getFireballManacost())
+	else if (m_setCurrentSkills.find(model::SKILL_FIREBALL) != m_setCurrentSkills.end() && m_self->getRemainingActionCooldownTicks() == 0 && m_self->getRemainingCooldownTicksByAction()[4] == 0 && bCanUseFireball && (bWizard || bBuilding || (nCreepsCount > 1)) && m_self->getMana() >= m_game->getFireballManacost())
 	{
 		if (std::abs(angle) < m_game->getStaffSector() / 2.0 && m_move->getAction() == model::ACTION_NONE)
 		{
