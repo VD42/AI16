@@ -406,15 +406,18 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			AddPower("bonus", result, CalcPower(unit, 100.0));
 	}
 
-	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
+	if (m_bCatchBonuses)
 	{
-		if (m_self->getDistanceTo(1200.0, 1200.0) <= 1800.0 && (m_global.CanGoToBonus() || m_self->getDistanceTo(1200.0, 1200.0) <= 500.0))
-			waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 1200.0 };
-	}
-	else if (m_global.m_bBonusB)
-	{
-		if (m_self->getDistanceTo(2800.0, 2800.0) <= 1800.0 && (m_global.CanGoToBonus() || m_self->getDistanceTo(2800.0, 2800.0) <= 500.0))
-			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
+		if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0)))
+		{
+			if (m_self->getDistanceTo(1200.0, 1200.0) <= 1800.0 && (m_global.CanGoToBonus() || m_self->getDistanceTo(1200.0, 1200.0) <= 500.0))
+				waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 1200.0 };
+		}
+		else if (m_global.m_bBonusB)
+		{
+			if (m_self->getDistanceTo(2800.0, 2800.0) <= 1800.0 && (m_global.CanGoToBonus() || m_self->getDistanceTo(2800.0, 2800.0) <= 500.0))
+				waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
+		}
 	}
 
 	if (!m_global.m_bEgoistMode && pEnMinUnit && enMinBase < 1300.0 && m_global.OwnLaneControl())
