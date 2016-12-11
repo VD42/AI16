@@ -986,27 +986,80 @@ int CGlobal::RangeLevel(const model::Wizard & wizard)
 	return nRangeLevel;
 }
 
-bool CGlobal::CanGoToBonus()
+bool CGlobal::CanGoToBonusT()
 {
 	if (m_bLaneRush)
 		return false;
 
-	int nWizards = 0;
-	int nWizardsEnemy = 0;
+	int nTopWizards = 0;
+	int nMidWizards = 0;
+	int nBotWizards = 0;
+	int nTopWizardsEnemy = 0;
+	int nMidWizardsEnemy = 0;
+	int nBotWizardsEnemy = 0;
 
 	for (auto & lane : m_mapFriendlyWizardsLane)
 	{
-		if (lane.second == m_lane)
-			nWizards++;
+		if (lane.second == model::LANE_TOP)
+			nTopWizards++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizards++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizards++;
 	}
 
 	for (auto & lane : m_mapEnemyWizardsLane)
 	{
-		if (lane.second == m_lane)
-			nWizardsEnemy++;
+		if (lane.second == model::LANE_TOP)
+			nTopWizardsEnemy++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizardsEnemy++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizardsEnemy++;
 	}
 
-	return (nWizardsEnemy <= nWizards);
+	if (m_lane == model::LANE_TOP || m_lane == model::LANE_MIDDLE)
+		return (nTopWizardsEnemy <= nTopWizards) && (nMidWizardsEnemy <= nMidWizards);
+
+	return false;
+}
+
+bool CGlobal::CanGoToBonusB()
+{
+	if (m_bLaneRush)
+		return false;
+
+	int nTopWizards = 0;
+	int nMidWizards = 0;
+	int nBotWizards = 0;
+	int nTopWizardsEnemy = 0;
+	int nMidWizardsEnemy = 0;
+	int nBotWizardsEnemy = 0;
+
+	for (auto & lane : m_mapFriendlyWizardsLane)
+	{
+		if (lane.second == model::LANE_TOP)
+			nTopWizards++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizards++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizards++;
+	}
+
+	for (auto & lane : m_mapEnemyWizardsLane)
+	{
+		if (lane.second == model::LANE_TOP)
+			nTopWizardsEnemy++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizardsEnemy++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizardsEnemy++;
+	}
+
+	if (m_lane == model::LANE_BOTTOM || m_lane == model::LANE_MIDDLE)
+		return (nBotWizardsEnemy <= nBotWizards) && (nMidWizardsEnemy <= nMidWizards);
+
+	return false;
 }
 
 bool CGlobal::MasterControl()

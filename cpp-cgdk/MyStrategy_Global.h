@@ -67,7 +67,8 @@ public:
 	int SpeedLevel(const model::Wizard & wizard);
 	int RangeLevel(const model::Wizard & wizard);
 
-	bool CanGoToBonus();
+	bool CanGoToBonusT();
+	bool CanGoToBonusB();
 
 	bool MasterControl();
 	bool m_bEnableMasterControl = false;
