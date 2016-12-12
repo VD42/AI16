@@ -194,6 +194,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
+	if (strategy.m_global.m_bIsFinal)
+		PW += 4.0;
+
 	if (PW > 1.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
@@ -209,14 +212,17 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			else
 			{
 				bool bFound = false;
-				for (auto & wizard : strategy.m_world->getWizards())
+				if (!strategy.m_global.m_bIsFinal)
 				{
-					if (wizard.getFaction() == strategy.m_self->getFaction())
-						continue;
-					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					for (auto & wizard : strategy.m_world->getWizards())
 					{
-						bFound = true;
-						break;
+						if (wizard.getFaction() == strategy.m_self->getFaction())
+							continue;
+						if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+						{
+							bFound = true;
+							break;
+						}
 					}
 				}
 				if (bFound)
@@ -373,6 +379,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			PW += 1.0;
 	}
 
+	if (strategy.m_global.m_bIsFinal)
+		PW += 4.0;
+
 	if (PW > 1.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
@@ -388,14 +397,17 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 			else
 			{
 				bool bFound = false;
-				for (auto & wizard : strategy.m_world->getWizards())
+				if (!strategy.m_global.m_bIsFinal)
 				{
-					if (wizard.getFaction() == strategy.m_self->getFaction())
-						continue;
-					if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+					for (auto & wizard : strategy.m_world->getWizards())
 					{
-						bFound = true;
-						break;
+						if (wizard.getFaction() == strategy.m_self->getFaction())
+							continue;
+						if (strategy.m_self->getDistanceTo(wizard) < strategy.m_game->getWizardVisionRange())
+						{
+							bFound = true;
+							break;
+						}
 					}
 				}
 				if (bFound)
