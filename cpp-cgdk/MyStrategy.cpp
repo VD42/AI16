@@ -442,7 +442,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	{
 		if (m_global.m_bIsFinal && m_bLocalId > 0)
 		{
-			if (m_world->getTickIndex() >= 2250)
+			if (m_world->getTickIndex() >= 1500)
 			{
 				m_bCreepStop = false;
 			}
