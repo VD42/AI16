@@ -1,6 +1,7 @@
 #include "MyStrategy_Global.h"
 #include "MyStrategy.h"
 #include <algorithm>
+#include "MyStrategy_Settings.h"
 
 
 CGlobal::CGlobal(MyStrategy & strategy) : m_lane(model::_LANE_UNKNOWN_), m_bLaneChoosed(false), m_strategy(strategy), m_top(LaneState::TOWER_1), m_mid(LaneState::TOWER_1), m_bot(LaneState::TOWER_1), m_bVaidCords(false), m_bBonusT(false), m_bBonusB(false), m_bLaneRush(false), m_bMasterNotSilent(false)
@@ -64,29 +65,31 @@ void CGlobal::ChooseLane()
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
-			return;
+			goto gt;
 		}
 
 		if (!MasterControl())
 		{
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
-			return;
+			goto gt;
 		}
 
 		if (!m_bEgoistMode && MasterControl())
 		{
+			m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, model::SKILL_FIREBALL);
+			std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
 			m_bLaneRush = true;
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
 			std::vector<model::Message> m_tMessages = {
-				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>()),
-				model::Message(model::LANE_MIDDLE, model::_SKILL_UNKNOWN_, std::vector<signed char>())
+				model::Message(model::LANE_MIDDLE, model::SKILL_SHIELD, std::vector<signed char>()),
+				model::Message(model::LANE_MIDDLE, model::SKILL_FROST_BOLT, std::vector<signed char>()),
+				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, std::vector<signed char>()),
+				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, std::vector<signed char>())
 			};
 			m_strategy.m_move->setMessages(m_tMessages);
-			return;
+			goto gt;
 		}
 
 		volatile int rand_number = rand();
@@ -101,6 +104,7 @@ void CGlobal::ChooseLane()
 		m_bLaneChoosed = true; // no rechoose lane! but master wizard can do it!
 	}
 
+gt:
 	if (!m_bEgoistMode && m_bEnableMasterHeard)
 	{
 		for (auto & message : m_strategy.m_self->getMessages())
@@ -110,6 +114,11 @@ void CGlobal::ChooseLane()
 			m_bMasterNotSilent = true;
 			m_lane = message.getLane();
 			m_bLaneChoosed = true;
+			if (message.getSkillToLearn() != model::_SKILL_UNKNOWN_)
+			{
+				m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, message.getSkillToLearn());
+				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
+			}
 		}
 	}
 

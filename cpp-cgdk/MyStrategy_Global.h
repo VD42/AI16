@@ -73,4 +73,6 @@ public:
 	bool m_bEnableMasterControl = false;
 
 	bool m_bEnableMasterHeard = false;
+
+	bool m_bIsFinal = false;
 };

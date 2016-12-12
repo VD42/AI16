@@ -102,6 +102,15 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		volatile unsigned int seed = (unsigned int)time(nullptr) + (unsigned int)m_game->getRandomSeed() + (unsigned int)m_self->getId() + (unsigned int)(m_self->getX() * 100.0) + (unsigned int)(m_self->getY() * 100.0);
 		srand(seed);
 		m_bSeedReady = true;
+
+		m_global.m_bIsFinal = m_game->isRawMessagesEnabled();
+		if (m_global.m_bIsFinal)
+		{
+			m_global.m_bEgoistMode = false;
+			m_global.m_bEnableMasterHeard = true;
+			m_global.m_bEnableMasterControl = true;
+			m_global.m_bLaneRush = true;
+		}
 	}
 
 	if (!m_bHealMode && m_self->getLife() < m_self->getMaxLife() * 0.25)
@@ -417,7 +426,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
 	}
 
-	if (!m_global.m_bEgoistMode && pEnMinUnit && enMinBase < 1300.0 && m_global.OwnLaneControl())
+	if (!m_global.m_bEgoistMode && !m_global.m_bIsFinal && pEnMinUnit && enMinBase < 1300.0 && m_global.OwnLaneControl())
 	{
 		m_global.m_lane = m_global.GetLane(*pEnMinUnit);
 		waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
