@@ -62,4 +62,6 @@ public:
 	long long m_CSTID = -1;
 	long long m_CSMID = -1;
 	long long m_CSBID = -1;
+
+	int m_bLocalId = 0;
 };

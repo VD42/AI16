@@ -82,11 +82,12 @@ void CGlobal::ChooseLane()
 			m_bLaneRush = true;
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
+			m_strategy.m_bLocalId = 1;
 			std::vector<model::Message> m_tMessages = {
-				model::Message(model::LANE_MIDDLE, model::SKILL_SHIELD, std::vector<signed char>()),
-				model::Message(model::LANE_MIDDLE, model::SKILL_FROST_BOLT, std::vector<signed char>()),
-				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, std::vector<signed char>()),
-				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, std::vector<signed char>())
+				model::Message(model::LANE_MIDDLE, model::SKILL_SHIELD, { 2 }),
+				model::Message(model::LANE_MIDDLE, model::SKILL_FROST_BOLT, { 3 }),
+				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, { 4 }),
+				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, { 5 })
 			};
 			m_strategy.m_move->setMessages(m_tMessages);
 			goto gt;
@@ -119,6 +120,8 @@ gt:
 				m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, message.getSkillToLearn());
 				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
 			}
+			if ((int)message.getRawMessage().size() > 0)
+				m_strategy.m_bLocalId = message.getRawMessage()[0];
 		}
 	}
 
