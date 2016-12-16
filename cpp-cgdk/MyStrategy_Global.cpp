@@ -681,6 +681,44 @@ bool CGlobal::Tower2Exists()
 	return true;
 }
 
+bool CGlobal::DangerLane()
+{
+	int nTopWizards = 0;
+	int nMidWizards = 0;
+	int nBotWizards = 0;
+	int nTopWizardsEnemy = 0;
+	int nMidWizardsEnemy = 0;
+	int nBotWizardsEnemy = 0;
+
+	for (auto & lane : m_mapFriendlyWizardsLane)
+	{
+		if (lane.second == model::LANE_TOP)
+			nTopWizards++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizards++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizards++;
+	}
+
+	for (auto & lane : m_mapEnemyWizardsLane)
+	{
+		if (lane.second == model::LANE_TOP)
+			nTopWizardsEnemy++;
+		else if (lane.second == model::LANE_MIDDLE)
+			nMidWizardsEnemy++;
+		else if (lane.second == model::LANE_BOTTOM)
+			nBotWizardsEnemy++;
+	}
+
+	if (m_lane == model::LANE_TOP && nTopWizardsEnemy > 2)
+		return true;
+	if (m_lane == model::LANE_MIDDLE && nMidWizardsEnemy > 2)
+		return true;
+	if (m_lane == model::LANE_BOTTOM && nBotWizardsEnemy > 2)
+		return true;
+	return false;
+}
+
 void CGlobal::ReCheckLane(bool after_death)
 {
 	if (!OwnLaneControl() || m_bLaneRush)

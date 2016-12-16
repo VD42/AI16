@@ -75,4 +75,6 @@ public:
 	bool m_bEnableMasterHeard = false;
 
 	bool m_bIsFinal = false;
+
+	bool DangerLane();
 };

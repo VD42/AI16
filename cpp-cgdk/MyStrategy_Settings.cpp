@@ -167,6 +167,14 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 
 const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_ENEMY_TOWER = [](MyStrategy & strategy, const model::Building & unit)
 {
+	bool bImmortal = false;
+	if (std::abs(unit.getX() - strategy.m_global.m_T2.first) < 0.1 && std::abs(unit.getY() - strategy.m_global.m_T2.second) < 0.1 && strategy.m_global.m_top == CGlobal::LaneState::TOWER_1)
+		bImmortal = true;
+	if (std::abs(unit.getX() - strategy.m_global.m_M2.first) < 0.1 && std::abs(unit.getY() - strategy.m_global.m_M2.second) < 0.1 && strategy.m_global.m_mid == CGlobal::LaneState::TOWER_1)
+		bImmortal = true;
+	if (std::abs(unit.getX() - strategy.m_global.m_B2.first) < 0.1 && std::abs(unit.getY() - strategy.m_global.m_B2.second) < 0.1 && strategy.m_global.m_bot == CGlobal::LaneState::TOWER_1)
+		bImmortal = true;
+	
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getGuardianTowerAttackRange() + strategy.m_game->getWizardForwardSpeed() + 20.0;
@@ -197,7 +205,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	if (strategy.m_global.m_bIsFinal)
 		PW += 4.0;
 
-	if (PW > 1.0 && !strategy.IsDangerous())
+	if (!bImmortal && PW > 1.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -241,7 +249,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
-			PW = 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+			PW = bImmortal ? 0.0 : 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
 
 	return PW;
@@ -352,6 +360,10 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 
 const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_ENEMY_BASE = [](MyStrategy & strategy, const model::Building & unit)
 {
+	bool bImmortal = false;
+	if (std::abs(unit.getX() - strategy.m_global.m_BS.first) < 0.1 && std::abs(unit.getY() - strategy.m_global.m_BS.second) < 0.1 && (strategy.m_global.m_top != CGlobal::LaneState::BASE || strategy.m_global.m_mid != CGlobal::LaneState::BASE || strategy.m_global.m_bot != CGlobal::LaneState::BASE))
+		bImmortal = true;
+
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getFactionBaseAttackRange() + strategy.m_game->getWizardForwardSpeed() + 20.0;
@@ -382,7 +394,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	if (strategy.m_global.m_bIsFinal)
 		PW += 4.0;
 
-	if (PW > 1.0 && !strategy.IsDangerous())
+	if (!bImmortal && PW > 1.0 && !strategy.IsDangerous())
 	{
 		if (DISTANCE >= MY_RANGE)
 		{
@@ -426,7 +438,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
 			PW = -3000.0;
 		else
-			PW = 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
+			PW = bImmortal ? 0.0 : 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
 	}
 
 	return PW;

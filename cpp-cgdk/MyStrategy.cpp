@@ -122,8 +122,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	}
 	//if (m_self->getLife() < m_self->getMaxLife() * 0.15)
 	//	m_bVeryHealMode = true;
-	//if (m_self->getLife() >= m_self->getMaxLife() * 0.2)
-	//	m_bVeryHealMode = false;
+	if (m_self->getLife() >= m_self->getMaxLife() * 0.25)
+		m_bVeryHealMode = false;
 	if (m_self->getLife() >= m_self->getMaxLife() * (m_bDoubleHealMode ? 0.6 : 0.4))
 	{
 		m_bHealMode = false;
@@ -175,7 +175,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	if (m_global.m_bEgoistMode)
 	{
-		if (m_world->getTickIndex() > 3000 && (m_world->getTickIndex() + 1000) % 2500 == 0)
+		if (m_global.DangerLane() || (m_world->getTickIndex() > 3000 && (m_world->getTickIndex() + 1000) % 5000 == 0))
 			m_global.ReCheckLane(false);
 	}
 	else
