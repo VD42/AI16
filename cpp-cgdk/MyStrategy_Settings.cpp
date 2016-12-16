@@ -361,7 +361,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_ENEMY_BASE = [](MyStrategy & strategy, const model::Building & unit)
 {
 	bool bImmortal = false;
-	if (std::abs(unit.getX() - strategy.m_global.m_BS.first) < 0.1 && std::abs(unit.getY() - strategy.m_global.m_BS.second) < 0.1 && (strategy.m_global.m_top != CGlobal::LaneState::BASE || strategy.m_global.m_mid != CGlobal::LaneState::BASE || strategy.m_global.m_bot != CGlobal::LaneState::BASE))
+	if (std::abs(unit.getX() - strategy.m_global.m_BS.first) < 0.1 && std::abs(unit.getY() - strategy.m_global.m_BS.second) < 0.1 && strategy.m_global.m_top != CGlobal::LaneState::BASE && strategy.m_global.m_mid != CGlobal::LaneState::BASE && strategy.m_global.m_bot != CGlobal::LaneState::BASE)
 		bImmortal = true;
 
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());

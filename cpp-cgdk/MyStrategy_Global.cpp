@@ -82,7 +82,7 @@ void CGlobal::ChooseLane()
 			m_bLaneRush = true;
 			m_lane = model::LANE_MIDDLE;
 			m_bLaneChoosed = true;
-			m_strategy.m_bLocalId = 1;
+			m_strategy.m_nLocalId = 1;
 			std::vector<model::Message> m_tMessages = {
 				model::Message(model::LANE_MIDDLE, model::SKILL_SHIELD, { 2 }),
 				model::Message(model::LANE_MIDDLE, model::SKILL_FROST_BOLT, { 3 }),
@@ -121,7 +121,7 @@ gt:
 				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
 			}
 			if ((int)message.getRawMessage().size() > 0)
-				m_strategy.m_bLocalId = message.getRawMessage()[0];
+				m_strategy.m_nLocalId = message.getRawMessage()[0];
 		}
 	}
 
@@ -154,7 +154,7 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			continue;
 		if (wizard.isMe())
 			continue;
-		if (wizard.getDistanceTo(m_BS.first, m_BS.second) < 1300.0)
+		if (wizard.getDistanceTo(m_BS.first, m_BS.second) < 1350.0)
 			nCloseToBase++;
 	}
 
