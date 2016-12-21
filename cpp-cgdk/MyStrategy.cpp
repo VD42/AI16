@@ -395,7 +395,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		double X = unit.getX();
 		double Y = unit.getY();
 
-		for (int i = 0; i <= 13; i++)
+		for (int i = 0; i <= 15; i++)
 		{
 			double tD = m_self->getDistanceTo(X, Y);
 			if (tD < m_self->getRadius() + unit.getRadius() + 1.0)
@@ -628,6 +628,29 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	AddPower("waypoint", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
 
+	if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && m_global.m_lane == model::LANE_MIDDLE)
+	{
+		for (auto & unit : m_world->getWizards())
+		{
+			if (unit.getFaction() == m_self->getFaction())
+				continue;
+			double D = m_self->getDistanceTo(unit);
+			if (D <= m_self->getVisionRange() + 100.0)
+			{
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
+					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
+					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
+					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) })
+				};
+				m_move->setMessages(m_tMessages);
+				m_global.m_nTargetId = unit.getId();
+				printf("Tick %d: attack %d!!!\r\n", m_world->getTickIndex(), (int)unit.getId());
+				break;
+			}
+		}
+	}
+
 	Step(result, collision_result, Shoot());
 }
 
@@ -750,22 +773,7 @@ bool MyStrategy::Shoot()
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
-
 		double D = m_self->getDistanceTo(unit);
-
-		if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && D <= m_self->getVisionRange() + 100.0 && m_global.m_lane == model::LANE_MIDDLE)
-		{
-			std::vector<model::Message> m_tMessages = {
-				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
-				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
-				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
-				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) })
-			};
-			m_move->setMessages(m_tMessages);
-			m_global.m_nTargetId = unit.getId();
-			printf("Tick %d: attack %d!!!\r\n", m_world->getTickIndex(), (int)unit.getId());
-		}
-
 		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double R = std::ceil(T) * m_game->getWizardForwardSpeed();
 		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
