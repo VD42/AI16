@@ -1067,3 +1067,23 @@ bool CGlobal::MasterControl()
 		return false;
 	return true;
 }
+
+int CGlobal::LaneAdvantage()
+{
+	int nWizards = 0;
+	int nWizardsEnemy = 0;
+
+	for (auto & lane : m_mapFriendlyWizardsLane)
+	{
+		if (lane.second == m_lane)
+			nWizards++;
+	}
+
+	for (auto & lane : m_mapEnemyWizardsLane)
+	{
+		if (lane.second == m_lane)
+			nWizardsEnemy++;
+	}
+
+	return (nWizards - nWizardsEnemy);
+}

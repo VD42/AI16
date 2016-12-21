@@ -417,12 +417,12 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) || m_nLocalId == 4))
 	{
-		if (m_self->getDistanceTo(1200.0, 1200.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(1200.0, 1200.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 4))
+		if (m_self->getDistanceTo(1200.0, 1200.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(1200.0, 1200.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 4 && m_global.LaneAdvantage() < 1))
 			waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 1200.0 };
 	}
 	else if (m_global.m_bBonusB)
 	{
-		if (m_self->getDistanceTo(2800.0, 2800.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(2800.0, 2800.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 5))
+		if (m_self->getDistanceTo(2800.0, 2800.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(2800.0, 2800.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 5 && m_global.LaneAdvantage() < 2))
 			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
 	}
 
@@ -758,7 +758,7 @@ bool MyStrategy::Shoot()
 			continue;
 		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
-		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
+		double P = m_global.m_bIsFinal ? 50000000000.0 : (unit.getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;

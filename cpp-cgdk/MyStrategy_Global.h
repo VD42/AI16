@@ -77,4 +77,6 @@ public:
 	bool m_bIsFinal = false;
 
 	bool DangerLane();
+
+	int LaneAdvantage();
 };
