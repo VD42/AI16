@@ -395,7 +395,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		double X = unit.getX();
 		double Y = unit.getY();
 
-		for (int i = 0; i <= 15; i++)
+		for (int i = 0; i <= 60; i++) // 15 ticks / 4 subticks
 		{
 			double tD = m_self->getDistanceTo(X, Y);
 			if (tD < m_self->getRadius() + unit.getRadius() + 1.0)
@@ -404,8 +404,8 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 				AddPower("missile", result, CalcPower(X, Y, -100000.0));
 				printf("Tick %d: found projectile, trying to evade!\r\n", m_world->getTickIndex());
 			}
-			X += unit.getSpeedX();
-			Y += unit.getSpeedY();
+			X += unit.getSpeedX() / 4.0;
+			Y += unit.getSpeedY() / 4.0;
 		}
 	}
 
