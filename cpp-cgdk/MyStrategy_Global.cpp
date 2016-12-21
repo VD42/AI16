@@ -110,26 +110,18 @@ gt:
 	{
 		for (auto & message : m_strategy.m_self->getMessages())
 		{
-			if (message.getLane() != model::_LANE_UNKNOWN_)
-			{
-				m_bMasterNotSilent = true;
-				m_lane = message.getLane();
-				m_bLaneChoosed = true;
-			}
+			if (message.getLane() == model::_LANE_UNKNOWN_)
+				continue;
+			m_bMasterNotSilent = true;
+			m_lane = message.getLane();
+			m_bLaneChoosed = true;
 			if (message.getSkillToLearn() != model::_SKILL_UNKNOWN_)
 			{
-				m_bMasterNotSilent = true;
 				m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, message.getSkillToLearn());
 				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
 			}
 			if ((int)message.getRawMessage().size() > 0)
-			{
-				m_bMasterNotSilent = true;
-				if (message.getRawMessage()[0] > 0)
-					m_strategy.m_nLocalId = message.getRawMessage()[0];
-				else
-					m_nTargetId = -message.getRawMessage()[0];
-			}
+				m_strategy.m_nLocalId = message.getRawMessage()[0];
 		}
 	}
 
@@ -262,27 +254,11 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
-			int nEnemyCreeps = 0;
-			for (auto & creep : m_strategy.m_world->getMinions())
-			{
-				if (creep.getFaction() == m_strategy.m_self->getFaction())
-					continue;
-				if (creep.getFaction() == model::FACTION_NEUTRAL)
-					continue;
-				if (creep.getDistanceTo(m_strategy.m_game->getMapSize() - 800.0, 800.0) < 50.0)
-					nEnemyCreeps++;
-			}
-
-			if ((nCloseToBase < 2 || nEnemyCreeps > 2) && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			if (nCloseToBase < 2 && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseX = m_BS.first - 800.0;
 				baseY = m_BS.second + 800.0;
 				priority = true;
-			}
-			else if (m_bIsFinal)
-			{
-				baseX = m_BS.first + 150.0;
-				baseY = m_BS.second - 150.0;
 			}
 
 			if (base->getDistanceTo(baseX, baseY) < distance)

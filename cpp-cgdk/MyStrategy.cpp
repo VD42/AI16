@@ -417,12 +417,12 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	if (m_global.m_bBonusT && (!m_global.m_bBonusB || m_self->getDistanceTo(1200.0, 1200.0) < m_self->getDistanceTo(2800.0, 2800.0) || m_nLocalId == 4))
 	{
-		if (m_self->getDistanceTo(1200.0, 1200.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(1200.0, 1200.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 4 && m_global.LaneAdvantage() < 1))
+		if (m_self->getDistanceTo(1200.0, 1200.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(1200.0, 1200.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 4))
 			waypoint.first = { 1200.0 + (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 1200.0 };
 	}
 	else if (m_global.m_bBonusB)
 	{
-		if (m_self->getDistanceTo(2800.0, 2800.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(2800.0, 2800.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 5 && m_global.LaneAdvantage() < 2))
+		if (m_self->getDistanceTo(2800.0, 2800.0) <= (m_global.m_bIsFinal ? 1200.0 : 1800.0) && (m_global.CanGoToBonus() || m_self->getDistanceTo(2800.0, 2800.0) <= 500.0) || (m_global.m_bIsFinal && m_nLocalId == 5))
 			waypoint.first = { 2800.0 - (m_world->getTickIndex() % 2500 > 2000 ? m_game->getBonusRadius() + m_self->getRadius() + 5.9 : 0.0), 2800.0 };
 	}
 
@@ -447,24 +447,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		{
 			m_global.m_lane = m_global.GetLane(*pEnMinUnit);
 			waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
-		}
-	}
-
-	if (m_global.m_nTargetId != -1)
-	{
-		bool bFound = false;
-		for (auto & wizard : m_world->getWizards())
-			if (wizard.getId() == m_global.m_nTargetId)
-			{
-				waypoint.first.first = wizard.getX();
-				waypoint.first.second = wizard.getY();
-				waypoint.second = false;
-				bFound = true;
-				break;
-			}
-		if (!bFound)
-		{
-			m_global.m_nTargetId = -1;
 		}
 	}
 
@@ -628,29 +610,6 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	AddPower("waypoint", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
 
-	if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && m_global.m_lane == model::LANE_MIDDLE && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) > 500.0)
-	{
-		for (auto & unit : m_world->getWizards())
-		{
-			if (unit.getFaction() == m_self->getFaction())
-				continue;
-			double D = m_self->getDistanceTo(unit);
-			if (D <= m_self->getVisionRange() + 100.0)
-			{
-				std::vector<model::Message> m_tMessages = {
-					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
-					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
-					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
-					model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) })
-				};
-				m_move->setMessages(m_tMessages);
-				m_global.m_nTargetId = unit.getId();
-				printf("Tick %d: attack %d!!!\r\n", m_world->getTickIndex(), (int)unit.getId());
-				break;
-			}
-		}
-	}
-
 	Step(result, collision_result, Shoot());
 }
 
@@ -786,8 +745,6 @@ bool MyStrategy::Shoot()
 			&& std::abs(unit.getAngleTo(*m_self)) <= m_game->getStaffSector() / 2.0
 		)
 			P = 50000000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
-		if (unit.getId() == m_global.m_nTargetId)
-			P = 50000000000000.0;
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;
@@ -801,7 +758,7 @@ bool MyStrategy::Shoot()
 			continue;
 		if (m_self->getDistanceTo(unit) > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
 			continue;
-		double P = m_global.m_bIsFinal ? 50000000000.0 : (unit.getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
+		double P = (unit.getType() == model::BUILDING_FACTION_BASE ? 100000.0 : 50000.0);
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;

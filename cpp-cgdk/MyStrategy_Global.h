@@ -79,6 +79,4 @@ public:
 	bool DangerLane();
 
 	int LaneAdvantage();
-
-	long long m_nTargetId = -1;
 };
