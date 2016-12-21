@@ -450,6 +450,24 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 		}
 	}
 
+	if (m_global.m_nTargetId != -1)
+	{
+		bool bFound = false;
+		for (auto & wizard : m_world->getWizards())
+			if (wizard.getId() == m_global.m_nTargetId)
+			{
+				waypoint.first.first = wizard.getX();
+				waypoint.first.second = wizard.getY();
+				waypoint.second = false;
+				bFound = true;
+				break;
+			}
+		if (!bFound)
+		{
+			m_global.m_nTargetId = -1;
+		}
+	}
+
 	if (m_world->getTickIndex() == 300 && !m_global.m_bIsFinal)
 	{
 		m_bCreepStop = true;
@@ -732,7 +750,21 @@ bool MyStrategy::Shoot()
 	{
 		if (unit.getFaction() == m_self->getFaction())
 			continue;
+
 		double D = m_self->getDistanceTo(unit);
+
+		if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && D <= m_self->getVisionRange() + 100.0)
+		{
+			std::vector<model::Message> m_tMessages = {
+				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
+				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
+				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
+				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) })
+			};
+			m_move->setMessages(m_tMessages);
+			m_global.m_nTargetId = unit.getId();
+		}
+
 		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());
 		double R = std::ceil(T) * m_game->getWizardForwardSpeed();
 		if (D > m_self->getCastRange() + unit.getRadius() - m_game->getMagicMissileRadius() - R - 0.1 + m_global.RangeLevel(*m_self) * m_game->getRangeBonusPerSkillLevel())
@@ -745,6 +777,8 @@ bool MyStrategy::Shoot()
 			&& std::abs(unit.getAngleTo(*m_self)) <= m_game->getStaffSector() / 2.0
 		)
 			P = 50000000.0 * ((unit.getMaxLife() - unit.getLife() + 1.0) / unit.getMaxLife());
+		if (unit.getId() == m_global.m_nTargetId)
+			P = 50000000000000.0;
 		if (P > MAX_PRIORITY)
 		{
 			target = &unit;

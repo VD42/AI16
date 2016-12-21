@@ -110,18 +110,26 @@ gt:
 	{
 		for (auto & message : m_strategy.m_self->getMessages())
 		{
-			if (message.getLane() == model::_LANE_UNKNOWN_)
-				continue;
-			m_bMasterNotSilent = true;
-			m_lane = message.getLane();
-			m_bLaneChoosed = true;
+			if (message.getLane() != model::_LANE_UNKNOWN_)
+			{
+				m_bMasterNotSilent = true;
+				m_lane = message.getLane();
+				m_bLaneChoosed = true;
+			}
 			if (message.getSkillToLearn() != model::_SKILL_UNKNOWN_)
 			{
+				m_bMasterNotSilent = true;
 				m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, message.getSkillToLearn());
 				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
 			}
 			if ((int)message.getRawMessage().size() > 0)
-				m_strategy.m_nLocalId = message.getRawMessage()[0];
+			{
+				m_bMasterNotSilent = true;
+				if (message.getRawMessage()[0] > 0)
+					m_strategy.m_nLocalId = message.getRawMessage()[0];
+				else
+					m_nTargetId = -message.getRawMessage()[0];
+			}
 		}
 	}
 

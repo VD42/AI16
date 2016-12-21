@@ -257,6 +257,9 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 
 const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENEMY_WIZARD = [](MyStrategy & strategy, const model::Wizard & unit)
 {
+	if (unit.getId() == strategy.m_global.m_nTargetId)
+		return 1000.0;
+
 	double DISTANCE = std::hypot(strategy.m_self->getX() - unit.getX(), strategy.m_self->getY() - unit.getY());
 
 	double ENEMY_RANGE = strategy.m_game->getWizardCastRange() + strategy.m_self->getRadius() + strategy.m_game->getMagicMissileRadius() + strategy.m_game->getWizardForwardSpeed() * 2.0 + 1.0 + strategy.m_global.RangeLevel(unit) * strategy.m_game->getRangeBonusPerSkillLevel();
