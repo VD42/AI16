@@ -753,7 +753,7 @@ bool MyStrategy::Shoot()
 
 		double D = m_self->getDistanceTo(unit);
 
-		if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && D <= m_self->getVisionRange() + 100.0)
+		if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && D <= m_self->getVisionRange() + 100.0 && m_global.m_lane == model::LANE_MIDDLE)
 		{
 			std::vector<model::Message> m_tMessages = {
 				model::Message(model::_LANE_UNKNOWN_, model::_SKILL_UNKNOWN_, { (signed char)-((signed char)unit.getId()) }),
@@ -763,6 +763,7 @@ bool MyStrategy::Shoot()
 			};
 			m_move->setMessages(m_tMessages);
 			m_global.m_nTargetId = unit.getId();
+			printf("Tick %d: attack %d!!!\r\n", m_world->getTickIndex(), (int)unit.getId());
 		}
 
 		double T = std::min(15.0, D / m_game->getMagicMissileSpeed());

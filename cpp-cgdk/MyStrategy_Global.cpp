@@ -262,11 +262,27 @@ std::pair<std::pair<double, double>, bool> CGlobal::GetWaypoint()
 			double baseY = m_BS.second + 200.0;
 			bool priority = false;
 
-			if (nCloseToBase < 2 && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
+			int nEnemyCreeps = 0;
+			for (auto & creep : m_strategy.m_world->getMinions())
+			{
+				if (creep.getFaction() == m_strategy.m_self->getFaction())
+					continue;
+				if (creep.getFaction() == model::FACTION_NEUTRAL)
+					continue;
+				if (creep.getDistanceTo(m_strategy.m_game->getMapSize() - 800.0, 800.0) < 50.0)
+					nEnemyCreeps++;
+			}
+
+			if ((nCloseToBase < 2 || nEnemyCreeps > 2) && (m_strategy.m_world->getTickIndex() - 1) % 750 > 550)
 			{
 				baseX = m_BS.first - 800.0;
 				baseY = m_BS.second + 800.0;
 				priority = true;
+			}
+			else if (m_bIsFinal)
+			{
+				baseX = m_BS.first + 150.0;
+				baseY = m_BS.second - 150.0;
 			}
 
 			if (base->getDistanceTo(baseX, baseY) < distance)
