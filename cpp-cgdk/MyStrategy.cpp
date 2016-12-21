@@ -394,11 +394,14 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 		double X = unit.getX();
 		double Y = unit.getY();
+		double R = unit.getRadius();
+		if (unit.getType() == model::PROJECTILE_FIREBALL)
+			R = m_game->getFireballExplosionMaxDamageRange() + (m_game->getFireballExplosionMinDamageRange() - m_game->getFireballExplosionMaxDamageRange()) / 2.0;
 
 		for (int i = 0; i <= 60; i++) // 15 ticks / 4 subticks
 		{
 			double tD = m_self->getDistanceTo(X, Y);
-			if (tD < m_self->getRadius() + unit.getRadius() + 1.0)
+			if (tD < m_self->getRadius() + R + 1.0)
 			{
 				m_bNoShoot = true;
 				AddPower("missile", result, CalcPower(X, Y, -100000.0));
