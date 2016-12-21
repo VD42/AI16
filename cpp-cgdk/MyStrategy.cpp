@@ -628,7 +628,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 
 	AddPower("waypoint", result, CalcPower(waypoint.first.first, waypoint.first.second, 150.0));
 
-	if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && m_global.m_lane == model::LANE_MIDDLE)
+	if (m_global.m_bIsFinal && m_global.m_nTargetId == -1 && m_global.MasterControl() && m_global.m_lane == model::LANE_MIDDLE && m_self->getDistanceTo(m_global.m_BS.first, m_global.m_BS.second) > 500.0)
 	{
 		for (auto & unit : m_world->getWizards())
 		{
