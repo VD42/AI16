@@ -430,7 +430,7 @@ void MyStrategy::move(const model::Wizard & self, const model::World & world, co
 	{
 		if (m_global.OwnLaneControl())
 		{
-			if (pEnMinUnit && enMinBase < 2000.0)
+			if (pEnMinUnit && enMinBase < 2000.0 && m_global.LaneAdvantage() < 2)
 			{
 				m_global.m_lane = m_global.GetLane(*pEnMinUnit);
 				waypoint.first = { pEnMinUnit->getX(), pEnMinUnit->getY() };
