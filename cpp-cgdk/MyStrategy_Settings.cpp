@@ -78,7 +78,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -156,7 +156,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -246,7 +246,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = bImmortal ? 0.0 : 50.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -294,6 +294,9 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 		if (building.getDistanceTo(unit) < ENEMY_RANGE_TO_BUILDING)
 			PW += 10.0;
 	}
+
+	if (strategy.m_global.LaneAdvantage() > 1)
+		PW += 10.0;
 
 	if ((PW > 0.0 || strategy.m_self->getLife() > (unit.getLife() / 2.0) || HAVE_SHIELD(strategy, *strategy.m_self) || HAVE_EMPOWER(strategy, *strategy.m_self)) && !strategy.IsDangerous())
 	{
@@ -349,7 +352,7 @@ const std::function<double(MyStrategy&, const model::Wizard&)> CSettings::PW_ENE
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 75.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -435,7 +438,7 @@ const std::function<double(MyStrategy&, const model::Building&)> CSettings::PW_E
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = bImmortal ? 0.0 : 60.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -543,7 +546,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -624,7 +627,7 @@ const std::function<double(MyStrategy&, const model::Minion&)> CSettings::PW_NEU
 	}
 	else
 	{
-		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF(strategy) + 0.1)))
+		if (DISTANCE <= std::max(MY_RANGE / RANGE_WINDOW_COEF(strategy), ENEMY_RANGE * (RANGE_WINDOW_COEF_ENEMY(strategy) + 0.1)))
 			PW = -3000.0;
 		else
 			PW = 100.0 / ((DISTANCE - MY_RANGE) * (DISTANCE - MY_RANGE) + 1.0);
@@ -916,6 +919,18 @@ const std::vector<model::SkillType> CSettings::GET_SKILLS_ORDER_FOR_SKILL(MyStra
 
 double CSettings::RANGE_WINDOW_COEF(MyStrategy & strategy)
 {
+	double coef = (double)strategy.m_self->getRemainingActionCooldownTicks() / (double)strategy.m_game->getWizardActionCooldownTicks(); // [0, 1] 0 - action, 1 - wait
+	double val = 0.9 + (1.0 - coef) * 0.2;
+	if (strategy.m_global.m_bIsFinal)
+		val = 1.1 + (1.0 - coef) * 0.2;
+	return val;
+}
+
+double CSettings::RANGE_WINDOW_COEF_ENEMY(MyStrategy & strategy)
+{
+	if (strategy.m_global.m_bIsFinal)
+		return 0.9;
+
 	double coef = (double)strategy.m_self->getRemainingActionCooldownTicks() / (double)strategy.m_game->getWizardActionCooldownTicks(); // [0, 1] 0 - action, 1 - wait
 	double val = 0.9 + (1.0 - coef) * 0.2;
 	return val;
