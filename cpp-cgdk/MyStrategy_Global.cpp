@@ -77,19 +77,36 @@ void CGlobal::ChooseLane()
 
 		if (!m_bEgoistMode && MasterControl())
 		{
-			m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, model::SKILL_FIREBALL);
-			std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
-			m_bLaneRush = true;
-			m_lane = model::LANE_MIDDLE;
-			m_bLaneChoosed = true;
-			m_strategy.m_nLocalId = 1;
-			std::vector<model::Message> m_tMessages = {
-				model::Message(model::LANE_MIDDLE, model::SKILL_SHIELD, { 2 }),
-				model::Message(model::LANE_MIDDLE, model::SKILL_FROST_BOLT, { 3 }),
-				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, { 4 }),
-				model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, { 5 })
-			};
-			m_strategy.m_move->setMessages(m_tMessages);
+			if (m_bIsFinal)
+			{
+				m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER_FOR_SKILL(m_strategy, model::SKILL_FIREBALL);
+				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
+				m_bLaneRush = true;
+				m_lane = model::LANE_MIDDLE;
+				m_bLaneChoosed = true;
+				m_strategy.m_nLocalId = 1;
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_MIDDLE, model::SKILL_SHIELD, { 2 }),
+					model::Message(model::LANE_MIDDLE, model::SKILL_FROST_BOLT, { 3 }),
+					model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, { 4 }),
+					model::Message(model::LANE_MIDDLE, model::SKILL_FIREBALL, { 5 })
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
+			}
+			else
+			{
+				m_strategy.m_tSkillsOrder = CSettings::GET_SKILLS_ORDER(m_strategy);
+				std::reverse(m_strategy.m_tSkillsOrder.begin(), m_strategy.m_tSkillsOrder.end());
+				m_lane = model::LANE_MIDDLE;
+				m_bLaneChoosed = true;
+				std::vector<model::Message> m_tMessages = {
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, {}),
+					model::Message(model::LANE_TOP, model::_SKILL_UNKNOWN_, {}),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, {}),
+					model::Message(model::LANE_BOTTOM, model::_SKILL_UNKNOWN_, {})
+				};
+				m_strategy.m_move->setMessages(m_tMessages);
+			}
 			goto gt;
 		}
 

@@ -56,7 +56,7 @@ public:
 
 	void ReCheckLane(bool after_death);
 
-	bool m_bEgoistMode = true;
+	bool m_bEgoistMode = false;
 
 	std::map<long long, model::LaneType> m_mapFriendlyWizardsLane;
 	std::map<long long, model::LaneType> m_mapEnemyWizardsLane;
@@ -70,9 +70,9 @@ public:
 	bool CanGoToBonus();
 
 	bool MasterControl();
-	bool m_bEnableMasterControl = false;
+	bool m_bEnableMasterControl = true;
 
-	bool m_bEnableMasterHeard = false;
+	bool m_bEnableMasterHeard = true;
 
 	bool m_bIsFinal = false;
 
